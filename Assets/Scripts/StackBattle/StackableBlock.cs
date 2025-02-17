@@ -85,4 +85,9 @@ public class StackableBlock : MonoBehaviour
 			{ moveForward = true; }
 		}
 	}
+
+	public void ScaleBlock()
+	{
+
+	}
 }

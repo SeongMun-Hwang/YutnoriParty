@@ -20,9 +20,22 @@ public class StackBattleManager : MonoBehaviour
 	// 현재 차례 플레이어의 인덱스
 	[SerializeField] private int currentPlayerIndex;
 
+	// 게임 블록 관련
+	[SerializeField] private BlockSpawnHandler blockSpawnHandler;
+
 	// 게임 UI 관련
 	[SerializeField] private List<ProfileView> profileViewList;
 	[SerializeField] private TMP_Text orderUI;
+
+	// 게임 상태 관련
+	public enum StackBattleState
+	{
+		Ready,
+		Playing,
+		Wait,
+		GameOver
+	}
+	public StackBattleState state;
 
 	private void OnEnable()
 	{
@@ -33,6 +46,8 @@ public class StackBattleManager : MonoBehaviour
 	private void Init()
 	{
 		currentPlayerIndex = 0;
+		state = StackBattleState.Playing;
+
 		orderUI.text = $"Go, {players[currentPlayerIndex].Name}!";
 		for (int i = 0; i < maxPlayers; i++)
 		{
@@ -41,5 +56,27 @@ public class StackBattleManager : MonoBehaviour
 		}
 	}
 
-	
+	private void Update()
+	{
+		switch (state)
+		{
+			case StackBattleState.Wait:
+				break;
+			case StackBattleState.Playing:
+				if (Input.GetMouseButtonDown(0))
+				{
+					blockSpawnHandler.DropBlock();
+					currentPlayerIndex++;
+					if (currentPlayerIndex >= maxPlayers) { currentPlayerIndex = 0; }
+					orderUI.text = $"Go, {players[currentPlayerIndex].Name}!";
+				}
+				break;
+			case StackBattleState.Ready:
+
+				break;
+			case StackBattleState.GameOver:
+
+				break;
+		}
+	}
 }
