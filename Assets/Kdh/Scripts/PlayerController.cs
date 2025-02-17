@@ -1,4 +1,3 @@
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,32 +6,35 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private float moveDistance = 2f;  // 한 번 이동할 거리
     [SerializeField] private float moveSpeed = 5f;     // 이동 속도
 
-    private Vector3 targetPosition;  // 목표 위치
+    private Vector3 targetPosition;
 
     private void Start()
     {
-        targetPosition = transform.position;  // 초기 목표 위치를 현재 위치로 설정
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
+        targetPosition = spawnTransform.position;
+        
     }
 
     private void Update()
     {
-        if (!IsOwner) return; // 네트워크에서 본인만 조작 가능
-
-        // 스페이스바를 누르면 앞으로 이동
+        if (!IsOwner) return; // 본인만 조작 가능하도록 설정
+        Camera.main.transform.position = transform.position + new Vector3(0, 5, 5);
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            MoveForwardServerRpc();
+            MoveForwardServerRpc(OwnerClientId);  
         }
 
-        // 부드럽게 이동
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
     }
 
     [ServerRpc]
-    private void MoveForwardServerRpc()
+    private void MoveForwardServerRpc(ulong clientId)
     {
+        // 해당 클라이언트만 위치 변경
+        if (OwnerClientId != clientId) return;
+
         targetPosition += transform.forward * moveDistance;
-        MoveClientRpc(targetPosition);  // 모든 클라이언트에 적용
+        MoveClientRpc(targetPosition);
     }
 
     [ClientRpc]
