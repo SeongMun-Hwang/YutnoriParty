@@ -20,11 +20,11 @@ public class Node : MonoBehaviour
     }
     public Node GetPrevNode()
     {
-        if (prevNode.Count == 0)
+        if (prevNode.Count == 1)
         {
             return prevNode[0];
         }
-        if (prevNode.Count > 0)
+        if (prevNode.Count > 1)
         {
             return prevNode[Random.Range(0, prevNode.Count)];
         }
