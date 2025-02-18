@@ -8,12 +8,20 @@ public class UIManager : MonoBehaviour
 {
 	public Button HostButton;
 	public Button ClientButton;
+
+	public Button StartButton;
+
 	public TMP_InputField InputField;
 
 	private void Start()
 	{
 		HostButton.onClick.AddListener(() => HostButtonClicked());
 		ClientButton.onClick.AddListener(() => ClientButtonClicked());
+	}
+
+	private void Update()
+	{
+		StartButton.gameObject.SetActive(NetworkManager.Singleton.IsHost);
 	}
 
 	public void HostButtonClicked()

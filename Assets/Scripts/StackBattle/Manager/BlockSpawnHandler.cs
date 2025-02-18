@@ -34,7 +34,7 @@ public class BlockSpawnHandler : MonoBehaviour
 		GameObject previousTile = stack[stack.Count - 1];
 		GameObject activeTile;
 
-		activeTile = Instantiate(blockPrefab);
+		activeTile = Instantiate(blockPrefab, transform.parent);
 		stack.Add(activeTile);
 
 		if (stack.Count > 2)
