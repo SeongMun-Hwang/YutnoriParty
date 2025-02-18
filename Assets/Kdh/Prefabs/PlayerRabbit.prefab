@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       propertyPath: m_Name
-      value: DGN_Rabbit_NoOutline Variant 1
+      value: PlayerRabbit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -46,13 +46,13 @@ PrefabInstance:
       addedObject: {fileID: -2611304641810267959}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3184778561082994700}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7632928068130819411}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3015282010839161828}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -2920621726764487699}
   m_SourcePrefab: {fileID: 100100000, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
 --- !u!1 &4333027581788519372 stripped
 GameObject:
@@ -69,7 +69,7 @@ Animator:
   m_GameObject: {fileID: 4333027581788519372}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a3ad39b8c24804741a9e132ba61b1ec5, type: 3}
-  m_Controller: {fileID: 9100000, guid: eece9535d347cea40bb8e2f3eb653410, type: 2}
+  m_Controller: {fileID: 9100000, guid: 02602da5b64d16649b3ded3bae7f6992, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 626788713
+  GlobalObjectIdHash: 1393282569
   InScenePlacedSourceGlobalObjectIdHash: 1393282569
   DeferredDespawnTick: 0
   Ownership: 1
@@ -144,21 +144,6 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3184778561082994700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4333027581788519372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 1182734588217233356}
 --- !u!114 &7632928068130819411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,3 +207,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-2920621726764487699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4333027581788519372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca167d331b5e914789558f1e8fe11c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 1182734588217233356}

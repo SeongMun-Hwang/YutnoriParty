@@ -7,17 +7,18 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private float moveSpeed = 5f;     // 이동 속도
 
     private Vector3 targetPosition;
-
+    private Animator animator;
+    private bool canMove = false;
     private void Start()
     {
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
-        
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        if (!IsOwner) return; // 본인만 조작 가능하도록 설정
+        if (!IsOwner || !canMove) return;
         Camera.main.transform.position = transform.position + new Vector3(0, 5, 5);
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -25,12 +26,14 @@ public class PlayerController : NetworkBehaviour
         }
 
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
+        animator.SetFloat("MoveSpeed", moveSpeedValue);
     }
 
     [ServerRpc]
     private void MoveForwardServerRpc(ulong clientId)
     {
-        // 해당 클라이언트만 위치 변경
+       
         if (OwnerClientId != clientId) return;
 
         targetPosition += transform.forward * moveDistance;
@@ -41,5 +44,9 @@ public class PlayerController : NetworkBehaviour
     private void MoveClientRpc(Vector3 newPosition)
     {
         targetPosition = newPosition;
+    }
+    public void EnableControl(bool enable)
+    {
+        canMove = enable;
     }
 }

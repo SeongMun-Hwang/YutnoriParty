@@ -6,7 +6,7 @@ public class GrandmotherChase : NetworkBehaviour
     [SerializeField] private float chaseSpeed = 3f;  // 할머니의 이동 속도
     [SerializeField] private Vector3 chaseDirection = Vector3.forward;  // 이동 방향
     [SerializeField] private Vector3 initialPosition; // 초기 위치
-
+    private bool canChase = false;
     private Vector3 grandmotherPosition;  // 할머니의 현재 위치
 
     public override void OnNetworkSpawn()
@@ -22,7 +22,7 @@ public class GrandmotherChase : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsServer) return;  // 서버에서만 실행
+        if (!IsServer || !canChase) return;
 
         MoveGrandmother();
     }
@@ -58,10 +58,15 @@ public class GrandmotherChase : NetworkBehaviour
     private void PlayerEliminated(PlayerController player)
     {
         Debug.Log(player.name + "이 탈락했습니다!");
-        player.gameObject.SetActive(false);
+        
         if (IsServer)
         {
             FindAnyObjectByType<GameManager>().CheckRemainingPlayers();
         }
+        player.EnableControl(false);
+    }
+    public void EnableChase()
+    {
+        canChase = true;
     }
 }
