@@ -61,7 +61,7 @@ public class GrandmotherChase : NetworkBehaviour
         
         if (IsServer)
         {
-            FindAnyObjectByType<GameManager>().CheckRemainingPlayers();
+            FindAnyObjectByType<GarndMaGameManager>().CheckRemainingPlayers();
         }
         player.EnableControl(false);
     }
