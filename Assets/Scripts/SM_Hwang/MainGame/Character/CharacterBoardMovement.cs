@@ -1,8 +1,12 @@
-using TMPro;
+using System.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
+enum CharacterMove
+{
+    Forward,
+    Backward
+}
 public class CharacterBoardMovement : NetworkBehaviour
 {
     private Animator animator;
@@ -13,8 +17,16 @@ public class CharacterBoardMovement : NetworkBehaviour
 
     private void Start()
     {
-        targetPos = new Vector3(10, 0, -6);
+        StartCoroutine(WaitForStartNode());
         animator = GetComponent<Animator>();
+    }
+    private IEnumerator WaitForStartNode()
+    {
+        while (GameManager.Instance == null)
+        {
+            yield return null;
+        }
+        currentNode = GameManager.Instance.startNode;
     }
     void Update()
     {
@@ -28,46 +40,46 @@ public class CharacterBoardMovement : NetworkBehaviour
             MoveToPrevNode();
         }
     }
-    private void FixedUpdate()
+    public void MoveToNextNode(int distance = 1)
     {
-        if (!IsOwner) return;
-        if (isMoving)
+        StartCoroutine(MoveToTargetPos(distance, CharacterMove.Forward));
+    }
+    public void MoveToPrevNode(int distance = 1)
+    {
+        StartCoroutine(MoveToTargetPos(distance, CharacterMove.Backward));
+    }
+    private IEnumerator MoveToTargetPos(int distance, CharacterMove dir)
+    {
+        isMoving = true;
+        animator.SetFloat("isMoving", 1f);
+
+        for (int i = 0; i < distance; i++)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, targetPos) < 0.01f)
+            Node tmpNode = null;
+            if (dir == CharacterMove.Forward) tmpNode = currentNode.GetNextNode();
+            else if (dir == CharacterMove.Backward) tmpNode = currentNode.GetPrevNode();
+            if(tmpNode == null)
             {
-                transform.position = targetPos;
-                isMoving = false;
-                animator.SetFloat("isMoving", isMoving ? 1f : 0f);
+                EnterGoal();
+                yield break;
             }
-        }
-    }
-    public void MoveToNextNode()
-    {
-        if (currentNode == null)
-        {
+            targetPos=tmpNode.transform.position;
+
             targetPos.y = transform.position.y;
+            while (Vector3.Distance(transform.position, targetPos) > 0.01f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+                yield return null;
+            }
+            transform.position = targetPos;
+            currentNode = tmpNode;
         }
-        else
-        {
-            targetPos = currentNode.nextNode[Random.Range(0, currentNode.nextNode.Count)].transform.position;
-            targetPos.y = transform.position.y;
-        }
-        isMoving = true;
-        animator.SetFloat("isMoving", isMoving ? 1f : 0f);
+        isMoving = false;
+        animator.SetFloat("isMoving", 0f);
     }
-    public void MoveToPrevNode()
+    private void EnterGoal()
     {
-        targetPos = currentNode.prevNode[Random.Range(0, currentNode.prevNode.Count)].transform.position;
-        targetPos.y = transform.position.y;
-        isMoving = true;
-        animator.SetFloat("isMoving", isMoving ? 1f : 0f);
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Node"))
-        {
-            currentNode = other.GetComponent<Node>();
-        }
+        Debug.Log("EnterGoal");
+        Destroy(gameObject);
     }
 }
