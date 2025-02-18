@@ -5,7 +5,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class GarndMaGameManager : NetworkBehaviour
+public class GrandMaGameManager : NetworkBehaviour
 {
     [SerializeField] private Collider goalArea;
     [SerializeField] private TextMeshProUGUI countdownText;
