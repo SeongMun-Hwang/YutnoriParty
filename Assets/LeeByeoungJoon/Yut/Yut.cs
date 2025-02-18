@@ -1,11 +1,13 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Yut : MonoBehaviour
 {
-    [HideInInspector] public Transform origin;
+    [HideInInspector] public Vector3 originPos;
+    [HideInInspector] public Quaternion originRot;
 
-    Rigidbody rigidbody;
+    new Rigidbody rigidbody;
     [SerializeField] GameObject yutModel;
 
     public GameObject GameObject { get { return gameObject; } }
