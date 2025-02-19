@@ -60,6 +60,7 @@ public class CharacterBoardMovement : NetworkBehaviour
             transform.position = targetPos;
             currentNode = tmpNode;
         }
+        GameManager.Instance.mainGameProgress.EndMove();
         animator.SetFloat("isMoving", 0f);
     }
     private void EnterGoal()
