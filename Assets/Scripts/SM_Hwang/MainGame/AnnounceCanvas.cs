@@ -7,13 +7,8 @@ public class AnnounceCanvas : NetworkBehaviour
 {
     [SerializeField] GameObject announceTmp;
 
-    [ServerRpc]
-    public void StartAnnounceCoroutineServerRpc(string str, float time)
-    {
-        ShowAnnounceTextClientRpc(str, time);
-    }
     [ClientRpc]
-    private void ShowAnnounceTextClientRpc(string str,float time)
+    public void ShowAnnounceTextClientRpc(string str,float time)
     {
         StartCoroutine(ShowAnnounceText(str, time));
     }

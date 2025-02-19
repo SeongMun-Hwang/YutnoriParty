@@ -13,7 +13,6 @@ public class CharacterBoardMovement : NetworkBehaviour
     Node currentNode;
     Vector3 targetPos;
     float moveSpeed = 10f;
-    bool isMoving = false;
 
     private void Start()
     {
@@ -28,18 +27,6 @@ public class CharacterBoardMovement : NetworkBehaviour
         }
         currentNode = GameManager.Instance.startNode;
     }
-    void Update()
-    {
-        if (!IsOwner) return;
-        if (Input.GetMouseButtonDown(0) && !isMoving)
-        {
-            MoveToNextNode();
-        }
-        if (Input.GetMouseButtonDown(1) && !isMoving)
-        {
-            MoveToPrevNode();
-        }
-    }
     public void MoveToNextNode(int distance = 1)
     {
         StartCoroutine(MoveToTargetPos(distance, CharacterMove.Forward));
@@ -50,7 +37,6 @@ public class CharacterBoardMovement : NetworkBehaviour
     }
     private IEnumerator MoveToTargetPos(int distance, CharacterMove dir)
     {
-        isMoving = true;
         animator.SetFloat("isMoving", 1f);
 
         for (int i = 0; i < distance; i++)
@@ -74,7 +60,6 @@ public class CharacterBoardMovement : NetworkBehaviour
             transform.position = targetPos;
             currentNode = tmpNode;
         }
-        isMoving = false;
         animator.SetFloat("isMoving", 0f);
     }
     private void EnterGoal()

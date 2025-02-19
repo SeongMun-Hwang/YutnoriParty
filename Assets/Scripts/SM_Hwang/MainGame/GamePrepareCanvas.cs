@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class GamePrepareCanvas :NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI playerTmp;
-    [SerializeField] AnnounceCanvas announceCanvas;
     [SerializeField] Button gameStartBtn;
 
     public override void OnNetworkSpawn()
@@ -31,13 +30,12 @@ public class GamePrepareCanvas :NetworkBehaviour
     {
         if(NetworkManager.ConnectedClients.Count > 1)
         {
-            announceCanvas.StartAnnounceCoroutineServerRpc("Game Start!", 2f);
-            GameManager.Instance.StartGame();
+            GameManager.Instance.mainGameProgress.StartGame();
             gameObject.GetComponent<NetworkObject>().Despawn();
         }
         else
         {
-            announceCanvas.StartAnnounceCoroutineServerRpc("Players not enough!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Players not enough!", 2f);
         }
     }
     public void RoomOut()
