@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum YutResult
 {
@@ -20,12 +21,13 @@ public class YutManager : NetworkBehaviour
     [SerializeField] YutResults yutResultPrefab;
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
+    [SerializeField] Image powerGage;
 
     List<Yut> yuts = new List<Yut>();
     List<YutResult> results = new List<YutResult>();
 
     int faceDown = 0;
-    float throwPower = 10;
+    public float throwPower = 10;
     float torque = 3;
     float yutSpacing = 2;
     float waitTime = 10;
@@ -35,7 +37,7 @@ public class YutManager : NetworkBehaviour
     public int yutNum = 4;
     public int throwChance = 0;
 
-    //½Ì±ÛÅæ ¾Æ´Ô
+    //ì‹±ê¸€í†¤ ì•„ë‹˜
     static YutManager instance;
     static public YutManager Instance
     {
@@ -45,34 +47,39 @@ public class YutManager : NetworkBehaviour
         }
     }
 
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public override void OnNetworkSpawn()
     {
-        //¼­¹ö¿¡¼­¸¸ À· ¼ÒÈ¯
+        //ì„œë²„ì—ì„œë§Œ ìœ· ì†Œí™˜
         if (!IsServer) return;
 
         Vector3 pos = yutSpawnTransform.position;
 
         for (int i = 0; i < yutNum; i++)
         {
-            //À· ¼ÒÈ¯ÇÏ°í
+            //ìœ· ì†Œí™˜í•˜ê³ 
             yuts.Add(Instantiate(yutPrefab));
             
             Yut yut = yuts[i];
-            //À· ÀüÃ¼ÀÇ Áß½É À§Ä¡ ¸ÂÃß±â À§ÇÑ ¶Ë²¿¼î
+            //ìœ· ì „ì²´ì˜ ì¤‘ì‹¬ ìœ„ì¹˜ ë§ì¶”ê¸° ìœ„í•œ ë˜¥ê¼¬ì‡¼
             yut.transform.position = pos + new Vector3(0, 0, -((yutNum - 1) * yutSpacing) / 2);
             yut.GetComponent<NetworkObject>().Spawn();
 
-            //À§Ä¡ Àâ¾ÆÁÖ°í
+            //ìœ„ì¹˜ ì¡ì•„ì£¼ê³ 
             if (i > 0)
             {
                 yut.transform.position = yuts[i - 1].transform.position + new Vector3(0, 0, yutSpacing);
             }
 
-            //ÃÊ±âÈ­µÈ À§Ä¡ ÀúÀå
+            //ì´ˆê¸°í™”ëœ ìœ„ì¹˜ ì €ì¥
             yut.originPos = yut.transform.position;
             yut.originRot = yut.transform.rotation;
 
-            //¾Èº¸ÀÌ°Ô ÇÏ±â
+            //ì•ˆë³´ì´ê²Œ í•˜ê¸°
             //yut.gameObject.SetActive(false);
         }
     }
@@ -88,26 +95,26 @@ public class YutManager : NetworkBehaviour
     void MyTurn()
     {
         throwChance = 1;
-        Debug.Log("³»ÅÏ, ´øÁú ±âÈ¸ +1");
+        Debug.Log("ë‚´í„´, ë˜ì§ˆ ê¸°íšŒ +1");
     }
 
     public void ThrowButtonPressed()
     {
-        //Áö±İ ´©±¸ ÅÏÀÎÁö
-        if ((ulong)GameManager.Instance.mainGameProgress.currentPlayerNumber != NetworkManager.LocalClientId)
-        {
-            return;
-        }
-        //´øÁú ±âÈ¸°¡ ³²¾Ò´ÂÁö
+        //ì§€ê¸ˆ ëˆ„êµ¬ í„´ì¸ì§€
+        //if ((ulong)GameManager.Instance.mainGameProgress.currentPlayerNumber != NetworkManager.LocalClientId)
+        //{
+        //    return;
+        //}
+        //ë˜ì§ˆ ê¸°íšŒê°€ ë‚¨ì•˜ëŠ”ì§€
         if (throwChance < 1)
         {
-            Debug.Log("´øÁú ±âÈ¸ ¾øÀ½");
+            Debug.Log("ë˜ì§ˆ ê¸°íšŒ ì—†ìŒ");
             return;
         }
-        //À· ¸î°³ ´øÁúÁö È®ÀÎ
+        //ìœ· ëª‡ê°œ ë˜ì§ˆì§€ í™•ì¸
         ThrowYutsServerRpc(yutNum, new ServerRpcParams());
         throwChance--;
-        Debug.Log("´øÁü");
+        Debug.Log("ë˜ì§");
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -119,18 +126,18 @@ public class YutManager : NetworkBehaviour
         {
             Yut yut = yuts[i];
 
-            //À·À» ¿ø·¡ À§Ä¡·Î µ¹¸®±â
-            yut.transform.localPosition = yut.originPos; //¿Ü¾Ê‰à?
-            yut.transform.localRotation = yut.originRot; //¿Ü¾Ê‰à? ÀÌÁ¦ ‰à!
+            //ìœ·ì„ ì›ë˜ ìœ„ì¹˜ë¡œ ëŒë¦¬ê¸°
+            yut.transform.localPosition = yut.originPos; //ì™¸ì•Šë¢?
+            yut.transform.localRotation = yut.originRot; //ì™¸ì•Šë¢? ì´ì œ ë¢!
 
-            //º¸ÀÌ°Ô ÇÏ±â
+            //ë³´ì´ê²Œ í•˜ê¸°
             //yut.gameObject.SetActive(true);
 
-            //À· ´øÁö±â
-            //´øÁö±â Àü¿¡ ¿òÁ÷ÀÓÀ» ¾ø¾Ö°í(ÀÌ»óÇÑ ¹æÇâÀ¸·Î ³¯¶ó°¡´Â°Å ¹æÁö)
+            //ìœ· ë˜ì§€ê¸°
+            //ë˜ì§€ê¸° ì „ì— ì›€ì§ì„ì„ ì—†ì• ê³ (ì´ìƒí•œ ë°©í–¥ìœ¼ë¡œ ë‚ ë¼ê°€ëŠ”ê±° ë°©ì§€)
             yut.Rigidbody.linearVelocity = Vector3.zero;
             yut.Rigidbody.angularVelocity = Vector3.zero;
-            //À·¿¡ ÈûÀ» °¡ÇØ À§ÂÊ ¹æÇâÀ¸·Î ´øÁö°í, ·£´ıÇÑ ÅäÅ©¸¦ °¡ÇØ ¾Õ µŞ¸éÀ» Á¶ÀıÇÑ´Ù
+            //ìœ·ì— í˜ì„ ê°€í•´ ìœ„ìª½ ë°©í–¥ìœ¼ë¡œ ë˜ì§€ê³ , ëœë¤í•œ í† í¬ë¥¼ ê°€í•´ ì• ë’·ë©´ì„ ì¡°ì ˆí•œë‹¤
             yut.Rigidbody.AddForce(Vector3.up * throwPower, ForceMode.Impulse);
             yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
         }
@@ -144,26 +151,26 @@ public class YutManager : NetworkBehaviour
 
         bool yutStable = false;
 
-        //ÀÏÁ¤ ½Ã°£µ¿¾È ¹İº¹
-        //waitTime ¾È¿¡ °á°ú°¡ ¾È³ª¿À¸é ¿¡·¯³²
+        //ì¼ì • ì‹œê°„ë™ì•ˆ ë°˜ë³µ
+        //waitTime ì•ˆì— ê²°ê³¼ê°€ ì•ˆë‚˜ì˜¤ë©´ ì—ëŸ¬ë‚¨
         while (timePassed < waitTime)
         {
-            //1ÃÊ¸¶´Ù À· »óÅÂ¸¦ È®ÀÎ
+            //1ì´ˆë§ˆë‹¤ ìœ· ìƒíƒœë¥¼ í™•ì¸
             yield return new WaitForSecondsRealtime(waitInterval);
 
             for(int i = 0; i < yutNums; i++)
             {
                 Yut yut = yuts[i];
 
-                //À·ÀÌ ¸ØÃçÀÖÀ¸¸é °á°ú È®ÀÎ °¡´ÉÇÑ°É·Î ÆÇ´Ü -> ¿ÏÀüÈ÷ ¾È¸ØÃß¸é °á°ú ¾È³ª¿È
+                //ìœ·ì´ ë©ˆì¶°ìˆìœ¼ë©´ ê²°ê³¼ í™•ì¸ ê°€ëŠ¥í•œê±¸ë¡œ íŒë‹¨ -> ì™„ì „íˆ ì•ˆë©ˆì¶”ë©´ ê²°ê³¼ ì•ˆë‚˜ì˜´
                 if(yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
                 {
-                    //´Ù ¸ØÃß¸é true·Î À¯Áö
+                    //ë‹¤ ë©ˆì¶”ë©´ trueë¡œ ìœ ì§€
                     yutStable = true;
                 }
                 else
                 {
-                    //ÇÏ³ª¶óµµ ¾È¸ØÃçÀÖÀ¸¸é ·çÇÁ Áö¼Ó
+                    //í•˜ë‚˜ë¼ë„ ì•ˆë©ˆì¶°ìˆìœ¼ë©´ ë£¨í”„ ì§€ì†
                     yutStable = false;
                 }
             }
@@ -174,18 +181,18 @@ public class YutManager : NetworkBehaviour
                 {
                     Yut yut = yuts[i];
 
-                    //·¹ÀÌÄ³½ºÆ® ÇØ¼­ ¾ÕµŞ¸é °è»ê
-                    //À· °á°ú °è»ê
+                    //ë ˆì´ìºìŠ¤íŠ¸ í•´ì„œ ì•ë’·ë©´ ê³„ì‚°
+                    //ìœ· ê²°ê³¼ ê³„ì‚°
                     if (CalcYutResult(yut))
                     {
-                        //¹éµµ °è»ê
+                        //ë°±ë„ ê³„ì‚°
                         if (i == 0)
                         {
                             backDo = true;
                         }
 
                         faceDown++;
-                        //Debug.Log("µŞ¸é +1, ÃÑ °³¼ö : " + faceDown);
+                        //Debug.Log("ë’·ë©´ +1, ì´ ê°œìˆ˜ : " + faceDown);
                     }
                 }
                 break;
@@ -194,11 +201,11 @@ public class YutManager : NetworkBehaviour
             timePassed += waitInterval;
         }
 
-        //Debug.Log("ÃÑ °³¼ö : " + faceDown);
+        //Debug.Log("ì´ ê°œìˆ˜ : " + faceDown);
         if (!yutStable)
         {
-            Debug.Log("°á°ú »êÃâ ½ÇÆĞ : Å¸ÀÓ¾Æ¿ô");
-            //Å¸ÀÓ¾Æ¿ô³ª¸é ´Ù½Ã ´øÁú ¼ö ÀÖ°Ô ±âÈ¸ ´õ ÁÜ
+            Debug.Log("ê²°ê³¼ ì‚°ì¶œ ì‹¤íŒ¨ : íƒ€ì„ì•„ì›ƒ");
+            //íƒ€ì„ì•„ì›ƒë‚˜ë©´ ë‹¤ì‹œ ë˜ì§ˆ ìˆ˜ ìˆê²Œ ê¸°íšŒ ë” ì¤Œ
             ThrowChanceChangeClientRpc(1, senderId);
 
             yield break;
@@ -240,19 +247,19 @@ public class YutManager : NetworkBehaviour
         Debug.DrawRay(yut.transform.position, yut.transform.right * 10, Color.red, 0.3f);
         if (Physics.Raycast(yut.transform.position, yut.transform.right, out hit, 10, ground))
         {
-            //Debug.Log("µŞ¸éÀÓ");
+            //Debug.Log("ë’·ë©´ì„");
             return true;
         }
-        //Debug.Log("¾Õ¸éÀÓ");
+        //Debug.Log("ì•ë©´ì„");
         return false;
     }
 
     [ClientRpc]
     void AddYutResultClientRpc(YutResult result, ulong senderId)
     {
-        //Debug.Log("·ÎÄÃ Å¬¶óÀÌ¾ğÆ® id : " + NetworkManager.Singleton.LocalClientId + "\nrpc¿äÃ» id : " + senderId + "\n¿À³Ê Å¬¶óÀÌ¾ğÆ® id : " + OwnerClientId);
+        //Debug.Log("ë¡œì»¬ í´ë¼ì´ì–¸íŠ¸ id : " + NetworkManager.Singleton.LocalClientId + "\nrpcìš”ì²­ id : " + senderId + "\nì˜¤ë„ˆ í´ë¼ì´ì–¸íŠ¸ id : " + OwnerClientId);
 
-        //À· ´øÁö´Â°Å ¿äÃ»ÇÑ Å¬¶óÀÌ¾ğÆ®ÀÇ À· °á°úÃ¢À» °»½Å
+        //ìœ· ë˜ì§€ëŠ”ê±° ìš”ì²­í•œ í´ë¼ì´ì–¸íŠ¸ì˜ ìœ· ê²°ê³¼ì°½ì„ ê°±ì‹ 
         if (senderId == NetworkManager.Singleton.LocalClientId)
         {
             results.Add(result);
@@ -261,9 +268,9 @@ public class YutManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void ThrowChanceChangeClientRpc(int num, ulong senderId)
+    public void ThrowChanceChangeClientRpc(int num, ulong senderId)
     {
-        //ÇØ´ç Å¬¶óÀÌ¾ğÆ®ÀÇ À· ´øÁö±â È½¼ö¸¦ °»½Å
+        //í•´ë‹¹ í´ë¼ì´ì–¸íŠ¸ì˜ ìœ· ë˜ì§€ê¸° íšŸìˆ˜ë¥¼ ê°±ì‹ 
         if(senderId == NetworkManager.Singleton.LocalClientId)
         {
             throwChance += num;
