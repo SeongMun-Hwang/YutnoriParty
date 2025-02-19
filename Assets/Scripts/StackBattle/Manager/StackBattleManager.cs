@@ -18,17 +18,15 @@ public class StackBattleManager : NetworkBehaviour
 	public Button turnButton;
 	public BlockSpawnHandler spawner;
 
-	private void Init()
+	private void Start()
 	{
-		if (IsClient || IsHost)
+		turnButton.onClick.AddListener(() =>
 		{
-			turnButton.onClick.AddListener(() =>
+			if (NetworkManager.Singleton.IsClient)
 			{
 				RequestNextTurnServerRpc(NetworkManager.Singleton.LocalClientId);
-			});
-
-			Debug.Log("턴 버튼 리스너 등록 완료");
-		}
+			}
+		});
 
 		currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
 		currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
@@ -41,8 +39,6 @@ public class StackBattleManager : NetworkBehaviour
 		{
 			NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
 		}
-
-		Init();
 	}
 
 	private void OnPlayerJoined(ulong clientId)
@@ -64,10 +60,11 @@ public class StackBattleManager : NetworkBehaviour
 	{
 		if (currentTurnPlayerId.Value == senderClientId)
 		{
+			spawner.DropBlock();
 			int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
 			currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
-			spawner.DropBlock();
+			spawner.CreateBlock();
 		}
 	}
 
