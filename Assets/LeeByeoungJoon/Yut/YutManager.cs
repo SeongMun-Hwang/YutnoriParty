@@ -23,7 +23,6 @@ public class YutManager : NetworkBehaviour
 
     List<Yut> yuts = new List<Yut>();
     List<YutResult> results = new List<YutResult>();
-    //NetworkList<Yut> a = new NetworkList<Yut>();
 
     int faceDown = 0;
     float throwPower = 10;
@@ -103,13 +102,13 @@ public class YutManager : NetworkBehaviour
         }
         //윷 몇개 던질지 확인
         ThrowYutsServerRpc(yutNum, new ServerRpcParams());
+        throwChance--;
         Debug.Log("던짐");
     }
 
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, ServerRpcParams rpcParams)
     {
-        throwChance--;
         backDo = false;
         faceDown = 0;
         for(int i = 0; i < yutNums; i++)
@@ -137,6 +136,8 @@ public class YutManager : NetworkBehaviour
 
     IEnumerator YutResultCheck(float timePassed, int yutNums, ServerRpcParams rpcParams)
     {
+        ulong senderId = rpcParams.Receive.SenderClientId;
+
         bool yutStable = false;
 
         //일정 시간동안 반복
@@ -192,46 +193,38 @@ public class YutManager : NetworkBehaviour
         //Debug.Log("총 개수 : " + faceDown);
         if (!yutStable)
         {
-            Debug.Log("결과 산출 실패");
-            //다시 던질 수 있게 기회 더 줌
+            Debug.Log("결과 산출 실패 : 타임아웃");
+            //타임아웃나면 다시 던질 수 있게 기회 더 줌
+            ThrowChanceChangeClientRpc(1, senderId);
 
             yield break;
         }
 
-        ulong senderId = rpcParams.Receive.SenderClientId;
-
         switch (faceDown)
         {
             case 0:
-                //results.Add(YutResult.Mo);
                 AddYutResultClientRpc(YutResult.Mo, senderId);
-                throwChance++;
+                ThrowChanceChangeClientRpc(1, senderId);
                 break;
             case 1:
                 if (backDo)
                 {
-                    //results.Add(YutResult.BackDo);
                     AddYutResultClientRpc(YutResult.BackDo, senderId);
                     break;
                 }
-                //results.Add(YutResult.Do);
                 AddYutResultClientRpc(YutResult.Do, senderId);
                 break;
             case 2:
-                //results.Add(YutResult.Gae);
                 AddYutResultClientRpc(YutResult.Gae, senderId);
                 break;
             case 3:
-                //results.Add(YutResult.Gur);
                 AddYutResultClientRpc(YutResult.Gur, senderId);
                 break;
             case 4:
-                //results.Add(YutResult.Yut);
                 AddYutResultClientRpc(YutResult.Yut, senderId);
-                throwChance++;
+                ThrowChanceChangeClientRpc(1, senderId);
                 break;
             default:
-                //results.Add(YutResult.Error);
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
@@ -260,6 +253,16 @@ public class YutManager : NetworkBehaviour
         {
             results.Add(result);
             Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
+        }
+    }
+
+    [ClientRpc]
+    void ThrowChanceChangeClientRpc(int num, ulong senderId)
+    {
+        //해당 클라이언트의 윷 던지기 횟수를 갱신
+        if(senderId == NetworkManager.Singleton.LocalClientId)
+        {
+            throwChance += num;
         }
     }
 }
