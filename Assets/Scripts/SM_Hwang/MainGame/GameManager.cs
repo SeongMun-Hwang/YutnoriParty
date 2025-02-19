@@ -18,5 +18,8 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
         }
     }
-    public Node startNode;
+    public AnnounceCanvas announceCanvas;
+    public GameObject inGameCanvas;
+    public MainGameProgress mainGameProgress;
+    public Node startNode;    
 }
