@@ -19,25 +19,31 @@ public class YutResults : NetworkBehaviour
         switch (yutResult)
         {
             case YutResult.BackDo:
-                Debug.Log("-1");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(1);
+                //Debug.Log("-1");
                 break;
             case YutResult.Do:
-                Debug.Log("1");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(1);
+                //Debug.Log("1");
                 break;
             case YutResult.Gae:
-                Debug.Log("2");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(2);
+                //Debug.Log("2");
                 break;
             case YutResult.Gur:
-                Debug.Log("3");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(3);
+                //Debug.Log("3");
                 break;
             case YutResult.Yut:
-                Debug.Log("4");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(4);
+                //Debug.Log("4");
                 break;
             case YutResult.Mo:
-                Debug.Log("5");
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(5);
+                //Debug.Log("5");
                 break;
         }
-
+        
         //¹öÆ° ¾ø¾Ú
         Destroy(gameObject);
     }

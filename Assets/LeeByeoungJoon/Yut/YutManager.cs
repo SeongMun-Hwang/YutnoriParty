@@ -94,6 +94,10 @@ public class YutManager : NetworkBehaviour
     public void ThrowButtonPressed()
     {
         //지금 누구 턴인지
+        if ((ulong)GameManager.Instance.mainGameProgress.currentPlayerNumber != NetworkManager.LocalClientId)
+        {
+            return;
+        }
         //던질 기회가 남았는지
         if (throwChance < 1)
         {
