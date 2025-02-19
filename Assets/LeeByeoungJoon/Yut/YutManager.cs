@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public enum YutResult
@@ -12,15 +13,17 @@ public enum YutResult
     BackDo,
     Error
 }
-public class YutManager : MonoBehaviour
+public class YutManager : NetworkBehaviour
 {
     [SerializeField] Yut yutPrefab;
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
+    [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
 
-    List<Yut> yuts;
+    List<Yut> yuts = new List<Yut>();
     List<YutResult> results = new List<YutResult>();
+    //NetworkList<Yut> a = new NetworkList<Yut>();
 
     int faceDown = 0;
     float throwPower = 10;
@@ -31,6 +34,7 @@ public class YutManager : MonoBehaviour
     bool backDo = false;
 
     public int yutNum = 4;
+    public int throwChance = 0;
 
     //싱글톤 아님
     static YutManager instance;
@@ -42,21 +46,35 @@ public class YutManager : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        yuts = new List<Yut>();
-        for(int i=0; i<yutNum; i++)
-        {
-            yuts.Add(Instantiate(yutPrefab));
-            if(i > 0)
-            {
-                yuts[i].transform.position = yuts[i-1].transform.position + new Vector3(0, 0, yutSpacing);
-            }
-            
-            yuts[i].originPos = yuts[i].transform.position;
-            yuts[i].originRot = yuts[i].transform.rotation;
-            //yuts[i].gameObject.SetActive(false);
+        //서버에서만 윷 소환
+        if (!IsServer) return;
 
+        Vector3 pos = yutSpawnTransform.position;
+
+        for (int i = 0; i < yutNum; i++)
+        {
+            //윷 소환하고
+            yuts.Add(Instantiate(yutPrefab));
+            
+            Yut yut = yuts[i];
+            //윷 전체의 중심 위치 맞추기 위한 똥꼬쇼
+            yut.transform.position = pos + new Vector3(0, 0, -((yutNum - 1) * yutSpacing) / 2);
+            yut.GetComponent<NetworkObject>().Spawn();
+
+            //위치 잡아주고
+            if (i > 0)
+            {
+                yut.transform.position = yuts[i - 1].transform.position + new Vector3(0, 0, yutSpacing);
+            }
+
+            //초기화된 위치 저장
+            yut.originPos = yut.transform.position;
+            yut.originRot = yut.transform.rotation;
+
+            //안보이게 하기
+            //yut.gameObject.SetActive(false);
         }
     }
 
@@ -64,42 +82,60 @@ public class YutManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            foreach (var result in results)
-            {
-                Debug.Log(result);
-            }
+            MyTurn();
         }
+    }
+
+    void MyTurn()
+    {
+        throwChance = 1;
+        Debug.Log("내턴, 던질 기회 +1");
     }
 
     public void ThrowButtonPressed()
     {
-        ThrowYuts(4);
+        //지금 누구 턴인지
+        //던질 기회가 남았는지
+        if (throwChance < 1)
+        {
+            Debug.Log("던질 기회 없음");
+            return;
+        }
+        //윷 몇개 던질지 확인
+        ThrowYutsServerRpc(yutNum, new ServerRpcParams());
         Debug.Log("던짐");
     }
 
-    void ThrowYuts(int yutNums)
+    [ServerRpc(RequireOwnership = false)]
+    void ThrowYutsServerRpc(int yutNums, ServerRpcParams rpcParams)
     {
+        throwChance--;
         backDo = false;
         faceDown = 0;
         for(int i = 0; i < yutNums; i++)
         {
             Yut yut = yuts[i];
+
             //윷을 원래 위치로 돌리기
             yut.transform.localPosition = yut.originPos; //외않됢?
             yut.transform.localRotation = yut.originRot; //외않됢? 이제 됢!
 
+            //보이게 하기
             //yut.gameObject.SetActive(true);
 
             //윷 던지기
+            //던지기 전에 움직임을 없애고(이상한 방향으로 날라가는거 방지)
+            yut.Rigidbody.linearVelocity = Vector3.zero;
+            yut.Rigidbody.angularVelocity = Vector3.zero;
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
             yut.Rigidbody.AddForce(Vector3.up * throwPower, ForceMode.Impulse);
             yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
         }
 
-        StartCoroutine(YutResultCheck(0, yutNums));
+        StartCoroutine(YutResultCheck(0, yutNums, rpcParams));
     }
 
-    IEnumerator YutResultCheck(float timePassed, int yutNums)
+    IEnumerator YutResultCheck(float timePassed, int yutNums, ServerRpcParams rpcParams)
     {
         bool yutStable = false;
 
@@ -114,7 +150,7 @@ public class YutManager : MonoBehaviour
             {
                 Yut yut = yuts[i];
 
-                //윷이 멈춰있으면 결과 확인 가능한걸로 판단
+                //윷이 멈춰있으면 결과 확인 가능한걸로 판단 -> 완전히 안멈추면 결과 안나옴
                 if(yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
                 {
                     //다 멈추면 true로 유지
@@ -157,44 +193,48 @@ public class YutManager : MonoBehaviour
         if (!yutStable)
         {
             Debug.Log("결과 산출 실패");
+            //다시 던질 수 있게 기회 더 줌
+
             yield break;
         }
+
+        ulong senderId = rpcParams.Receive.SenderClientId;
 
         switch (faceDown)
         {
             case 0:
                 //results.Add(YutResult.Mo);
-                AddYutResult(YutResult.Mo);
+                AddYutResultClientRpc(YutResult.Mo, senderId);
+                throwChance++;
                 break;
             case 1:
                 if (backDo)
                 {
                     //results.Add(YutResult.BackDo);
-                    AddYutResult(YutResult.BackDo);
+                    AddYutResultClientRpc(YutResult.BackDo, senderId);
                     break;
                 }
                 //results.Add(YutResult.Do);
-                AddYutResult(YutResult.Do);
+                AddYutResultClientRpc(YutResult.Do, senderId);
                 break;
             case 2:
                 //results.Add(YutResult.Gae);
-                AddYutResult(YutResult.Gae);
+                AddYutResultClientRpc(YutResult.Gae, senderId);
                 break;
             case 3:
                 //results.Add(YutResult.Gur);
-                AddYutResult(YutResult.Gur);
+                AddYutResultClientRpc(YutResult.Gur, senderId);
                 break;
             case 4:
                 //results.Add(YutResult.Yut);
-                AddYutResult(YutResult.Yut);
+                AddYutResultClientRpc(YutResult.Yut, senderId);
+                throwChance++;
                 break;
             default:
                 //results.Add(YutResult.Error);
-                AddYutResult(YutResult.Error);
+                AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
-
-        
     }
 
     bool CalcYutResult(Yut yut)
@@ -210,10 +250,16 @@ public class YutManager : MonoBehaviour
         return false;
     }
 
-    void AddYutResult(YutResult result)
+    [ClientRpc]
+    void AddYutResultClientRpc(YutResult result, ulong senderId)
     {
-        results.Add(result);
-        yutResultPrefab.SetYutText(result.ToString());
-        Instantiate(yutResultPrefab, yutResultContent.transform);
+        //Debug.Log("로컬 클라이언트 id : " + NetworkManager.Singleton.LocalClientId + "\nrpc요청 id : " + senderId + "\n오너 클라이언트 id : " + OwnerClientId);
+
+        //윷 던지는거 요청한 클라이언트의 윷 결과창을 갱신
+        if (senderId == NetworkManager.Singleton.LocalClientId)
+        {
+            results.Add(result);
+            Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
+        }
     }
 }
