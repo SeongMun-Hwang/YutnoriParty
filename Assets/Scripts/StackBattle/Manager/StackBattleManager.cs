@@ -1,82 +1,88 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
-// 참가자 정보
-[Serializable]
-public class PlayerProfile
-{
-	public string Name;
-	public int Score;
-}
-
-public class StackBattleManager : MonoBehaviour
+public class StackBattleManager : NetworkBehaviour
 {
 	// 게임에 참여하는 유저 관련
 	[SerializeField] private int maxPlayers;
-	[SerializeField] private List<PlayerProfile> players;
+	private List<ulong> playerIds = new List<ulong>(); // 참가한 플레이어 ID 리스트
 
-	// 현재 차례 플레이어의 인덱스
-	[SerializeField] private int currentPlayerIndex;
+	// 현재 차례 플레이어 ID
+	private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(0);
 
-	// 게임 블록 관련
-	[SerializeField] private BlockSpawnHandler blockSpawnHandler;
+	public TMP_Text turnText;
+	public Button turnButton;
+	public BlockSpawnHandler spawner;
 
-	// 게임 UI 관련
-	[SerializeField] private List<ProfileView> profileViewList;
-	[SerializeField] private TMP_Text orderUI;
-
-	// 게임 상태 관련
-	public enum StackBattleState
+	private void Init()
 	{
-		Ready,
-		Playing,
-		Wait,
-		GameOver
+		if (IsClient || IsHost)
+		{
+			turnButton.onClick.AddListener(() =>
+			{
+				RequestNextTurnServerRpc(NetworkManager.Singleton.LocalClientId);
+			});
+
+			Debug.Log("턴 버튼 리스너 등록 완료");
+		}
+
+		currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
+		currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
+		UpdateTurnUI(0, GetCurrentTurnPlayerId());
 	}
-	public StackBattleState state;
 
-	private void OnEnable()
+	public override void OnNetworkSpawn()
 	{
+		if (IsServer)
+		{
+			NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
+		}
+
 		Init();
 	}
 
-	// 게임의 데이터를 초기화
-	private void Init()
+	private void OnPlayerJoined(ulong clientId)
 	{
-		currentPlayerIndex = 0;
-		state = StackBattleState.Playing;
-
-		orderUI.text = $"Go, {players[currentPlayerIndex].Name}!";
-		for (int i = 0; i < maxPlayers; i++)
+		if (!playerIds.Contains(clientId))
 		{
-			profileViewList[i].gameObject.SetActive(true);
-			profileViewList[i].InitView(players[i]);
+			playerIds.Add(clientId);
+		}
+
+		// 첫 번째 플레이어가 게임 시작 시 첫 턴을 가짐
+		if (playerIds.Count == 1)
+		{
+			currentTurnPlayerId.Value = playerIds[0];
 		}
 	}
 
-	private void Update()
+	[ServerRpc(RequireOwnership = false)]
+	public void RequestNextTurnServerRpc(ulong senderClientId)
 	{
-		switch (state)
+		if (currentTurnPlayerId.Value == senderClientId)
 		{
-			case StackBattleState.Wait:
-				break;
-			case StackBattleState.Playing:
-				if (Input.GetMouseButtonDown(0))
-				{
-					blockSpawnHandler.DropBlock();
-					currentPlayerIndex++;
-					if (currentPlayerIndex >= maxPlayers) { currentPlayerIndex = 0; }
-					orderUI.text = $"Go, {players[currentPlayerIndex].Name}!";
-				}
-				break;
-			case StackBattleState.Ready:
-
-				break;
-			case StackBattleState.GameOver:
-
-				break;
+			int currentIndex = playerIds.IndexOf(senderClientId);
+			int nextIndex = (currentIndex + 1) % playerIds.Count;
+			currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
+			spawner.DropBlock();
 		}
+	}
+
+	public ulong GetCurrentTurnPlayerId()
+	{
+		return currentTurnPlayerId.Value;
+	}
+
+	private void UpdateButtonInteractable(ulong previousValue, ulong newValue)
+	{
+		turnButton.interactable = (newValue == NetworkManager.Singleton.LocalClientId);
+	}
+
+	private void UpdateTurnUI(ulong previousValue, ulong newValue)
+	{
+		turnText.text = $"Current Turn : Player {newValue}";
 	}
 }

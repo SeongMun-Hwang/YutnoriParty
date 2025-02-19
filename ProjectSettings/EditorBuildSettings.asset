@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Kdh/Scenes/GrandMa.unity
     guid: e253b03ab636d78468cddc31d3050473
+  - enabled: 1
+    path: Assets/Scenes/StackBattle/StackScene.unity
+    guid: 26c2f7c08c4df3d49b32de19efad0e22
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

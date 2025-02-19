@@ -1,54 +1,90 @@
 ﻿using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BlockSpawnHandler : MonoBehaviour
+public class BlockSpawnHandler : NetworkBehaviour
 {
 	// 게임 엔티티 관련
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject bottomFrame;
-	private List<GameObject> stack; // 현재까지 쌓인 스택
+	private NetworkList<NetworkObjectReference> stack = new NetworkList<NetworkObjectReference>();
 
 	// 색상 관련
 	[SerializeField] private List<Color32> teamColors;
 	private int colorIndex;
 
-	private void Start()
+	public override void OnNetworkSpawn()
 	{
-		stack = new List<GameObject>();
-		colorIndex = 0;
-		stack.Add(bottomFrame);
-		stack[0].GetComponent<Renderer>().material.color = teamColors[0];
-		CreateBlock();
-	}
-
-	public void DropBlock()
-	{
-		if (stack.Count > 1)
-		{ stack[stack.Count - 1].GetComponent<StackableBlock>().ScaleBlock(); }
-
-		CreateBlock();
+		if (IsServer)
+		{
+			stack.Clear();
+			CreateBlock();
+		}
 	}
 
 	public void CreateBlock()
 	{
-		GameObject previousTile = stack[stack.Count - 1];
+		if (!IsServer) return; // 서버에서만 블록 생성
+
 		GameObject activeTile;
+		Vector3 spawnPosition;
 
-		activeTile = Instantiate(blockPrefab, transform.parent);
-		stack.Add(activeTile);
+		if (stack.Count > 0) // 기존 블록이 있을 경우
+		{
+			if (stack[stack.Count - 1].TryGet(out NetworkObject previousTileNetObj))
+			{
+				GameObject previousTile = previousTileNetObj.gameObject;
+				spawnPosition = new Vector3(
+					previousTile.transform.position.x,
+					previousTile.transform.position.y + previousTile.transform.localScale.y,
+					previousTile.transform.position.z);
+			}
+			else
+			{
+				spawnPosition = bottomFrame.transform.position;
+			}
+		}
+		else // 첫 번째 블록 생성
+		{
+			spawnPosition = bottomFrame.transform.position + Vector3.up;
+		}
 
-		if (stack.Count > 2)
-			activeTile.transform.localScale = previousTile.transform.localScale;
+		// 블록 생성 및 네트워크에 등록
+		activeTile = Instantiate(blockPrefab, spawnPosition, Quaternion.identity, transform.parent);
+		StackableBlock stackableBlock = activeTile.GetComponent<StackableBlock>();
+		stackableBlock.spawner = this;
 
-		activeTile.transform.position = new Vector3(previousTile.transform.position.x,
-			previousTile.transform.position.y + previousTile.transform.localScale.y, previousTile.transform.position.z);
+		stackableBlock.moveX = stack.Count % 2 == 0;
 
-		colorIndex++;
-		if (colorIndex >= teamColors.Count)
-		{ colorIndex = 0; }
+		NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
+		netObj.Spawn(true); // 네트워크에 생성 등록
+		stack.Add(netObj);  // NetworkList에 추가
 
+		// 크기 및 색상 적용
+		if (stack.Count > 1)
+		{
+			if (stack[stack.Count - 2].TryGet(out NetworkObject prevNetObj))
+			{
+				activeTile.transform.localScale = prevNetObj.gameObject.transform.localScale;
+			}
+		}
+
+		colorIndex = (colorIndex + 1) % teamColors.Count;
 		activeTile.GetComponent<Renderer>().material.color = teamColors[colorIndex];
-		activeTile.GetComponent<StackableBlock>().spawner = this;
-		activeTile.GetComponent<StackableBlock>().moveX = stack.Count % 2 == 0;
+	}
+
+	public void DropBlock()
+	{
+		if (!IsServer) return; // 서버에서만 블록 배치
+		if (stack.Count > 0)
+		{
+			if (stack[stack.Count - 1].TryGet(out NetworkObject currentNetBlock))
+			{
+				GameObject currentBlock = currentNetBlock.gameObject;
+				currentBlock.GetComponent<StackableBlock>().ScaleBlockServerRpc();
+			}
+		}
+
+		CreateBlock();
 	}
 }
