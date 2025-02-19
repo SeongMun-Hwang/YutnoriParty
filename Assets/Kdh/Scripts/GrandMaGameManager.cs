@@ -10,6 +10,8 @@ public class GrandMaGameManager : NetworkBehaviour
     [SerializeField] private Collider goalArea;
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private GameObject countdownCanvas;
+    [SerializeField] private GameObject winnerTextCanvas; 
+    [SerializeField] private TextMeshProUGUI winnerText; 
 
     private bool gameStarted = false;
     private bool gameEnded = false; // 게임 종료 상태 추가
@@ -100,13 +102,13 @@ public class GrandMaGameManager : NetworkBehaviour
 
     private void CheckForWinner()
     {
-        if (gameEnded) return; // 게임이 이미 종료되었으면 실행 X
+        if (gameEnded) return;
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out PlayerController playerController))
+            if (playerObject.TryGetComponent(out PlayerController playerController) && !playerController.IsEliminated)
             {
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
@@ -119,7 +121,7 @@ public class GrandMaGameManager : NetworkBehaviour
 
     public void CheckRemainingPlayers()
     {
-        if (gameEnded) return; // 이미 종료된 경우 실행 X
+        if (gameEnded) return;
 
         List<PlayerController> alivePlayers = new List<PlayerController>();
 
@@ -127,7 +129,7 @@ public class GrandMaGameManager : NetworkBehaviour
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out PlayerController playerController) && playerController.gameObject.activeSelf)
+            if (playerObject.TryGetComponent(out PlayerController playerController) && !playerController.IsEliminated)
             {
                 alivePlayers.Add(playerController);
             }
@@ -141,7 +143,7 @@ public class GrandMaGameManager : NetworkBehaviour
 
     private void EndGame(PlayerController winner)
     {
-        if (gameEnded) return;
+        
 
         gameEnded = true;
 
@@ -149,23 +151,22 @@ public class GrandMaGameManager : NetworkBehaviour
 
         // 모든 플레이어의 조작 멈추기
         StopAllPlayersClientRpc();
-
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            var playerObject = client.Value.PlayerObject;
-
-            if (playerObject.TryGetComponent(out PlayerController playerController) && playerController != winner)
-            {
-                EndGame_ClientRpc(playerController.NetworkObject.NetworkObjectId);
-            }
-        }
-
+        ShowWinnerClientRpc(winner.name);
+       
         Debug.Log("미니게임이 종료되었습니다.");
 
         // 3초 후 씬 이동
         StartCoroutine(LoadNextScene());
     }
+    [ClientRpc]
+    private void ShowWinnerClientRpc(string winnerName)
+    {
+        if (winnerTextCanvas != null)
+            winnerTextCanvas.SetActive(true);
 
+        if (winnerText != null)
+            winnerText.text = $"{winnerName} Win!";
+    }
     [ClientRpc]
     private void StopAllPlayersClientRpc()
     {
@@ -196,6 +197,20 @@ public class GrandMaGameManager : NetworkBehaviour
         if (IsServer)
         {
             NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // 모든 클라이언트가 이동
+            EnableAllPlayersControlClientRpc(); // 씬 이동 후 즉시 실행
+        }
+    }
+
+    [ClientRpc]
+    private void EnableAllPlayersControlClientRpc()
+    {
+        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        {
+            if (client.Value.PlayerObject.TryGetComponent(out PlayerController player))
+            {
+                player.SetEliminated(false);
+                player.EnableControl(true);
+            }
         }
     }
 

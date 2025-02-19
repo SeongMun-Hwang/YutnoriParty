@@ -9,6 +9,7 @@ public class PlayerController : NetworkBehaviour
     private Vector3 targetPosition;
     private Animator animator;
     private bool canMove = false;
+    public bool IsEliminated { get; private set; } = false;
     private void Start()
     {
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
@@ -18,8 +19,8 @@ public class PlayerController : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner || !canMove) return;
-        Camera.main.transform.position = transform.position + new Vector3(0, 5, 5);
+        if (!IsOwner || !canMove || IsEliminated) return;
+        Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             MoveForwardServerRpc(OwnerClientId);  
@@ -33,8 +34,8 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     private void MoveForwardServerRpc(ulong clientId)
     {
-       
-        if (OwnerClientId != clientId) return;
+
+        if (OwnerClientId != clientId || IsEliminated) return;
 
         targetPosition += transform.forward * moveDistance;
         MoveClientRpc(targetPosition);
@@ -48,5 +49,10 @@ public class PlayerController : NetworkBehaviour
     public void EnableControl(bool enable)
     {
         canMove = enable;
+    }
+    public void SetEliminated(bool isEliminated)
+    {
+        IsEliminated = isEliminated;
+        EnableControl(!isEliminated); // 탈락하면 false, 초기화되면 true
     }
 }
