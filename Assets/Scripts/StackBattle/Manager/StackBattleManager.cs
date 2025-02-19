@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -7,11 +7,11 @@ using UnityEngine.UI;
 
 public class StackBattleManager : NetworkBehaviour
 {
-	// °ÔÀÓ¿¡ Âü¿©ÇÏ´Â À¯Àú °ü·Ã
+	// ê²Œì„ì— ì°¸ì—¬í•˜ëŠ” ìœ ì € ê´€ë ¨
 	[SerializeField] private int maxPlayers;
-	private List<ulong> playerIds = new List<ulong>(); // Âü°¡ÇÑ ÇÃ·¹ÀÌ¾î ID ¸®½ºÆ®
+	private List<ulong> playerIds = new List<ulong>(); // ì°¸ê°€í•œ í”Œë ˆì´ì–´ ID ë¦¬ìŠ¤íŠ¸
 
-	// ÇöÀç Â÷·Ê ÇÃ·¹ÀÌ¾î ID
+	// í˜„ì¬ ì°¨ë¡€ í”Œë ˆì´ì–´ ID
 	private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(0);
 
 	public TMP_Text turnText;
@@ -48,7 +48,7 @@ public class StackBattleManager : NetworkBehaviour
 			playerIds.Add(clientId);
 		}
 
-		// Ã¹ ¹øÂ° ÇÃ·¹ÀÌ¾î°¡ °ÔÀÓ ½ÃÀÛ ½Ã Ã¹ ÅÏÀ» °¡Áü
+		// ì²« ë²ˆì§¸ í”Œë ˆì´ì–´ê°€ ê²Œì„ ì‹œì‘ ì‹œ ì²« í„´ì„ ê°€ì§
 		if (playerIds.Count == 1)
 		{
 			currentTurnPlayerId.Value = playerIds[0];
@@ -63,7 +63,7 @@ public class StackBattleManager : NetworkBehaviour
 			spawner.DropBlock();
 			int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
-			currentTurnPlayerId.Value = playerIds[nextIndex]; // ÅÏ ³Ñ±è
+			currentTurnPlayerId.Value = playerIds[nextIndex]; // í„´ ë„˜ê¹€
 			spawner.CreateBlock();
 		}
 	}
