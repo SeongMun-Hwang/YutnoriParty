@@ -304,7 +304,7 @@ public class YutManager : NetworkBehaviour
         //현재 플레이어 id 체크
         //player2가 선턴을 잡을때 player1은 0이, player2는 1이 찍힘 == 플레이어 넘버가 동기화 안됨
         //Debug.Log("게임매니저 현재 플레이어 번호 : " + GameManager.Instance.mainGameProgress.currentPlayerNumber);
-        //Debug.Log("윷 리스트 카운트 : " + results.Count);
+        //Debug.Log("클라이언트id " +NetworkManager.Singleton.LocalClientId + " 윷 리스트 카운트 : " + results.Count);
         return results.Count;
     }
 
@@ -333,6 +333,7 @@ public class YutManager : NetworkBehaviour
         //버튼 누른 클라이언트 주인거에서 찾아서 삭제
         if(id == NetworkManager.Singleton.LocalClientId)
         {
+            //Debug.Log("지울거 : " + result);
             results.Remove(result);
         }
     }
