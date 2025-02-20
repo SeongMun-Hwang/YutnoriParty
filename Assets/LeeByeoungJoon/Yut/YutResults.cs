@@ -15,36 +15,38 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
-        //¸î Ä­ ÀüÁøÇÏ´ÂÁö ¼ıÀÚ ¹İÈ¯
+        //ëª‡ ì¹¸ ì „ì§„í•˜ëŠ”ì§€ ìˆ«ì ë°˜í™˜
         switch (yutResult)
         {
             case YutResult.BackDo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(1);
-                //Debug.Log("-1");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(1);
+                Debug.Log("-1");
                 break;
             case YutResult.Do:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(1);
-                //Debug.Log("1");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(1);
+                Debug.Log("1");
                 break;
             case YutResult.Gae:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(2);
-                //Debug.Log("2");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(2);
+                Debug.Log("2");
                 break;
             case YutResult.Gur:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(3);
-                //Debug.Log("3");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(3);
+                Debug.Log("3");
                 break;
             case YutResult.Yut:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(4);
-                //Debug.Log("4");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(4);
+                Debug.Log("4");
                 break;
             case YutResult.Mo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(5);
-                //Debug.Log("5");
+                //GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(5);
+                Debug.Log("5");
                 break;
         }
-        
-        //¹öÆ° ¾ø¾Ú
+        //ê²°ê³¼ ë¦¬ìŠ¤íŠ¸ì—ì„œ ëºŒ
+        YutManager.Instance.RemoveYutResultClientRpc(yutResult, OwnerClientId);
+
+        //ë²„íŠ¼ ì—†ì•°
         Destroy(gameObject);
     }
 }
