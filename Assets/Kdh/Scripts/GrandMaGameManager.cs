@@ -15,6 +15,7 @@ public class GrandMaGameManager : NetworkBehaviour
 
     private bool gameStarted = false;
     private bool gameEnded = false; // 게임 종료 상태 추가
+    private ulong winnerClientId;
 
     public override void OnNetworkSpawn()
     {
@@ -72,7 +73,7 @@ public class GrandMaGameManager : NetworkBehaviour
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out PlayerController player))
+            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
             {
                 player.EnableControl(true);
             }
@@ -83,7 +84,7 @@ public class GrandMaGameManager : NetworkBehaviour
     private void EnablePlayerControl()
     {
         // 미니게임 씬에 들어갔을 때 플레이어 컨트롤 활성화
-        if (TryGetComponent(out PlayerController playerController))
+        if (TryGetComponent(out ChaseGameController playerController))
         {
             playerController.EnableControl(true);
         }
@@ -108,7 +109,7 @@ public class GrandMaGameManager : NetworkBehaviour
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out PlayerController playerController) && !playerController.IsEliminated)
+            if (playerObject.TryGetComponent(out ChaseGameController playerController) && !playerController.IsEliminated)
             {
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
@@ -123,13 +124,13 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         if (gameEnded) return;
 
-        List<PlayerController> alivePlayers = new List<PlayerController>();
+        List<ChaseGameController> alivePlayers = new List<ChaseGameController>();
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out PlayerController playerController) && !playerController.IsEliminated)
+            if (playerObject.TryGetComponent(out ChaseGameController playerController) && !playerController.IsEliminated)
             {
                 alivePlayers.Add(playerController);
             }
@@ -141,14 +142,14 @@ public class GrandMaGameManager : NetworkBehaviour
         }
     }
 
-    private void EndGame(PlayerController winner)
+    private void EndGame(ChaseGameController winner)
     {
         
 
         gameEnded = true;
 
         Debug.Log(winner.name + "이 승리했습니다!");
-
+        //winnerClientId = winner.OwnerClientId;
         // 모든 플레이어의 조작 멈추기
         StopAllPlayersClientRpc();
         ShowWinnerClientRpc(winner.name);
@@ -172,7 +173,7 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out PlayerController player))
+            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
             {
                 player.EnableControl(false); // 조작 비활성화
             }
@@ -184,7 +185,7 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
 
-        if (playerObject != null && playerObject.TryGetComponent(out PlayerController playerController))
+        if (playerObject != null && playerObject.TryGetComponent(out ChaseGameController playerController))
         {
             playerController.EnableControl(false);
         }
@@ -206,7 +207,7 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out PlayerController player))
+            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
             {
                 player.SetEliminated(false);
                 player.EnableControl(true);

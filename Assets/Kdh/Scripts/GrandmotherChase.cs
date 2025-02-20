@@ -62,14 +62,14 @@ public class GrandmotherChase : NetworkBehaviour
     {
         if (!IsServer) return;
         
-        if (other.TryGetComponent<PlayerController>(out PlayerController player))
+        if (other.TryGetComponent<ChaseGameController>(out ChaseGameController player))
         {
             PlayerEliminated(player);
             animator.SetTrigger("hit");
         }
     }
 
-    private void PlayerEliminated(PlayerController player)
+    private void PlayerEliminated(ChaseGameController player)
     {
         Debug.Log(player.name + "이 탈락했습니다!");
         player.SetEliminated(true);

@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerController : NetworkBehaviour
+public class ChaseGameController : NetworkBehaviour
 {
     [SerializeField] private float moveDistance = 2f;  // 한 번 이동할 거리
     [SerializeField] private float moveSpeed = 5f;     // 이동 속도
