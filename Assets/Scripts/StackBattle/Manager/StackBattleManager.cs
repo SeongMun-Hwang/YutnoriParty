@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,11 +19,13 @@ public class StackBattleManager : NetworkBehaviour
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
 
 	private bool failed = false;
+	public BlockSpawnHandler spawner;
 
 	// UI관련
-	public TMP_Text turnText;
-	public Button turnButton;
-	public BlockSpawnHandler spawner;
+	[SerializeField] private TMP_Text turnText;
+	[SerializeField] private Button turnButton;
+	[SerializeField] private GameObject winMessageUI;
+	[SerializeField] private GameObject loseMessageUI;
 
 	private void Start()
 	{
@@ -96,7 +99,8 @@ public class StackBattleManager : NetworkBehaviour
 			else
 			{
 				int aliveIndex = isRetire.IndexOf(false);
-				Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
+				// Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
+				GameFinishedClientRpc(playerIds[aliveIndex]);
 			}
 		}
 	}
@@ -116,7 +120,7 @@ public class StackBattleManager : NetworkBehaviour
 		turnText.text = $"Current Turn : Player {newValue}";
 		if (IsClient)
 		{
-			Debug.Log(isRetire[playerIds.IndexOf(NetworkManager.Singleton.LocalClientId)]);
+			// Debug.Log(isRetire[playerIds.IndexOf(NetworkManager.Singleton.LocalClientId)]);
 		}
 	}
 
@@ -130,5 +134,27 @@ public class StackBattleManager : NetworkBehaviour
 	{
 		isRetire[playerIds.IndexOf(id)] = true;
 		failed = true;
+
+		GameOverClientRpc(id);
+	}
+
+	[ClientRpc]
+	public void GameOverClientRpc(ulong id)
+	{
+		if (NetworkManager.Singleton.LocalClientId == id)
+		{
+			loseMessageUI.SetActive(true);
+		}
+	}
+	
+	[ClientRpc]
+	public void GameFinishedClientRpc(ulong winClientId)
+	{
+		if (NetworkManager.Singleton.LocalClientId == winClientId)
+		{
+			winMessageUI.SetActive(true);
+		}
+
+		Debug.Log("게임 종료");
 	}
 }

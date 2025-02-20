@@ -176,7 +176,7 @@ public class StackableBlock : NetworkBehaviour
 	public void FixBlockClientRpc(Vector3 pos, Vector3 scale)
 	{
 		if (IsServer) return;
-		Debug.Log("클라이언트 고정");
+		// Debug.Log("클라이언트 고정");
 		isFixed = true;
 		transform.position = pos;
 		transform.localScale = scale;
