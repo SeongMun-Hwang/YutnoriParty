@@ -17,6 +17,8 @@ public class StackBattleManager : NetworkBehaviour
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
 
+	private bool failed = false;
+
 	// UI관련
 	public TMP_Text turnText;
 	public Button turnButton;
@@ -66,6 +68,7 @@ public class StackBattleManager : NetworkBehaviour
 	{
 		if (currentTurnPlayerId.Value == senderClientId)
 		{
+			failed = false;
 			spawner.DropBlock();
 			int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
@@ -78,8 +81,10 @@ public class StackBattleManager : NetworkBehaviour
 				}
 
 				currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
-			
-				spawner.CreateBlock();
+				if (!failed)
+				{
+					spawner.CreateBlock();
+				}
 			}
 			else
 			{
@@ -116,5 +121,6 @@ public class StackBattleManager : NetworkBehaviour
 	public void GameOverServerRpc(ulong id)
 	{
 		isRetire[playerIds.IndexOf(id)] = true;
+		failed = true;
 	}
 }

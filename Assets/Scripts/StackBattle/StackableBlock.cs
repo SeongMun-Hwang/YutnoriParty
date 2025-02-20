@@ -130,6 +130,7 @@ public class StackableBlock : NetworkBehaviour
 				{
 					Debug.Log("GameOver");
 					manager.GameOver();
+					isFixed = false;
 					return;
 				}
 
@@ -142,6 +143,7 @@ public class StackableBlock : NetworkBehaviour
 				{
 					Debug.Log("GameOver");
 					manager.GameOver();
+					isFixed = false;
 					return;
 				}
 
