@@ -41,6 +41,12 @@ public class MainGameProgress : NetworkBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
+                if (hit.collider.TryGetComponent<NetworkObject>(out var networkObject) &&
+                    networkObject.OwnerClientId!=NetworkManager.LocalClientId)
+                {
+                    Debug.Log("Not your player");
+                    return;
+                }
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                 {
                     Debug.Log("Character Choose Success");
