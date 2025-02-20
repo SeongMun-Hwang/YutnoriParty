@@ -71,7 +71,7 @@ public class YutManager : NetworkBehaviour
         {
             //윷 소환하고
             yuts.Add(Instantiate(yutPrefab));
-            
+
             Yut yut = yuts[i];
             //윷 전체의 중심 위치 맞추기 위한 똥꼬쇼
             yut.transform.position = pos + new Vector3(0, 0, -((yutNum - 1) * yutSpacing) / 2);
@@ -116,7 +116,7 @@ public class YutManager : NetworkBehaviour
             //Debug.Log("현재 파워 : " + powerAmount);
 
             //타임아웃되면 알아서 던짐
-            if(Time.time - powerStartTime > powerTimeOut)
+            if (Time.time - powerStartTime > powerTimeOut)
             {
                 ThrowButtonReleased();
             }
@@ -155,7 +155,7 @@ public class YutManager : NetworkBehaviour
 
         //버튼 풀면 파워게이지 멈추고
         isThrowButtonDown = false;
-        
+
         //윷 몇개 던질지 확인하고, 현재 파워로 던짐
         ThrowYutsServerRpc(yutNum, Mathf.Clamp(maxThrowPower * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
         throwChance--;
@@ -167,7 +167,7 @@ public class YutManager : NetworkBehaviour
     {
         backDo = false;
         faceDown = 0;
-        for(int i = 0; i < yutNums; i++)
+        for (int i = 0; i < yutNums; i++)
         {
             Yut yut = yuts[i];
 
@@ -203,12 +203,12 @@ public class YutManager : NetworkBehaviour
             //1초마다 윷 상태를 확인
             yield return new WaitForSecondsRealtime(waitInterval);
 
-            for(int i = 0; i < yutNums; i++)
+            for (int i = 0; i < yutNums; i++)
             {
                 Yut yut = yuts[i];
 
                 //윷이 멈춰있으면 결과 확인 가능한걸로 판단 -> 완전히 안멈추면 결과 안나옴
-                if(yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
+                if (yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
@@ -222,7 +222,7 @@ public class YutManager : NetworkBehaviour
 
             if (yutStable)
             {
-                for(int i = 0; i<yutNums; i++)
+                for (int i = 0; i < yutNums; i++)
                 {
                     Yut yut = yuts[i];
 
@@ -327,16 +327,13 @@ public class YutManager : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RemoveYutResultClientRpc(YutResult result, ulong id)
+    //리스트에서 윷 결과 삭제
+    public void RemoveYutResult(YutResult result)
     {
-        //버튼 누른 클라이언트 주인거에서 찾아서 삭제
-        if(id == NetworkManager.Singleton.LocalClientId)
-        {
-            //Debug.Log("지울거 : " + result);
-            results.Remove(result);
-        }
+        //Debug.Log("id : " + NetworkManager.Singleton.LocalClientId + "" + result + "삭제");
+        results.Remove(result);
     }
+
     [ClientRpc]
     public void ClearYutResuliClientRpc()
     {

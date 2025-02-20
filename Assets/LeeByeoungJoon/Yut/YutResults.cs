@@ -1,3 +1,5 @@
+
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -44,8 +46,8 @@ public class YutResults : NetworkBehaviour
                 break;
         }
         //결과 리스트에서 뺌
-        //Debug.Log("오너 클라이언트 id : " + OwnerClientId + " 네트워크 싱글톤 id " + NetworkManager.Singleton.LocalClientId);
-        YutManager.Instance.RemoveYutResultClientRpc(yutResult, NetworkManager.Singleton.LocalClientId);
+        //Debug.Log("네트워크 싱글톤 id " + NetworkManager.Singleton.LocalClientId);
+        YutManager.Instance.RemoveYutResult(yutResult);
 
         //버튼 없앰
         Destroy(gameObject);
