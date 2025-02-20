@@ -47,7 +47,7 @@ public class CharacterBoardMovement : NetworkBehaviour
         for (int i = 0; i < distance; i++)
         {
             Node tmpNode = null;
-            List<Node> possibleNodes = dir == CharacterMove.Forward ? currentNode.nextNode : currentNode.prevNode;
+            List<Node> possibleNodes = dir == CharacterMove.Forward ? currentNode.GetNextNode() : currentNode.GetPrevNode();
 
             if (possibleNodes.Count > 1)
             {
@@ -76,9 +76,10 @@ public class CharacterBoardMovement : NetworkBehaviour
             transform.position = targetPos;
             currentNode = tmpNode;
         }
-
+        Debug.Log("End move");
         GameManager.Instance.mainGameProgress.EndMove();
         animator.SetFloat("isMoving", 0f);
+        yield break;
     }
     private IEnumerator SpawnAndSelectNode(List<Node> possibleNodes)
     {
@@ -108,7 +109,7 @@ public class CharacterBoardMovement : NetworkBehaviour
             }
             yield return null;
         }
-        
+
         foreach (GameObject desInstance in spawnedDesObjects)
         {
             Destroy(desInstance);

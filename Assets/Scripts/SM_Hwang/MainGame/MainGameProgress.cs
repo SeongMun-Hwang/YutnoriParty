@@ -49,23 +49,34 @@ public class MainGameProgress : NetworkBehaviour
             }
         }
     }
+    public void MoveCurrentCharacter(int n)
+    {
+        if(currentCharacter == null)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Choose Character First!",2f);
+            return;
+        }
+        currentCharacter.MoveToNextNode(n);
+    }
     public void EndMove()
     {
         //윷 리스트 없으면 턴 종료
-        Debug.Log("End turn");
-        GameManager.Instance.inGameCanvas.SetActive(false);
-        EndTurnServerRpc();
+        if (YutManager.Instance.YutResultCount() == 0)
+        {
+            Debug.Log("End turn");
+            GameManager.Instance.inGameCanvas.SetActive(false);
+            EndTurnServerRpc();
+        }
     }
     [ServerRpc(RequireOwnership = false)]
     void EndTurnServerRpc()
     {
-        if (!IsServer) return;
         currentPlayerNumber.Value++;
         if (currentPlayerNumber.Value == numOfPlayer)
         {
             currentPlayerNumber.Value = 0;
         }
-        Debug.Log("Change turn to player"+currentPlayerNumber);
+        Debug.Log("Change turn to player" + currentPlayerNumber);
         StartTurn(currentPlayerNumber.Value);
     }
 }

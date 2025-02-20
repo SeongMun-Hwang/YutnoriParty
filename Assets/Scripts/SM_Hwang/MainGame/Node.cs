@@ -3,31 +3,15 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    public List<Node> nextNode;
-    public List<Node> prevNode;
+    [SerializeField] List<Node> nextNode;
+    [SerializeField] List<Node> prevNode;
 
-    public Node GetNextNode()
+    public List<Node> GetNextNode()
     {
-        if (nextNode.Count==1)
-        {
-            return nextNode[0];
-        }
-        if (nextNode.Count > 1)
-        {
-            return nextNode[Random.Range(0, nextNode.Count)];
-        }
-        return null;
+        return nextNode;
     }
-    public Node GetPrevNode()
+    public List<Node> GetPrevNode()
     {
-        if (prevNode.Count == 1)
-        {
-            return prevNode[0];
-        }
-        if (prevNode.Count > 1)
-        {
-            return prevNode[Random.Range(0, prevNode.Count)];
-        }
-        return null;
+        return prevNode;
     }
 }
