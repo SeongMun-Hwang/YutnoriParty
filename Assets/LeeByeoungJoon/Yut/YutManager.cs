@@ -336,6 +336,12 @@ public class YutManager : NetworkBehaviour
             results.Remove(result);
         }
     }
+    [ClientRpc]
+    public void ClearYutResuliClientRpc()
+    {
+        //모든 클라이언트에서 리스트 클리어
+        results.Clear();
+    }
 
     [ClientRpc]
     public void ThrowChanceChangeClientRpc(int num, ulong senderId)
