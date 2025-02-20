@@ -1,10 +1,10 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class ChaseGameController : NetworkBehaviour
+public class RunGameController : NetworkBehaviour
 {
-    [SerializeField] private float moveDistance = 2f;  // ÇÑ ¹ø ÀÌµ¿ÇÒ °Å¸®
-    [SerializeField] private float moveSpeed = 5f;     // ÀÌµ¿ ¼Óµµ
+    [SerializeField] private float moveDistance = 2f;  // í•œ ë²ˆ ì´ë™í•  ê±°ë¦¬
+    [SerializeField] private float moveSpeed = 5f;     // ì´ë™ ì†ë„
 
     private Vector3 targetPosition;
     private Animator animator;
@@ -12,7 +12,7 @@ public class ChaseGameController : NetworkBehaviour
     public bool IsEliminated { get; private set; } = false;
     private void Start()
     {
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);//í”Œë ˆì´ì–´ìˆœì„œëŒ€ë¡œ ë°°ì¹˜
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
     }
@@ -21,6 +21,7 @@ public class ChaseGameController : NetworkBehaviour
     {
         if (!IsOwner || !canMove || IsEliminated) return;
         Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
+        Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             MoveForwardServerRpc(OwnerClientId);  
@@ -53,6 +54,6 @@ public class ChaseGameController : NetworkBehaviour
     public void SetEliminated(bool isEliminated)
     {
         IsEliminated = isEliminated;
-        EnableControl(!isEliminated); // Å»¶ôÇÏ¸é false, ÃÊ±âÈ­µÇ¸é true
+        EnableControl(!isEliminated); // íƒˆë½í•˜ë©´ false, ì´ˆê¸°í™”ë˜ë©´ true
     }
 }
