@@ -4,8 +4,8 @@ using UnityEngine;
 public class MainGameProgress : NetworkBehaviour
 {
     int numOfPlayer;
-    public int currentPlayerNumber;
-    private bool chooseCharacter = false;
+    private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
+    private bool chooseCharacter = true;
     public CharacterBoardMovement currentCharacter;
     private void Update()
     {
@@ -17,13 +17,13 @@ public class MainGameProgress : NetworkBehaviour
     public void StartGame()
     {
         numOfPlayer = NetworkManager.ConnectedClients.Count;
-        currentPlayerNumber = Random.Range(0, numOfPlayer);
-        
-        StartTurn(currentPlayerNumber);
+        currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
+
+        StartTurn(currentPlayerNumber.Value);
     }
     void StartTurn(int n)
     {
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(currentPlayerNumber + "'s Turn!", 2f);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(currentPlayerNumber.Value + "'s Turn!", 2f);
         SpawnInGameCanvasClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)n } } });
     }
     [ClientRpc]
@@ -31,19 +31,41 @@ public class MainGameProgress : NetworkBehaviour
     {
         GameManager.Instance.inGameCanvas.SetActive(true);
         YutManager.Instance.throwChance++;
-        
+        //EndTurn();
     }
     public void ChooseCharacter()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray=Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if(Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit))
             {
-                currentCharacter=hit.collider.gameObject.GetComponent<CharacterBoardMovement>();
-                Debug.Log(hit.collider.name);
+                if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
+                {
+                    Debug.Log("Character Choose Success");
+                    currentCharacter = character;
+                }
             }
         }
+    }
+    public void EndMove()
+    {
+        //윷 리스트 없으면 턴 종료
+        Debug.Log("End turn");
+        GameManager.Instance.inGameCanvas.SetActive(false);
+        EndTurnServerRpc();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    void EndTurnServerRpc()
+    {
+        if (!IsServer) return;
+        currentPlayerNumber.Value++;
+        if (currentPlayerNumber.Value == numOfPlayer)
+        {
+            currentPlayerNumber.Value = 0;
+        }
+        Debug.Log("Change turn to player"+currentPlayerNumber);
+        StartTurn(currentPlayerNumber.Value);
     }
 }
