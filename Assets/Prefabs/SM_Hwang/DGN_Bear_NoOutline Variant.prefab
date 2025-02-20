@@ -164,6 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  characterOnDes: {fileID: 4280042326805546884, guid: 5bcf6952e7455ff43abf42322f7c3024, type: 3}
 --- !u!136 &5905374286713868406
 CapsuleCollider:
   m_ObjectHideFlags: 0
