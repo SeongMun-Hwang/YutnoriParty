@@ -73,7 +73,13 @@ public class StackBattleManager : NetworkBehaviour
 			int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
 
-			if (isRetire.Contains(false))
+			int aliveCount = 0;
+			for (int i = 0; i < isRetire.Count; i++)
+			{
+				if (!isRetire[i]) { aliveCount++; }
+			}
+
+			if (aliveCount > 1)
 			{
 				while (isRetire[nextIndex])
 				{
@@ -85,10 +91,12 @@ public class StackBattleManager : NetworkBehaviour
 				{
 					spawner.CreateBlock();
 				}
+
 			}
 			else
 			{
-				Debug.Log("전원 탈락");
+				int aliveIndex = isRetire.IndexOf(false);
+				Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
 			}
 		}
 	}
