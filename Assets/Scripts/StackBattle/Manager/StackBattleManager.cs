@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -49,6 +50,8 @@ public class StackBattleManager : NetworkBehaviour
 		{
 			NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
 		}
+
+		turnButton.interactable = (GetCurrentTurnPlayerId() == NetworkManager.Singleton.LocalClientId);
 	}
 
 	private void OnPlayerJoined(ulong clientId)
@@ -155,6 +158,7 @@ public class StackBattleManager : NetworkBehaviour
 			winMessageUI.SetActive(true);
 		}
 
+		turnButton.interactable = false;
 		Debug.Log("게임 종료");
 	}
 }
