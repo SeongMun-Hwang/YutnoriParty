@@ -6,6 +6,7 @@ using UnityEngine;
 public class BlockSpawnHandler : NetworkBehaviour
 {
 	// 게임 엔티티 관련
+	public StackBattleManager manager;
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject bottomFrame;
 	[SerializeField] private List<GameObject> stack;
@@ -42,6 +43,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 		activeTile.transform.position = previousTile.transform.position + Vector3.up;
 		activeTile.GetComponent<StackableBlock>().moveX = stack.Count % 2 == 0;
 		activeTile.GetComponent<StackableBlock>().spawner = this;
+		activeTile.GetComponent<StackableBlock>().manager = manager;
 
 		NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
 		netObj.Spawn(true); // 네트워크에 생성 등록

@@ -11,6 +11,7 @@ public class StackableBlock : NetworkBehaviour
 {
 	// 스포너 관련
 	public BlockSpawnHandler spawner;
+	public StackBattleManager manager;
 
 	// StackableBlock 이동 관련
 	private float distance; // 현재 블록이 원점으로부터 떨어진 거리
@@ -128,6 +129,7 @@ public class StackableBlock : NetworkBehaviour
 				if (transform.localScale.x < lostLength)
 				{
 					Debug.Log("GameOver");
+					manager.GameOver();
 					return;
 				}
 
@@ -139,6 +141,7 @@ public class StackableBlock : NetworkBehaviour
 				if (transform.localScale.z < lostLength)
 				{
 					Debug.Log("GameOver");
+					manager.GameOver();
 					return;
 				}
 
