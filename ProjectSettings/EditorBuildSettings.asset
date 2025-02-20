@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/SM_Hwang/Server/MainGame.unity
     guid: d2c81f8ee311e3b42a891ef191ed8d17
   - enabled: 1
-    path: Assets/Kdh/Scenes/GrandMa.unity
+    path: Assets/Kdh/Scenes/RunGame.unity
     guid: e253b03ab636d78468cddc31d3050473
   - enabled: 1
     path: Assets/Scenes/StackBattle/StackScene.unity
