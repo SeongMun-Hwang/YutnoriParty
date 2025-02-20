@@ -21,18 +21,26 @@ public class YutManager : NetworkBehaviour
     [SerializeField] YutResults yutResultPrefab;
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
-    [SerializeField] Image powerGage;
+    [SerializeField] Image powerGauge;
 
     List<Yut> yuts = new List<Yut>();
     List<YutResult> results = new List<YutResult>();
+    public List<YutResult> Results { get { return results; } }
 
     int faceDown = 0;
+    int powerAmountSign = 1;
     public float throwPower = 10;
+    float minThrowPower = 8;
+    float maxThrowPower = 20;
+    float powerTimeOut = 3;
+    float powerStartTime = 0;
     float torque = 3;
     float yutSpacing = 2;
     float waitTime = 10;
     float waitInterval = 1;
+    float powerAmount = 0;
     bool backDo = false;
+    bool isThrowButtonDown = false;
 
     public int yutNum = 4;
     public int throwChance = 0;
@@ -84,11 +92,34 @@ public class YutManager : NetworkBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            MyTurn();
+            //MyTurn();
+            YutResultCount();
+        }
+
+        if (isThrowButtonDown)
+        {
+            if (powerAmount >= 1)
+            {
+                powerAmountSign = -1;
+            }
+            else if (powerAmount <= 0)
+            {
+                powerAmountSign = 1;
+            }
+            powerAmount += Time.deltaTime * powerAmountSign;
+
+            powerGauge.fillAmount = Mathf.Clamp(powerAmount, 0, 1);
+            //Debug.Log("현재 파워 : " + powerAmount);
+
+            //타임아웃되면 알아서 던짐
+            if(Time.time - powerStartTime > powerTimeOut)
+            {
+                ThrowButtonReleased();
+            }
         }
     }
 
@@ -111,14 +142,28 @@ public class YutManager : NetworkBehaviour
             Debug.Log("던질 기회 없음");
             return;
         }
-        //윷 몇개 던질지 확인
-        ThrowYutsServerRpc(yutNum, new ServerRpcParams());
+        //누르고 있는 동안 파워 게이지 작동
+        powerAmount = 0;
+        powerStartTime = Time.time;
+
+        isThrowButtonDown = true;
+    }
+    public void ThrowButtonReleased()
+    {
+        //버튼 풀려있으면 작동 안되게함
+        if (!isThrowButtonDown) return;
+
+        //버튼 풀면 파워게이지 멈추고
+        isThrowButtonDown = false;
+        
+        //윷 몇개 던질지 확인하고, 현재 파워로 던짐
+        ThrowYutsServerRpc(yutNum, Mathf.Clamp(maxThrowPower * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
         throwChance--;
         Debug.Log("던짐");
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void ThrowYutsServerRpc(int yutNums, ServerRpcParams rpcParams)
+    void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
         backDo = false;
         faceDown = 0;
@@ -138,7 +183,7 @@ public class YutManager : NetworkBehaviour
             yut.Rigidbody.linearVelocity = Vector3.zero;
             yut.Rigidbody.angularVelocity = Vector3.zero;
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
-            yut.Rigidbody.AddForce(Vector3.up * throwPower, ForceMode.Impulse);
+            yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
             yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
         }
 
@@ -254,6 +299,21 @@ public class YutManager : NetworkBehaviour
         return false;
     }
 
+    public int YutResultCount()
+    {
+        //현재 플레이어 id 체크
+        //player2가 선턴을 잡을때 player1은 0이, player2는 1이 찍힘 == 플레이어 넘버가 동기화 안됨
+        //Debug.Log("게임매니저 현재 플레이어 번호 : " + GameManager.Instance.mainGameProgress.currentPlayerNumber);
+        //Debug.Log("윷 리스트 카운트 : " + results.Count);
+        return results.Count;
+    }
+
+    public List<YutResult> GetYutResults()
+    {
+        //현재 플레이어의 클라이언트 id 체크하고 리스트 반환?
+        return results;
+    }
+
     [ClientRpc]
     void AddYutResultClientRpc(YutResult result, ulong senderId)
     {
@@ -264,6 +324,16 @@ public class YutManager : NetworkBehaviour
         {
             results.Add(result);
             Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
+        }
+    }
+
+    [ClientRpc]
+    public void RemoveYutResultClientRpc(YutResult result, ulong id)
+    {
+        //버튼 누른 클라이언트 주인거에서 찾아서 삭제
+        if(id == NetworkManager.Singleton.LocalClientId)
+        {
+            results.Remove(result);
         }
     }
 

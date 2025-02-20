@@ -119,6 +119,7 @@ GameObject:
   - component: {fileID: 1690134789780533401}
   - component: {fileID: 2296603891353033494}
   - component: {fileID: 1018637637702596077}
+  - component: {fileID: 7869916357255950840}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -227,19 +228,52 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2296603891353033494}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6650298779898698628}
-        m_TargetAssemblyTypeName: YutManager, Assembly-CSharp
-        m_MethodName: ThrowButtonPressed
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+--- !u!114 &7869916357255950840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382540949358359510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6650298779898698628}
+          m_TargetAssemblyTypeName: YutManager, Assembly-CSharp
+          m_MethodName: ThrowButtonPressed
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6650298779898698628}
+          m_TargetAssemblyTypeName: YutManager, Assembly-CSharp
+          m_MethodName: ThrowButtonReleased
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1554134519894355688
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,7 +291,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4655701889099292920
 RectTransform:
   m_ObjectHideFlags: 0
@@ -274,8 +308,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0008773804, y: -314.99564}
-  m_SizeDelta: {x: 1000, y: 56.192}
+  m_AnchoredPosition: {x: -775.08, y: -348.97858}
+  m_SizeDelta: {x: 344.53, y: 80.0429}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7045832816454741923
 CanvasRenderer:
@@ -305,11 +339,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 2ff7e2065206d704dabdd9db7ba241bb, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -623,7 +657,7 @@ MonoBehaviour:
   ground:
     serializedVersion: 2
     m_Bits: 64
-  powerGage: {fileID: 0}
+  powerGauge: {fileID: 1742151000882579911}
   throwPower: 10
   yutNum: 4
   throwChance: 0
