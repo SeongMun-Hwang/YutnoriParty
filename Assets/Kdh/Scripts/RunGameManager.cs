@@ -5,7 +5,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class GrandMaGameManager : NetworkBehaviour
+public class RunGameManager : NetworkBehaviour
 {
     [SerializeField] private Collider goalArea;
     [SerializeField] private TextMeshProUGUI countdownText;
@@ -14,14 +14,14 @@ public class GrandMaGameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winnerText; 
 
     private bool gameStarted = false;
-    private bool gameEnded = false; // °ÔÀÓ Á¾·á »óÅÂ Ãß°¡
+    private bool gameEnded = false; // ê²Œì„ ì¢…ë£Œ ìƒíƒœ ì¶”ê°€
     private ulong winnerClientId;
 
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            gameEnded = false; // ¾À¿¡ µé¾î¿Ã ¶§ °ÔÀÓ Á¾·á »óÅÂ ÃÊ±âÈ­
+            gameEnded = false; // ì”¬ì— ë“¤ì–´ì˜¬ ë•Œ ê²Œì„ ì¢…ë£Œ ìƒíƒœ ì´ˆê¸°í™”
             StartCoroutine(StartCountdown());
         }
         if (gameStarted && IsClient)
@@ -73,18 +73,18 @@ public class GrandMaGameManager : NetworkBehaviour
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
+            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
             {
                 player.EnableControl(true);
             }
         }
 
-        FindAnyObjectByType<GrandmotherChase>().EnableChase();
+        FindAnyObjectByType<Chase>().EnableChase();
     }
     private void EnablePlayerControl()
     {
-        // ¹Ì´Ï°ÔÀÓ ¾À¿¡ µé¾î°¬À» ¶§ ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ È°¼ºÈ­
-        if (TryGetComponent(out ChaseGameController playerController))
+        // ë¯¸ë‹ˆê²Œì„ ì”¬ì— ë“¤ì–´ê°”ì„ ë•Œ í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ í™œì„±í™”
+        if (TryGetComponent(out RunGameController playerController))
         {
             playerController.EnableControl(true);
         }
@@ -109,7 +109,7 @@ public class GrandMaGameManager : NetworkBehaviour
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out ChaseGameController playerController) && !playerController.IsEliminated)
+            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
             {
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
@@ -124,13 +124,13 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         if (gameEnded) return;
 
-        List<ChaseGameController> alivePlayers = new List<ChaseGameController>();
+        List<RunGameController> alivePlayers = new List<RunGameController>();
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
             var playerObject = client.Value.PlayerObject;
 
-            if (playerObject.TryGetComponent(out ChaseGameController playerController) && !playerController.IsEliminated)
+            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
             {
                 alivePlayers.Add(playerController);
             }
@@ -142,21 +142,21 @@ public class GrandMaGameManager : NetworkBehaviour
         }
     }
 
-    private void EndGame(ChaseGameController winner)
+    private void EndGame(RunGameController winner)
     {
         
 
         gameEnded = true;
 
-        Debug.Log(winner.name + "ÀÌ ½Â¸®Çß½À´Ï´Ù!");
+        Debug.Log(winner.name + "ì´ ìŠ¹ë¦¬í–ˆìŠµë‹ˆë‹¤!");
         //winnerClientId = winner.OwnerClientId;
-        // ¸ğµç ÇÃ·¹ÀÌ¾îÀÇ Á¶ÀÛ ¸ØÃß±â
+        // ëª¨ë“  í”Œë ˆì´ì–´ì˜ ì¡°ì‘ ë©ˆì¶”ê¸°
         StopAllPlayersClientRpc();
         ShowWinnerClientRpc(winner.name);
        
-        Debug.Log("¹Ì´Ï°ÔÀÓÀÌ Á¾·áµÇ¾ú½À´Ï´Ù.");
+        Debug.Log("ë¯¸ë‹ˆê²Œì„ì´ ì¢…ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
 
-        // 3ÃÊ ÈÄ ¾À ÀÌµ¿
+        // 3ì´ˆ í›„ ì”¬ ì´ë™
         StartCoroutine(LoadNextScene());
     }
     [ClientRpc]
@@ -173,9 +173,9 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
+            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
             {
-                player.EnableControl(false); // Á¶ÀÛ ºñÈ°¼ºÈ­
+                player.EnableControl(false); // ì¡°ì‘ ë¹„í™œì„±í™”
             }
         }
     }
@@ -185,7 +185,7 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
 
-        if (playerObject != null && playerObject.TryGetComponent(out ChaseGameController playerController))
+        if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController))
         {
             playerController.EnableControl(false);
         }
@@ -197,8 +197,8 @@ public class GrandMaGameManager : NetworkBehaviour
 
         if (IsServer)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // ¸ğµç Å¬¶óÀÌ¾ğÆ®°¡ ÀÌµ¿
-            EnableAllPlayersControlClientRpc(); // ¾À ÀÌµ¿ ÈÄ Áï½Ã ½ÇÇà
+            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ê°€ ì´ë™
+            EnableAllPlayersControlClientRpc(); // ì”¬ ì´ë™ í›„ ì¦‰ì‹œ ì‹¤í–‰
         }
     }
 
@@ -207,7 +207,7 @@ public class GrandMaGameManager : NetworkBehaviour
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out ChaseGameController player))
+            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
             {
                 player.SetEliminated(false);
                 player.EnableControl(true);

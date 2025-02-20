@@ -44,9 +44,6 @@ PrefabInstance:
       addedObject: {fileID: 6700797523645339032}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -1297975421404517350}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -2611304641810267959}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
@@ -57,6 +54,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
       addedObject: {fileID: -2920621726764487699}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7815766270082974244}
   m_SourcePrefab: {fileID: 100100000, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
 --- !u!1 &4333027581788519372 stripped
 GameObject:
@@ -110,21 +110,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &-1297975421404517350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4333027581788519372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 013ba0ee72bde014ca250cbe9df80b53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  moveDistance: 2
-  moveSpeed: 5
 --- !u!136 &-2611304641810267959
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -226,3 +211,17 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 1182734588217233356}
+--- !u!114 &7815766270082974244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4333027581788519372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5920ce1011121024dbb2ca82bf6b5203, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  moveSpeed: 5
