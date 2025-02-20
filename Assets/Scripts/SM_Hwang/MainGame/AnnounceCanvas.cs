@@ -7,12 +7,12 @@ public class AnnounceCanvas : NetworkBehaviour
 {
     [SerializeField] GameObject announceTmp;
 
-    [ClientRpc]
-    public void ShowAnnounceTextClientRpc(string str,float time)
+    //[ClientRpc]
+    public void ShowAnnounceText(string str,float time)
     {
-        StartCoroutine(ShowAnnounceText(str, time));
+        StartCoroutine(ShowAnnounceTextIEnumerator(str, time));
     }
-    private IEnumerator ShowAnnounceText(string str, float time)
+    private IEnumerator ShowAnnounceTextIEnumerator(string str, float time)
     {
         GameObject go=Instantiate(announceTmp,transform.position,Quaternion.identity,transform);
         go.GetComponent<TextMeshProUGUI>().text = str;
