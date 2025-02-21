@@ -4,11 +4,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-enum CharacterMove
-{
-    Forward,
-    Backward
-}
 public class CharacterBoardMovement : NetworkBehaviour
 {
     private Animator animator;
@@ -33,21 +28,21 @@ public class CharacterBoardMovement : NetworkBehaviour
     /*정방향 이동*/
     public void MoveToNextNode(int distance = 1)
     {
-        StartCoroutine(MoveToTargetPos(distance, CharacterMove.Forward));
+        StartCoroutine(MoveToTargetPos(distance));
     }
     /*역방향 이동*/
     public void MoveToPrevNode(int distance = 1)
     {
-        StartCoroutine(MoveToTargetPos(distance, CharacterMove.Backward));
+        StartCoroutine(MoveToTargetPos(distance));
     }
-    private IEnumerator MoveToTargetPos(int distance, CharacterMove dir)
+    private IEnumerator MoveToTargetPos(int distance)
     {
         animator.SetFloat("isMoving", 1f);
-
-        for (int i = 0; i < distance; i++)
+        int moveCount=Mathf.Abs(distance);
+        for (int i = 0; i < moveCount; i++)
         {
             Node tmpNode = null;
-            List<Node> possibleNodes = dir == CharacterMove.Forward ? currentNode.GetNextNode() : currentNode.GetPrevNode();
+            List<Node> possibleNodes = distance>0 ? currentNode.GetNextNode() : currentNode.GetPrevNode();
 
             if (possibleNodes.Count > 1)
             {
@@ -119,6 +114,7 @@ public class CharacterBoardMovement : NetworkBehaviour
     private void EnterGoal()
     {
         Debug.Log("EnterGoal");
+        gameObject.GetComponent<NetworkObject>().Despawn();
         Destroy(gameObject);
     }
 }

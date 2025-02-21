@@ -17,11 +17,16 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
+        if (GameManager.Instance.mainGameProgress.currentCharacter == null)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
+            return;
+        }
         //몇 칸 전진하는지 숫자 반환
         switch (yutResult)
         {
             case YutResult.BackDo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(1);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(-1);
                 //Debug.Log("-1");
                 break;
             case YutResult.Do:
