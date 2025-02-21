@@ -30,11 +30,6 @@ public class CharacterBoardMovement : NetworkBehaviour
     {
         StartCoroutine(MoveToTargetPos(distance));
     }
-    /*역방향 이동*/
-    public void MoveToPrevNode(int distance = 1)
-    {
-        StartCoroutine(MoveToTargetPos(distance));
-    }
     private IEnumerator MoveToTargetPos(int distance)
     {
         animator.SetFloat("isMoving", 1f);
