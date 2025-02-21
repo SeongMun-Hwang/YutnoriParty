@@ -26,7 +26,7 @@ public class YutResults : NetworkBehaviour
         switch (yutResult)
         {
             case YutResult.BackDo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToPrevNode(-1);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(-1);
                 //Debug.Log("-1");
                 break;
             case YutResult.Do:

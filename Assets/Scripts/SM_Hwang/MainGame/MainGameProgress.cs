@@ -8,8 +8,8 @@ public class MainGameProgress : NetworkBehaviour
     private int numOfPlayer;
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
     private bool chooseCharacter = true;
-    private bool isMiniGamePlaying = false;
     public CharacterBoardMovement currentCharacter;
+    private GameObject encounteredEnemy;
     private void Update()
     {
         if (chooseCharacter)
@@ -81,7 +81,15 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
-        StartCoroutine(CheckOtherPlayer());
+        //if (CheckOtherPlayer())
+        //{
+        //    StartMiniGame(encounteredEnemy);
+        //}
+        CheckTurnChange();
+
+    }
+    private void CheckTurnChange()
+    {
         if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
         {
             Debug.Log("End turn");
@@ -89,26 +97,45 @@ public class MainGameProgress : NetworkBehaviour
             EndTurnServerRpc();
         }
     }
-    private IEnumerator CheckOtherPlayer()
+    private bool CheckOtherPlayer()
     {
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
-
         foreach (Collider collider in hitColliders)
         {
             if (collider.TryGetComponent<CharacterBoardMovement>(out var character) &&
-                character.GetComponent<NetworkObject>().OwnerClientId != NetworkManager.LocalClientId)
+                character.GetComponent<NetworkObject>().OwnerClientId != (ulong)currentPlayerNumber.Value)
             {
-                Debug.Log("Loading StackScene...");
-                if (MiniGameSceneManager.Instance == null) Debug.Log("Null");
-                MiniGameSceneManager.Instance.LoadBattleScene();
-                isMiniGamePlaying = true;
-                break; // 한 번만 실행되도록 중단
+                Debug.Log("Find Enemy");
+                encounteredEnemy = character.gameObject;
+                return true;
             }
         }
-        while (isMiniGamePlaying)
+        Debug.Log("Cannot Find enemy");
+        return false;
+        
+    }
+    private void StartMiniGame(GameObject enemy)
+    {
+        //미니게임 실행
+
+        //미니게임 종료
+
+        //미니 게임 승자 아이디 받기
+        ulong winnerId = (ulong)Random.Range(0, 2);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
+        if (winnerId == NetworkManager.LocalClientId)
         {
-            yield return null;
+            Debug.Log("You Win");
+            YutManager.Instance.throwChance++;
+            enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            Destroy(enemy);
         }
+        else
+        {
+            Debug.Log("You Lose");
+            currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+        }
+        CheckTurnChange();
     }
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
@@ -120,7 +147,6 @@ public class MainGameProgress : NetworkBehaviour
         {
             currentPlayerNumber.Value = 0;
         }
-        Debug.Log("Change turn to player" + currentPlayerNumber);
         StartTurn(currentPlayerNumber.Value);
     }
 }
