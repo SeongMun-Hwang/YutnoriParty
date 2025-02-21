@@ -27,6 +27,7 @@ public class YutManager : NetworkBehaviour
     [SerializeField] Yut backDoYutPrefab;
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
+    [SerializeField] YutOutTrigger outTrigger;
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
     [SerializeField] Image powerGauge;
@@ -46,11 +47,12 @@ public class YutManager : NetworkBehaviour
     public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
-    float waitInterval = 0.5f;
+    float waitInterval = 1f;
     float powerAmount = 0;
     bool backDo = false;
     bool isThrowButtonDown = false;
     bool isFaceError = false;
+    bool isYutFalled = false;
 
     public int yutNum = 4;
     public int throwChance = 0;
@@ -73,8 +75,10 @@ public class YutManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         //서버에서만 윷 소환
+        //서버에서만 낙 트리거 판정
         if (!IsServer) return;
 
+        //윷 소환
         Vector3 pos = yutSpawnTransform.position;
 
         for (int i = 0; i < yutNum; i++)
@@ -108,6 +112,25 @@ public class YutManager : NetworkBehaviour
 
             //안보이게 하기
             //yut.gameObject.SetActive(false);
+        }
+
+        //낙 트리거 등록
+        outTrigger.OnYutTriggerd += YutFalled;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        //낙 트리거 해제
+        outTrigger.OnYutTriggerd -= YutFalled;
+    }
+
+    void YutFalled(int num)
+    {
+        //4개 다 떨어지면 좋은 아이템 지급??
+        
+        if(num > 0)
+        {
+            isYutFalled = true;
         }
     }
 
@@ -178,13 +201,18 @@ public class YutManager : NetworkBehaviour
         //윷 몇개 던질지 확인하고, 현재 파워로 던짐
         ThrowYutsServerRpc(yutNum, Mathf.Clamp(minThrowPower + (maxThrowPower - minThrowPower) * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
         throwChance--;
-        Debug.Log("던짐");
+        //Debug.Log("던짐");
     }
 
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
         Debug.Log("던지는 파워 : " + power);
+
+        //낙 해서 키네마틱이던 윷 있으면 풀어줌
+        outTrigger.ReleaseYuts();
+
+        //쓰는거 초기화
         backDo = false;
         faceDown = 0;
         isFaceError = false;
@@ -233,13 +261,19 @@ public class YutManager : NetworkBehaviour
                 //윷이 멈춰있으면 결과 확인 가능한걸로 판단 -> 완전히 안멈추면 결과 안나옴
                 //윷이 수직으로 서있을때 레이캐스트 해버리는 상황 -> 앞 뒷면 레이캐스트를 쏴서 바닥에 면이 붙어있는지 체크
                 //잠깐만 멈춰있어도 타이밍 겹치면 완전히 멈춰버린걸로 판정해버림 -> 다음 루프에서도 멈춰있는지 체크
-                //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity + " 각속도 : " + yut.Rigidbody.angularVelocity);
-                //Debug.Log("리지드바디 잠?" + yut.Rigidbody.IsSleeping());
-                if (yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero && yut.Rigidbody.IsSleeping())
+                //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity.magnitude + " 각속도 : " + yut.Rigidbody.angularVelocity.magnitude);
+                Debug.Log("리지드바디 잠?" + yut.Rigidbody.IsSleeping());
+                if (yut.Rigidbody.IsSleeping())
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
+
+                    //찔끔씩 움직이는거 방지하기 위해서 키네마틱 잠깐 껐다 킴
+                    yut.Rigidbody.isKinematic = true;
+                    yut.Rigidbody.isKinematic = false;
+
                     faces[i] = CalcYutResult(yut);
+                    //Debug.Log("멈춤");
                     //Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
                     //에러 뜨면 안정적이지 않다고 판정, 루프 지속
                     if (faces[i] == YutFace.Error)
@@ -267,6 +301,8 @@ public class YutManager : NetworkBehaviour
             {
                 yutStabledPrev = false;
             }
+
+            Debug.Log("전에 멈춤 ? : " +  yutStabledPrev + " 이번에 멈춤? : " + yutStable);
 
             //이번 루프와 이전 루프 모두 멈춰있었으면 완전히 멈춘걸로 판단
             if (yutStable && yutStabledPrev)
@@ -319,6 +355,19 @@ public class YutManager : NetworkBehaviour
             yield break;
         }
 
+        if (isYutFalled)
+        {
+            Debug.Log("낙! 턴이 넘어갑니다");
+
+            //윷 결과 비워버리고
+            ClearYutResuliClientRpc();
+            //이동 끝 실행해서 턴 넘김
+            GameManager.Instance.mainGameProgress.EndMove();
+            isYutFalled = false;
+
+            yield break;
+        }
+
         switch (faceDown)
         {
             case 0:
@@ -356,7 +405,7 @@ public class YutManager : NetworkBehaviour
     {
         bool isFront = YutRayCast(yut, true);
         bool isBack = YutRayCast(yut, false);
-        Debug.Log("앞면 : " +  isFront + " 뒷면 : " +  isBack);
+        //Debug.Log("앞면 : " +  isFront + " 뒷면 : " +  isBack);
 
         //두 결과가 모두 달라야만 올바른 출력
         if (isFront ^ isBack) 
