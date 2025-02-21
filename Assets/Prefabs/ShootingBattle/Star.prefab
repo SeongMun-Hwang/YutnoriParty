@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 675993713094348069}
   - component: {fileID: 5177304061824544899}
   - component: {fileID: 1639867927544858639}
+  - component: {fileID: 9216966462056994395}
   m_Layer: 0
   m_Name: Star
   m_TagString: Untagged
@@ -102,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3080971720
+  GlobalObjectIdHash: 847038646
   InScenePlacedSourceGlobalObjectIdHash: 3080971720
   DeferredDespawnTick: 0
   Ownership: 1
@@ -259,3 +260,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shotEffect: {fileID: 1137233926978328921, guid: 31949f22d7d488346a4a6c2e011a3a2b, type: 3}
+--- !u!95 &9216966462056994395
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3281761353814920671}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0949032de4d53f340948aebda9c8aea3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

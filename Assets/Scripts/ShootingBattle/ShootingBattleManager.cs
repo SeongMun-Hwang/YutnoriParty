@@ -3,9 +3,16 @@ using UnityEngine;
 
 public class ShootingBattleManager : NetworkBehaviour
 {
+    [SerializeField] GameObject StarPrefab;
+    public int maxStar = 10;
+
     private void Start()
     {
-
+        for (int i = 0; i < maxStar; i++)
+        {
+            Vector3 randomPos = new Vector3(Random.Range(-5f, 5f), Random.Range(-3f, 3f), 0);
+            Instantiate(StarPrefab, randomPos, transform.rotation);
+        }
     }
 
     public override void OnNetworkSpawn()
