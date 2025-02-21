@@ -37,18 +37,20 @@ public class YutManager : NetworkBehaviour
 
     int faceDown = 0;
     int powerAmountSign = 1;
-    float yutRaycastLength = 5;
-    float minThrowPower = 8;
-    float maxThrowPower = 20;
+    float yutRaycastLength = 3;
+    float minThrowPower = 200;
+    float maxThrowPower = 300;
     float powerTimeOut = 3;
     float powerStartTime = 0;
-    float torque = 3;
+    float torque = 80;
+    public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
-    float waitInterval = 1;
+    float waitInterval = 0.5f;
     float powerAmount = 0;
     bool backDo = false;
     bool isThrowButtonDown = false;
+    bool isFaceError = false;
 
     public int yutNum = 4;
     public int throwChance = 0;
@@ -174,7 +176,7 @@ public class YutManager : NetworkBehaviour
         isThrowButtonDown = false;
 
         //윷 몇개 던질지 확인하고, 현재 파워로 던짐
-        ThrowYutsServerRpc(yutNum, Mathf.Clamp(maxThrowPower * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
+        ThrowYutsServerRpc(yutNum, Mathf.Clamp(minThrowPower + (maxThrowPower - minThrowPower) * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
         throwChance--;
         Debug.Log("던짐");
     }
@@ -182,8 +184,10 @@ public class YutManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
+        Debug.Log("던지는 파워 : " + power);
         backDo = false;
         faceDown = 0;
+        isFaceError = false;
         for (int i = 0; i < yutNums; i++)
         {
             Yut yut = yuts[i];
@@ -212,13 +216,14 @@ public class YutManager : NetworkBehaviour
         ulong senderId = rpcParams.Receive.SenderClientId;
 
         bool yutStable = false;
+        bool yutStabledPrev = false;
         YutFace[] faces = new YutFace[yutNums];
 
         //일정 시간동안 반복
         //waitTime 안에 결과가 안나오면 에러남
         while (timePassed < waitTime)
         {
-            //1초마다 윷 상태를 확인
+            //waitInterval 마다 윷 상태를 확인
             yield return new WaitForSecondsRealtime(waitInterval);
 
             for (int i = 0; i < yutNums; i++)
@@ -227,12 +232,15 @@ public class YutManager : NetworkBehaviour
 
                 //윷이 멈춰있으면 결과 확인 가능한걸로 판단 -> 완전히 안멈추면 결과 안나옴
                 //윷이 수직으로 서있을때 레이캐스트 해버리는 상황 -> 앞 뒷면 레이캐스트를 쏴서 바닥에 면이 붙어있는지 체크
-                if (yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
+                //잠깐만 멈춰있어도 타이밍 겹치면 완전히 멈춰버린걸로 판정해버림 -> 다음 루프에서도 멈춰있는지 체크
+                //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity + " 각속도 : " + yut.Rigidbody.angularVelocity);
+                //Debug.Log("리지드바디 잠?" + yut.Rigidbody.IsSleeping());
+                if (yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero && yut.Rigidbody.IsSleeping())
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
                     faces[i] = CalcYutResult(yut);
-                    Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
+                    //Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
                     //에러 뜨면 안정적이지 않다고 판정, 루프 지속
                     if (faces[i] == YutFace.Error)
                     {
@@ -246,13 +254,35 @@ public class YutManager : NetworkBehaviour
                 }
             }
 
+            //이전 루프때도 멈춰있었는지 판별
             if (yutStable)
+            {
+                if (!yutStabledPrev)
+                {
+                    yutStabledPrev = true;
+                    yutStable = false;
+                }
+            }
+            else
+            {
+                yutStabledPrev = false;
+            }
+
+            //이번 루프와 이전 루프 모두 멈춰있었으면 완전히 멈춘걸로 판단
+            if (yutStable && yutStabledPrev)
             {
                 for (int i = 0; i < yutNums; i++)
                 {
                     //레이캐스트 해서 앞뒷면 계산
                     faces[i] = CalcYutResult(yuts[i]);
+                    Debug.Log(i + "번 면 : " + faces[i]);
+
                     //윷 결과 계산
+                    if(faces[i] == YutFace.Error)
+                    {
+                        isFaceError = true;
+                        break;
+                    }
                     if (faces[i] == YutFace.Back)
                     {
                         //백도 계산
@@ -276,6 +306,14 @@ public class YutManager : NetworkBehaviour
         {
             Debug.Log("결과 산출 실패 : 타임아웃");
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
+            ThrowChanceChangeClientRpc(1, senderId);
+
+            yield break;
+        }
+
+        if (isFaceError)
+        {
+            Debug.Log("결과 산출 실패 : 면 판단 실패");
             ThrowChanceChangeClientRpc(1, senderId);
 
             yield break;
@@ -309,6 +347,9 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
+
+        //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
+        yield break;
     }
 
     YutFace CalcYutResult(Yut yut)
