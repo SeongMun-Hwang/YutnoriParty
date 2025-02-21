@@ -646,11 +646,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4126322290754499463}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebb4ffdd8fcf36046b774cd6343cb7a9, type: 3}
+  m_Script: {fileID: 11500000, guid: f3c57f67c4a8b4446921d3e898163465, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   yutPrefab: {fileID: 1985562655655713190, guid: 8bfa4822d670de94380242d4e3beba04, type: 3}
+  backDoYutPrefab: {fileID: 1985562655655713190, guid: cee9bdcbc82e0d44fb6907a5d97f2030, type: 3}
   yutResultContent: {fileID: 7136100826372896414}
   yutResultPrefab: {fileID: -5903856209648657327, guid: ae05ff39043882244b8ae430601f9963, type: 3}
   yutSpawnTransform: {fileID: 1201246957298705448}

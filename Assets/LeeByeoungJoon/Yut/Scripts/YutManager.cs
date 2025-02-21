@@ -14,9 +14,17 @@ public enum YutResult
     BackDo,
     Error
 }
+
+enum YutFace
+{
+    Back,
+    Front,
+    Error
+}
 public class YutManager : NetworkBehaviour
 {
     [SerializeField] Yut yutPrefab;
+    [SerializeField] Yut backDoYutPrefab;
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
     [SerializeField] Transform yutSpawnTransform;
@@ -29,7 +37,7 @@ public class YutManager : NetworkBehaviour
 
     int faceDown = 0;
     int powerAmountSign = 1;
-    public float throwPower = 10;
+    float yutRaycastLength = 5;
     float minThrowPower = 8;
     float maxThrowPower = 20;
     float powerTimeOut = 3;
@@ -70,7 +78,16 @@ public class YutManager : NetworkBehaviour
         for (int i = 0; i < yutNum; i++)
         {
             //윷 소환하고
-            yuts.Add(Instantiate(yutPrefab));
+            if (i == 0)
+            {
+                //0번 윷은 백도 윷
+                yuts.Add(Instantiate(backDoYutPrefab));
+            }
+            else
+            {
+                //나머지는 그냥 윷
+                yuts.Add(Instantiate(yutPrefab));
+            }
 
             Yut yut = yuts[i];
             //윷 전체의 중심 위치 맞추기 위한 똥꼬쇼
@@ -195,6 +212,7 @@ public class YutManager : NetworkBehaviour
         ulong senderId = rpcParams.Receive.SenderClientId;
 
         bool yutStable = false;
+        YutFace[] faces = new YutFace[yutNums];
 
         //일정 시간동안 반복
         //waitTime 안에 결과가 안나오면 에러남
@@ -208,10 +226,18 @@ public class YutManager : NetworkBehaviour
                 Yut yut = yuts[i];
 
                 //윷이 멈춰있으면 결과 확인 가능한걸로 판단 -> 완전히 안멈추면 결과 안나옴
+                //윷이 수직으로 서있을때 레이캐스트 해버리는 상황 -> 앞 뒷면 레이캐스트를 쏴서 바닥에 면이 붙어있는지 체크
                 if (yut.Rigidbody.linearVelocity == Vector3.zero && yut.Rigidbody.angularVelocity == Vector3.zero)
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
+                    faces[i] = CalcYutResult(yut);
+                    Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
+                    //에러 뜨면 안정적이지 않다고 판정, 루프 지속
+                    if (faces[i] == YutFace.Error)
+                    {
+                        yutStable = false;
+                    }
                 }
                 else
                 {
@@ -224,11 +250,10 @@ public class YutManager : NetworkBehaviour
             {
                 for (int i = 0; i < yutNums; i++)
                 {
-                    Yut yut = yuts[i];
-
                     //레이캐스트 해서 앞뒷면 계산
+                    faces[i] = CalcYutResult(yuts[i]);
                     //윷 결과 계산
-                    if (CalcYutResult(yut))
+                    if (faces[i] == YutFace.Back)
                     {
                         //백도 계산
                         if (i == 0)
@@ -286,16 +311,45 @@ public class YutManager : NetworkBehaviour
         }
     }
 
-    bool CalcYutResult(Yut yut)
+    YutFace CalcYutResult(Yut yut)
     {
-        RaycastHit hit;
-        Debug.DrawRay(yut.transform.position, yut.transform.right * 10, Color.red, 0.3f);
-        if (Physics.Raycast(yut.transform.position, yut.transform.right, out hit, 10, ground))
+        bool isFront = YutRayCast(yut, true);
+        bool isBack = YutRayCast(yut, false);
+        Debug.Log("앞면 : " +  isFront + " 뒷면 : " +  isBack);
+
+        //두 결과가 모두 달라야만 올바른 출력
+        if (isFront ^ isBack) 
         {
-            //Debug.Log("뒷면임");
+            if (isFront)
+            {
+                return YutFace.Front;
+            }   
+            else
+            {
+                return YutFace.Back;
+            }
+        }
+        //둘 다 같은거 나오면 정상적인 상태가 아니므로 오류출력
+        return YutFace.Error;
+    }
+
+    bool YutRayCast(Yut yut, bool isFront)
+    {
+        Vector3 dir = yut.transform.right;
+        Color color = Color.red;
+
+        if (isFront)
+        {
+            dir *= -1;
+            color = Color.green;
+        }
+        
+        RaycastHit hit;
+        Debug.DrawRay(yut.transform.position, dir * yutRaycastLength, color, 0.3f);
+        if (Physics.Raycast(yut.transform.position, dir, out hit, yutRaycastLength, ground))
+        {
             return true;
         }
-        //Debug.Log("앞면임");
         return false;
     }
 
