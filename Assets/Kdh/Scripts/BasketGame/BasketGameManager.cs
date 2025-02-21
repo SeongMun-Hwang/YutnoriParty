@@ -8,7 +8,7 @@ public class BasketGameManager : NetworkBehaviour
     [SerializeField] private float gameTime = 60f; // 게임 시간
     [SerializeField] private TextMeshProUGUI timerText; // 타이머 UI
     [SerializeField] private TextMeshProUGUI winnerText; // 승자 텍스트 UI
-
+    [SerializeField] private GameObject winnerTextCanvas;
     private float remainingTime;
     private bool gameEnded = false;
     //게임카운트다운추가,스폰에 게임시작,끝알림추가
@@ -19,7 +19,12 @@ public class BasketGameManager : NetworkBehaviour
             remainingTime = gameTime;
             StartCoroutine(GameTimer());
         }
+        if (winnerTextCanvas != null)
+        {
+            winnerTextCanvas.SetActive(false);
+        }
     }
+
 
     private IEnumerator GameTimer()
     {
@@ -78,6 +83,14 @@ public class BasketGameManager : NetworkBehaviour
     [ClientRpc]
     private void DisplayWinnerClientRpc(string winnerName)
     {
-        winnerText.text = $"{winnerName} Win!";
+        if (winnerTextCanvas != null)
+        {
+            winnerTextCanvas.SetActive(true); // 승자 UI 활성화
+        }
+
+        if (winnerText != null)
+        {
+            winnerText.text = $"{winnerName} Win!"; // 승자 이름 출력
+        }
     }
 }
