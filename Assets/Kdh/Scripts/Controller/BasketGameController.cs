@@ -1,27 +1,51 @@
 using Unity.Netcode;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class BasketGameController : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;     
 
     private Vector3 targetPosition;
     private Animator animator;
-    private bool canMove = true;
+    private bool canMove = true;//테스트때매 true한것 매니저에서 true해줘야함 
+    private string currentSceneName;
 
     private void Start()
     {
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);//요건 나중에 스폰위치관련으로 따로 수정할수도?
+        currentSceneName = SceneManager.GetActiveScene().name;
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; 
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
+        currentSceneName = SceneManager.GetActiveScene().name;
+        // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
+        targetPosition = spawnTransform.position;
+        transform.position = targetPosition;
+    }
+
+  
+
     private void Update()
     {
-        if (!IsOwner || !canMove) return;
+        if (!IsOwner || !canMove || SceneManager.GetActiveScene().name != "BasketGame") return;
 
-        Camera.main.transform.position = transform.position + new Vector3(0, 15, -5);
-        Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);
+        //Camera.main.transform.position = transform.position + new Vector3(0, 15, -5);
+        //Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);// 카메라 지울지 말지 고민중
 
 
         Vector3 moveDirection = Vector3.zero;
