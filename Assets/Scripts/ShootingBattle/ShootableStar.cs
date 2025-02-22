@@ -9,6 +9,7 @@ public class ShootableStar : MonoBehaviour
     private Vector2 moveDirection; // 이동 방향
     private float moveSpeed; // 이동 속도
     private Vector2 minBounds, maxBounds; // 화면 바운더리
+    private float boundsOffset = 4f;
 
     [SerializeField] private GameObject shotEffect;
     private Animator _animator;
@@ -28,8 +29,8 @@ public class ShootableStar : MonoBehaviour
         transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
         transform.position += (Vector3)(moveDirection * moveSpeed * Time.deltaTime);
 
-        if (transform.position.x < minBounds.x || transform.position.x > maxBounds.x ||
-            transform.position.y < minBounds.y || transform.position.y > maxBounds.y)
+        if (transform.position.x < minBounds.x - boundsOffset || transform.position.x > maxBounds.x + boundsOffset ||
+            transform.position.y < minBounds.y - boundsOffset || transform.position.y > maxBounds.y + boundsOffset)
         {
             Destroy(gameObject); // 별 삭제
         }

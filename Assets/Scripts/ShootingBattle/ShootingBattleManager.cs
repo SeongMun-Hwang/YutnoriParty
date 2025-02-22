@@ -1,18 +1,21 @@
+using System.Collections;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 public class ShootingBattleManager : NetworkBehaviour
 {
     [SerializeField] GameObject StarPrefab;
-    public int maxStar = 10;
+    private bool isPlaying;
+    [SerializeField] private float spawnDuration = 1.5f;
+    [SerializeField] private TMP_Text timerUI;
+    [SerializeField] private float timer = 15f;
 
     private void Start()
     {
-        for (int i = 0; i < maxStar; i++)
-        {
-            Vector3 randomPos = new Vector3(Random.Range(-5f, 5f), Random.Range(-3f, 3f), 0);
-            Instantiate(StarPrefab, randomPos, transform.rotation);
-        }
+        isPlaying = true;
+        StartCoroutine(SpawnStar());
+        StartCoroutine(CountTimer());
     }
 
     public override void OnNetworkSpawn()
@@ -36,6 +39,37 @@ public class ShootingBattleManager : NetworkBehaviour
                     star.OnClick();
                 }
             }
+        }
+    }
+
+    private IEnumerator CountTimer()
+    {
+        while (isPlaying)
+        {
+            yield return null;
+            timer--;
+            timerUI.text = timer.ToString();
+            yield return new WaitForSecondsRealtime(1f);
+
+            if (timer == 0)
+            {
+                isPlaying = false;
+                yield break;
+            }
+        }
+    }
+
+    private IEnumerator SpawnStar()
+    {
+        while (isPlaying)
+        {
+            yield return null;
+
+            Vector3 randomPos = new Vector3(Random.Range(-7f, 7f), Random.Range(-2f, 2f), 0);
+            Instantiate(StarPrefab, randomPos, transform.rotation);
+
+            yield return new WaitForSecondsRealtime(spawnDuration);
+            spawnDuration = Mathf.Clamp(spawnDuration - 0.4f, 0.2f, 1.5f);
         }
     }
 }
