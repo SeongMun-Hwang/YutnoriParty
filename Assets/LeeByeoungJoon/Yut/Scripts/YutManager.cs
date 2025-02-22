@@ -47,8 +47,9 @@ public class YutManager : NetworkBehaviour
     public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
-    float waitInterval = 1f;
+    float waitInterval = 0.5f;
     float powerAmount = 0;
+    float yutSleepThreshold = 0.05f;
     bool backDo = false;
     bool isThrowButtonDown = false;
     bool isFaceError = false;
@@ -112,6 +113,9 @@ public class YutManager : NetworkBehaviour
 
             //안보이게 하기
             //yut.gameObject.SetActive(false);
+
+            //작은 움직임이 남아도 멈춘걸로 인식하도록 값 조절
+            //yut.Rigidbody.sleepThreshold = yutSleepThreshold;
         }
 
         //낙 트리거 등록
@@ -262,15 +266,16 @@ public class YutManager : NetworkBehaviour
                 //윷이 수직으로 서있을때 레이캐스트 해버리는 상황 -> 앞 뒷면 레이캐스트를 쏴서 바닥에 면이 붙어있는지 체크
                 //잠깐만 멈춰있어도 타이밍 겹치면 완전히 멈춰버린걸로 판정해버림 -> 다음 루프에서도 멈춰있는지 체크
                 //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity.magnitude + " 각속도 : " + yut.Rigidbody.angularVelocity.magnitude);
-                Debug.Log("리지드바디 잠?" + yut.Rigidbody.IsSleeping());
-                if (yut.Rigidbody.IsSleeping())
+                Debug.Log("리지드바디 잠? " + yut.Rigidbody.IsSleeping());
+                Debug.Log("윷 서있음? " + yut.IsVertical);
+                if (yut.Rigidbody.linearVelocity.magnitude < 0.1f && yut.Rigidbody.angularVelocity.magnitude < 0.1f && !yut.IsVertical)
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
 
                     //찔끔씩 움직이는거 방지하기 위해서 키네마틱 잠깐 껐다 킴
-                    yut.Rigidbody.isKinematic = true;
-                    yut.Rigidbody.isKinematic = false;
+                    //yut.Rigidbody.isKinematic = true;
+                    //yut.Rigidbody.isKinematic = false;
 
                     faces[i] = CalcYutResult(yut);
                     //Debug.Log("멈춤");

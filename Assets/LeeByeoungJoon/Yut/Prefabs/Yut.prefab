@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 5177154057717698913}
   - component: {fileID: 9066379463860368498}
   m_Layer: 0
-  m_Name: VerticleTrigger2
+  m_Name: VerticalTrigger2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 4963803133351615779}
   - component: {fileID: 6129509664967799948}
   m_Layer: 0
-  m_Name: VerticleTrigger
+  m_Name: VerticalTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
