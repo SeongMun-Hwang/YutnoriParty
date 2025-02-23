@@ -28,6 +28,11 @@ public class ShootableStar : MonoBehaviour
 
     private void Update()
     {
+        if (!manager.isPlaying.Value)
+        {
+            Destroy(gameObject);
+        }
+
         transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
         transform.position += (Vector3)(moveDirection * moveSpeed * Time.deltaTime);
 

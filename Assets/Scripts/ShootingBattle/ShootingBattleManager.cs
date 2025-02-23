@@ -4,19 +4,21 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class ShootingBattleManager : NetworkBehaviour
 {
     // 게임에 참여하는 유저 관련
     [SerializeField] private int maxPlayers;
     private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
+    int currentId = -1;
 
     // UI 관련
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> scoreUI;
 
     // 게임 상태 및 진행 관련
-    [SerializeField] private NetworkVariable<bool> isPlaying;
+    [SerializeField] public NetworkVariable<bool> isPlaying;
     private bool gameStart = false;
     [SerializeField] private float timer = 15f;
     private NetworkList<int> playerScore = new NetworkList<int>(); // 플레이어들의 획득 점수
@@ -34,6 +36,8 @@ public class ShootingBattleManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        currentId = playerIds.Count;
+        Debug.Log($"플레이어 ID : {currentId}");
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
@@ -45,6 +49,7 @@ public class ShootingBattleManager : NetworkBehaviour
         if (!playerIds.Contains(clientId))
         {
             playerIds.Add(clientId);
+            playerScore.Add(0);
 
             if (playerIds.Count == maxPlayers)
             {
@@ -55,11 +60,18 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void Update()
     {
-        if (isPlaying.Value && !gameStart)
+        if (isPlaying.Value)
         {
-            StartCoroutine(SpawnStar());
-            StartCoroutine(CountTimer());
-            gameStart = true;
+            if (!gameStart)
+            {
+                StartCoroutine(SpawnStar());
+                StartCoroutine(CountTimer());
+                gameStart = true;
+            }
+            else
+            {
+                UpdateScoreUI();
+            }
         }
 
         if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 클릭
@@ -74,8 +86,23 @@ public class ShootingBattleManager : NetworkBehaviour
                 if (star != null)
                 {
                     star.OnClick();
+                    AddScoreServerRpc(currentId);
                 }
             }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void AddScoreServerRpc(int id)
+    {
+        playerScore[id]++;
+    }
+
+    private void UpdateScoreUI()
+    {
+        for (int i = 0; i < maxPlayers; i++)
+        {
+            scoreUI[i].text = playerScore[i].ToString();
         }
     }
 
@@ -90,7 +117,10 @@ public class ShootingBattleManager : NetworkBehaviour
 
             if (timer == 0)
             {
-                isPlaying.Value = false;
+                if (IsServer)
+                {
+                    isPlaying.Value = false;
+                }
                 yield break;
             }
         }
@@ -103,7 +133,8 @@ public class ShootingBattleManager : NetworkBehaviour
             yield return null;
 
             Vector3 randomPos = new Vector3(Random.Range(-7f, 7f), Random.Range(-2f, 2f), 0);
-            Instantiate(StarPrefab, randomPos, transform.rotation);
+            GameObject star = Instantiate(StarPrefab, randomPos, transform.rotation);
+            star.GetComponent<ShootableStar>().manager = this;
 
             yield return new WaitForSecondsRealtime(spawnDuration);
             spawnDuration = Mathf.Clamp(spawnDuration - 0.4f, 0.2f, 1.5f);

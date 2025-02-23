@@ -2306,7 +2306,11 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   maxPlayers: 4
   timerUI: {fileID: 687331245}
-  scoreUI: []
+  scoreUI:
+  - {fileID: 784526053}
+  - {fileID: 1403991593}
+  - {fileID: 146911231}
+  - {fileID: 741693459}
   isPlaying:
     m_InternalValue: 0
   timer: 15
