@@ -39,11 +39,11 @@ public class YutManager : NetworkBehaviour
     int faceDown = 0;
     int powerAmountSign = 1;
     float yutRaycastLength = 3;
-    float minThrowPower = 200;
-    float maxThrowPower = 300;
-    float powerTimeOut = 3;
+    float minThrowPower = 200; //최소 파워
+    float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
+    float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float torque = 80;
+    float torque = 80; //토크
     public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
@@ -54,6 +54,7 @@ public class YutManager : NetworkBehaviour
     bool isThrowButtonDown = false;
     bool isFaceError = false;
     bool isYutFalled = false;
+    bool faceStable = false;
 
     public int yutNum = 4;
     public int throwChance = 0;
@@ -266,9 +267,8 @@ public class YutManager : NetworkBehaviour
                 //윷이 수직으로 서있을때 레이캐스트 해버리는 상황 -> 앞 뒷면 레이캐스트를 쏴서 바닥에 면이 붙어있는지 체크
                 //잠깐만 멈춰있어도 타이밍 겹치면 완전히 멈춰버린걸로 판정해버림 -> 다음 루프에서도 멈춰있는지 체크
                 //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity.magnitude + " 각속도 : " + yut.Rigidbody.angularVelocity.magnitude);
-                Debug.Log("리지드바디 잠? " + yut.Rigidbody.IsSleeping());
-                Debug.Log("윷 서있음? " + yut.IsVertical);
-                if (yut.Rigidbody.linearVelocity.magnitude < 0.1f && yut.Rigidbody.angularVelocity.magnitude < 0.1f && !yut.IsVertical)
+                //Debug.Log("리지드바디 잠? " + yut.Rigidbody.IsSleeping());
+                if (yut.Rigidbody.linearVelocity.magnitude < 0.1f && yut.Rigidbody.angularVelocity.magnitude < 0.1f)
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
@@ -277,11 +277,12 @@ public class YutManager : NetworkBehaviour
                     //yut.Rigidbody.isKinematic = true;
                     //yut.Rigidbody.isKinematic = false;
 
-                    faces[i] = CalcYutResult(yut);
                     //Debug.Log("멈춤");
                     //Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
-                    //에러 뜨면 안정적이지 않다고 판정, 루프 지속
-                    if (faces[i] == YutFace.Error)
+                    //Debug.Log("윷 서있음? " + yut.IsVertical);
+
+                    //윷 서있으면 안정적이지 않다고 판정, 루프 지속
+                    if (yut.IsVertical)
                     {
                         yutStable = false;
                     }
@@ -309,14 +310,22 @@ public class YutManager : NetworkBehaviour
 
             Debug.Log("전에 멈춤 ? : " +  yutStabledPrev + " 이번에 멈춤? : " + yutStable);
 
+            faceStable = false;
             //이번 루프와 이전 루프 모두 멈춰있었으면 완전히 멈춘걸로 판단
             if (yutStable && yutStabledPrev)
             {
                 for (int i = 0; i < yutNums; i++)
                 {
+                    //이전 결과랑 이번 결과랑 다르면 안정적이지 않다고 판단, 다시 계산
+                    Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + CalcYutResult(yuts[i]));
+                    if (faces[i] == CalcYutResult(yuts[i]))
+                    {
+                        faceStable = true;
+                    }
+
                     //레이캐스트 해서 앞뒷면 계산
                     faces[i] = CalcYutResult(yuts[i]);
-                    Debug.Log(i + "번 면 : " + faces[i]);
+                    Debug.Log(i + "번 최종 결과 : " + faces[i]);
 
                     //윷 결과 계산
                     if(faces[i] == YutFace.Error)
@@ -336,7 +345,12 @@ public class YutManager : NetworkBehaviour
                         //Debug.Log("뒷면 +1, 총 개수 : " + faceDown);
                     }
                 }
-                break;
+
+                //면 안정적이지 않으면 루프 지속
+                if (faceStable)
+                {
+                    break;
+                }
             }
 
             timePassed += waitInterval;
