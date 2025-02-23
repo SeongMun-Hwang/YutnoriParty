@@ -14,6 +14,8 @@ public class ShootableStar : MonoBehaviour
     [SerializeField] private GameObject shotEffect;
     private Animator _animator;
 
+    public ShootingBattleManager manager;
+
     private void Start()
     {
         _animator = GetComponent<Animator>();
