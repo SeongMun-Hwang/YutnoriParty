@@ -2450,7 +2450,7 @@ MonoBehaviour:
   - {fileID: 741693459}
   isPlaying:
     m_InternalValue: 0
-  timer: 30
+  timer: 15
   spawnDuration: 3
   StarPrefab: {fileID: 3281761353814920671, guid: f27bbf69db802a64fb4fa56d7b8a1293, type: 3}
 --- !u!1 &1958560225

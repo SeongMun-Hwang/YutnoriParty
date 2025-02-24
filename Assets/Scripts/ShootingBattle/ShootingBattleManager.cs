@@ -130,6 +130,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 if (IsServer)
                 {
                     isPlaying.Value = false;
+                    Debug.Log($"게임 종료! {topPlayerId} 플레이어 승리");
                 }
                 yield break;
             }
