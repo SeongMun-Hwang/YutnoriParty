@@ -216,10 +216,7 @@ public class YutManager : NetworkBehaviour
         //낙 해서 키네마틱이던 윷 있으면 풀어줌
         outTrigger.ReleaseYuts();
 
-        //쓰는거 초기화
-        backDo = false;
-        faceDown = 0;
-        isFaceError = false;
+       
         for (int i = 0; i < yutNums; i++)
         {
             Yut yut = yuts[i];
@@ -309,21 +306,36 @@ public class YutManager : NetworkBehaviour
 
             Debug.Log("전에 멈춤 ? : " +  yutStabledPrev + " 이번에 멈춤? : " + yutStable);
 
-            faceStable = false;
             //이번 루프와 이전 루프 모두 멈춰있었으면 완전히 멈춘걸로 판단
             if (yutStable && yutStabledPrev)
             {
+                //쓰는거 초기화
+                faceStable = false;
+                backDo = false;
+                faceDown = 0;
+                isFaceError = false;
+
                 for (int i = 0; i < yutNums; i++)
                 {
+                    YutFace curFace = CalcYutResult(yuts[i]);
+                    //면이 에러거나,
                     //이전 결과랑 이번 결과랑 다르면 안정적이지 않다고 판단, 다시 계산
-                    Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + CalcYutResult(yuts[i]));
-                    if (faces[i] == CalcYutResult(yuts[i]))
+                    Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + curFace);
+                    if (faces[i] == curFace)
                     {
                         faceStable = true;
                     }
+                    else if (faces[i] != curFace || faces[i] == YutFace.Error)
+                    {
+                        faceStable = false;
+                    }
 
                     //레이캐스트 해서 앞뒷면 계산
-                    faces[i] = CalcYutResult(yuts[i]);
+                    faces[i] = curFace;
+
+                    //결과 다르면 최종결과 안나옴
+                    if (!faceStable) break;
+
                     Debug.Log(i + "번 최종 결과 : " + faces[i]);
 
                     //윷 결과 계산
