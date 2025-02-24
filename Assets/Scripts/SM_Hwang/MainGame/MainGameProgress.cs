@@ -81,21 +81,12 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
-        //if (CheckOtherPlayer())
-        //{
-        //    StartMiniGame(encounteredEnemy);
-        //}
+        if (CheckOtherPlayer())
+        {
+            StartMiniGame(encounteredEnemy);
+        }
         CheckTurnChange();
 
-    }
-    private void CheckTurnChange()
-    {
-        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
-        {
-            Debug.Log("End turn");
-            GameManager.Instance.inGameCanvas.SetActive(false);
-            EndTurnServerRpc();
-        }
     }
     private bool CheckOtherPlayer()
     {
@@ -112,8 +103,18 @@ public class MainGameProgress : NetworkBehaviour
         }
         Debug.Log("Cannot Find enemy");
         return false;
-        
+
     }
+    private void CheckTurnChange()
+    {
+        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
+        {
+            Debug.Log("End turn");
+            GameManager.Instance.inGameCanvas.SetActive(false);
+            EndTurnServerRpc();
+        }
+    }
+
     private void StartMiniGame(GameObject enemy)
     {
         //미니게임 실행
@@ -128,20 +129,19 @@ public class MainGameProgress : NetworkBehaviour
             Debug.Log("You Win");
             YutManager.Instance.throwChance++;
             enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
-            Destroy(enemy);
         }
         else
         {
             Debug.Log("You Lose");
             currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
         }
-        CheckTurnChange();
     }
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
     [ServerRpc(RequireOwnership = false)]
     void EndTurnServerRpc()
     {
+        Debug.Log("Change Turn");
         currentPlayerNumber.Value++;
         if (currentPlayerNumber.Value == numOfPlayer)
         {

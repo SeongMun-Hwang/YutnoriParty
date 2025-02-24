@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -21,5 +22,6 @@ public class GameManager : NetworkBehaviour
     public AnnounceCanvas announceCanvas;
     public GameObject inGameCanvas;
     public MainGameProgress mainGameProgress;
-    public Node startNode;    
+    public Node startNode;
+    public List<GameObject> playerCharacters;
 }

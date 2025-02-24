@@ -143,6 +143,7 @@ public class YutManager : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             //MyTurn();
+            Debug.Log(throwChance);
             YutResultCount();
         }
 
