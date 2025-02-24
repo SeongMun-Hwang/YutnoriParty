@@ -3319,6 +3319,7 @@ MonoBehaviour:
   inGameCanvas: {fileID: 897736197}
   mainGameProgress: {fileID: 1365642760}
   startNode: {fileID: 1219398259}
+  playerCharacters: []
 --- !u!4 &1698649115
 Transform:
   m_ObjectHideFlags: 0
