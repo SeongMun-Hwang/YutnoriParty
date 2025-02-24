@@ -20,8 +20,10 @@ public class ShootingBattleManager : NetworkBehaviour
     // 게임 상태 및 진행 관련
     [SerializeField] public NetworkVariable<bool> isPlaying;
     private bool gameStart = false;
-    [SerializeField] private float timer = 15f;
+    [SerializeField] private float timer = 30f;
     private NetworkList<int> playerScore = new NetworkList<int>(); // 플레이어들의 획득 점수
+    private int topPlayerId = 0;
+    private int topPlayerScore = 0;
 
     // 게임 규칙 관련
     [SerializeField] private float spawnDuration = 1.5f;
@@ -96,6 +98,14 @@ public class ShootingBattleManager : NetworkBehaviour
     private void AddScoreServerRpc(int id)
     {
         playerScore[id]++;
+
+        // 가장 높은 점수를 가장 빠르게 달성한 사람을 기록
+        if (topPlayerScore < playerScore[id])
+        {
+            topPlayerScore = playerScore[id];
+            topPlayerId = id;
+            Debug.Log($"현재 1등 {topPlayerId} : {topPlayerScore}");
+        }
     }
 
     private void UpdateScoreUI()
