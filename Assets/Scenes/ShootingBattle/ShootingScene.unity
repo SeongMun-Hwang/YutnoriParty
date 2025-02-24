@@ -2448,6 +2448,7 @@ MonoBehaviour:
   - {fileID: 1403991593}
   - {fileID: 146911231}
   - {fileID: 741693459}
+  cursorTexture: {fileID: 2800000, guid: 8c89ed5746a4faa48bb97701cc2f2e35, type: 3}
   isPlaying:
     m_InternalValue: 0
   timer: 15

@@ -16,6 +16,8 @@ public class ShootingBattleManager : NetworkBehaviour
     // UI 관련
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> scoreUI;
+    [SerializeField] private Texture2D cursorTexture;
+
 
     // 게임 상태 및 진행 관련
     [SerializeField] public NetworkVariable<bool> isPlaying;
@@ -66,6 +68,8 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             if (!gameStart)
             {
+                Vector2 hotspot = new Vector2(cursorTexture.width / 2f, cursorTexture.height / 2f);
+                Cursor.SetCursor(cursorTexture, hotspot, CursorMode.Auto);
                 StartCoroutine(SpawnStar());
                 StartCoroutine(CountTimer());
                 gameStart = true;
@@ -73,6 +77,13 @@ public class ShootingBattleManager : NetworkBehaviour
             else
             {
                 UpdateScoreUI();
+            }
+        }
+        else
+        {
+            if (gameStart)
+            {
+                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             }
         }
 
