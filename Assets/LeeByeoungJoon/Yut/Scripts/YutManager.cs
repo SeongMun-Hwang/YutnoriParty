@@ -325,7 +325,7 @@ public class YutManager : NetworkBehaviour
                     {
                         faceStable = true;
                     }
-                    else if (faces[i] != curFace || faces[i] == YutFace.Error)
+                    else if (faces[i] != curFace || curFace == YutFace.Error)
                     {
                         faceStable = false;
                     }

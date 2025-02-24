@@ -52,7 +52,7 @@ public class Yut : NetworkBehaviour
         {
             //Debug.Log("섰음!!!!!!!");
             //수직으로 섰으니까 토크 가함
-            rigidbody.AddTorque(transform.forward * torque);
+            //rigidbody.AddTorque(transform.forward * torque);
         }
     }
 
