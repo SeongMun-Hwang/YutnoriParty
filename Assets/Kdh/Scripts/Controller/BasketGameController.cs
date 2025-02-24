@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class BasketGameController : NetworkBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;     
-
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private GameObject basketObject;
     private Vector3 targetPosition;
-    private Animator animator;
+    private Animator animator; 
     private bool canMove = true;//테스트때매 true한것 매니저에서 true해줘야함 
     private string currentSceneName;
 
@@ -16,6 +16,7 @@ public class BasketGameController : NetworkBehaviour
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
+        UpdateBasketObjectState();
     }
 
     private void OnEnable()
@@ -36,9 +37,17 @@ public class BasketGameController : NetworkBehaviour
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         transform.position = targetPosition;
+        UpdateBasketObjectState();
+    }
+    private void UpdateBasketObjectState()
+    {
+        if (basketObject != null)
+        {
+            // "BasketGame" 씬일 때만 Basket 오브젝트를 활성화
+            basketObject.SetActive(currentSceneName == "BasketGame");
+        }
     }
 
-  
 
     private void Update()
     {
@@ -104,4 +113,5 @@ public class BasketGameController : NetworkBehaviour
     {
         canMove = enable;
     }
+   
 }

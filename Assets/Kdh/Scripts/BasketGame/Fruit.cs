@@ -1,64 +1,56 @@
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class Fruit : NetworkBehaviour
 {
-    [SerializeField] private int scoreValue; 
+    [SerializeField] private int scoreValue; // 과일 점수
+    private bool collected = false; // 중복 점수 방지
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Basket")) // 바구니와 충돌하면
-        {
-            if (other.TryGetComponent(out BasketScore playerScore))
-            {
-                playerScore.AddScore(scoreValue); 
-            }
+        if (collected) return;
 
-            // 서버에서 과일 삭제
-            if (IsServer)
+        if (other.CompareTag("Basket"))
+        {
+            collected = true;
+
+            NetworkObject basketObject = other.GetComponentInParent<NetworkObject>();
+            if (basketObject != null)
             {
-                DestroyFruit();
-            }
-            else
-            {
-                // 클라이언트에서 서버에게 과일 삭제 요청
-                DestroyFruitServerRpc();
+                ulong playerId = basketObject.OwnerClientId;  // 과일을 잡은 클라이언트의 ID를 가져옵니다.
+                AddScoreAndDestroyServerRpc(playerId);  // 해당 플레이어에게 점수를 부여
             }
         }
-
-        if (other.CompareTag("Ground")) // 바닥에 닿으면
+        else if (other.CompareTag("Ground"))
         {
-            // 서버에서 과일 삭제
-            if (IsServer)
-            {
-                DestroyFruit();
-            }
-            else
-            {
-                // 클라이언트에서 서버에게 과일 삭제 요청
-                DestroyFruitServerRpc();
-            }
+            // 땅에 닿은 경우는 서버에서 처리하도록 서버 RPC를 호출
+            DestroyFruitServerRpc();  // 서버에서 과일을 제거하도록 요청
         }
     }
 
-  
-    private void DestroyFruit()
-    {
-        NetworkObject networkObject = GetComponent<NetworkObject>();
-        if (networkObject != null)
-        {
-            networkObject.Despawn(); // 네트워크에서 객체 삭제
-        }
-        else
-        {
-            Debug.LogError("No NetworkObject found on the fruit!");
-        }
-    }
-
-
-    [ServerRpc]
+    // 서버에서 과일을 제거하는 ServerRpc
+    [ServerRpc(RequireOwnership = false)]
     private void DestroyFruitServerRpc()
     {
-        DestroyFruit(); // 서버에서 삭제
+        // 서버에서 과일을 삭제
+        if (IsServer)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 점수를 추가하고 과일을 삭제하는 ServerRpc
+    [ServerRpc(RequireOwnership = false)]
+    private void AddScoreAndDestroyServerRpc(ulong playerId)
+    {
+        BasketGameManager gameManager = FindAnyObjectByType<BasketGameManager>();
+
+        if (gameManager != null)
+        {
+            gameManager.AddScore(playerId, scoreValue);  // 서버에서 해당 플레이어에게 점수를 추가
+        }
+
+        // 과일을 서버에서 삭제
+        DestroyFruitServerRpc();  // 과일을 서버에서 제거
     }
 }
