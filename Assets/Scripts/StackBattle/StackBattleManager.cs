@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class StackBattleManager : NetworkBehaviour
 {
 	// 게임에 참여하는 유저 관련
-	[SerializeField] private int maxPlayers;
+	public int maxPlayers;
 	private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
 
 	// 현재 차례 플레이어 ID

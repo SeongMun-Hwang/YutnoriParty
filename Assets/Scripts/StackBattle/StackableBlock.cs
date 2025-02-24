@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ public class StackableBlock : NetworkBehaviour
 	// StackableBlock 이동 관련
 	private float distance; // 현재 블록이 원점으로부터 떨어진 거리
 	private float maxDistance = 6f; // 블록이 최대로 멀어지는 거리
+	public float moveSpeed = 6f; // 블록이 이동하는 속도
 	private float stepLength; // 이동 거리
 	private bool moveForward; // 정면으로 이동중인가?
 	public bool moveX; // X방향으로 이동중인가?
@@ -45,7 +46,7 @@ public class StackableBlock : NetworkBehaviour
 
 	private void Update()
 	{
-		stepLength = Time.deltaTime * 6f;
+		stepLength = Time.deltaTime * moveSpeed;
 
 		if (!isFixed)
 		{
