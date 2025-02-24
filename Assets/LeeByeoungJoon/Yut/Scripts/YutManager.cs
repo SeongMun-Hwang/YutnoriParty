@@ -49,7 +49,6 @@ public class YutManager : NetworkBehaviour
     float waitTime = 10;
     float waitInterval = 0.5f;
     float powerAmount = 0;
-    float yutSleepThreshold = 0.05f;
     bool backDo = false;
     bool isThrowButtonDown = false;
     bool isFaceError = false;
