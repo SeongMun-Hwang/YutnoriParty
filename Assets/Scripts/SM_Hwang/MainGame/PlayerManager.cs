@@ -5,14 +5,12 @@ using System.Collections.Generic;
 
 public class PlayerManager : NetworkBehaviour
 {
-    public GameObject playerCharacter; //유저 별 캐릭터
     private int numOfCharacter = 4; //전체 말 개수
     public List<GameObject> currentCharacters=new List<GameObject>(); //필드 위 말 개수
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
     public override void OnNetworkSpawn()
     {
-        StartCoroutine(WaitUntilGameManagerLoad());
         if (instance == null)
         {
             instance = this;
@@ -23,22 +21,16 @@ public class PlayerManager : NetworkBehaviour
             Destroy(gameObject);
         }
     }
-    private IEnumerator WaitUntilGameManagerLoad()
+    public void SpawnCharacter()
     {
-        while (GameManager.Instance == null)
+        if (currentCharacters.Count >= 4)
         {
-            yield return null;
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled",2f);
+            return;
         }
-        Initialize();
+        SpawnCharacterServerRpc();
     }
-    private void Initialize()
-    {
-        GetInfo();
-    }
-    private void GetInfo()
-    {
-        playerCharacter = GameManager.Instance.playerCharacters[(int)NetworkManager.LocalClientId];
-    }
+
     [ServerRpc(RequireOwnership = false)]
     public void SpawnCharacterServerRpc(ServerRpcParams rpcParams = default)
     {
