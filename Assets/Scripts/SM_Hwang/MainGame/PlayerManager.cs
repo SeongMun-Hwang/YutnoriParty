@@ -61,15 +61,27 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = default)]
-    public void DespawnCharacterServerRpc(NetworkObjectReference noRef)
+    public void DespawnCharacterServerRpc(NetworkObjectReference noRef, ulong targetClientId)
     {
-        currentCharacters.Remove(noRef);
         noRef.TryGet(out NetworkObject no);
-        if(no != null)
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { targetClientId } }
+        };
+        DespawnCharacterClientRpc(noRef, clientRpcParams);
+
+        if (no != null)
         {
             no.Despawn();
             Destroy(no);
         }
+    }
+    [ClientRpc]
+    private void DespawnCharacterClientRpc(NetworkObjectReference noRef,ClientRpcParams clientRpcParams = default)
+    {
+        noRef.TryGet(out NetworkObject no);
+        currentCharacters.Remove(noRef);
+        currentCharacters.RemoveAll(item => item == null);
     }
     public List<GameObject> GetCurrentCharacterList()
     {

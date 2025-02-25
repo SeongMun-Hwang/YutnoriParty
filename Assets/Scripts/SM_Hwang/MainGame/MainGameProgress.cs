@@ -153,12 +153,14 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("You Win");
             YutManager.Instance.throwChance++;
-            enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
         }
         else
         {
             Debug.Log("You Lose");
-            currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
     /*턴 종료*/
