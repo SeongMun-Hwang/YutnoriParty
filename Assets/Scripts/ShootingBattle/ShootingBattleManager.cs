@@ -40,12 +40,17 @@ public class ShootingBattleManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        currentId = playerIds.Count;
-        Debug.Log($"플레이어 ID : {currentId}");
         if (IsServer)
         {
-            NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
+            foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                ulong clientId = clientPair.Key;
+                OnPlayerJoined(clientId);
+            }
         }
+
+        currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
+        Debug.Log($"플레이어 ID : {currentId}");
     }
 
     private void OnPlayerJoined(ulong clientId)

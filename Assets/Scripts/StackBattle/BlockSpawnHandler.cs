@@ -16,6 +16,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 	{
 		if (IsServer)
 		{
+            Debug.Log("이거");
 			stack.Clear();
 			CreateBlock();
 		}
