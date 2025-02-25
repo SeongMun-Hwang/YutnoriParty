@@ -13,9 +13,10 @@ public class StackBattleManager : NetworkBehaviour
 	// 게임에 참여하는 유저 관련
 	public int maxPlayers;
 	private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
+    int currentId = -1;
 
-	// 현재 차례 플레이어 ID
-	private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(0);
+    // 현재 차례 플레이어 ID
+    private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(0);
 	
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
@@ -43,7 +44,6 @@ public class StackBattleManager : NetworkBehaviour
 			}
 		});
 
-		spawner.manager = this;
 		currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
 		currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
 
@@ -56,12 +56,21 @@ public class StackBattleManager : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
-		if (IsServer)
-		{
-			NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
-		}
+        if (IsServer)
+        {
+            foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                ulong clientId = clientPair.Key;
+                OnPlayerJoined(clientId);
+            }
+        }
 
-		turnButton.interactable = (GetCurrentTurnPlayerId() == NetworkManager.Singleton.LocalClientId);
+        spawner.manager = this;
+
+        currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
+        Debug.Log($"플레이어 ID : {currentId}");
+
+        turnButton.interactable = (GetCurrentTurnPlayerId() == NetworkManager.Singleton.LocalClientId);
 	}
 
 	private void OnPlayerJoined(ulong clientId)
@@ -87,13 +96,21 @@ public class StackBattleManager : NetworkBehaviour
             if (turnTimerCoroutine != null)
             {
                 StopCoroutine(turnTimerCoroutine);
+                turnTimerCoroutine = null;
             }
+
             StartTurnTimer();
         }
     }
 
     private void StartTurnTimer()
     {
+        if (turnTimerCoroutine != null)
+        {
+            StopCoroutine(turnTimerCoroutine);
+            turnTimerCoroutine = null;
+        }
+
         timeover = false;
         turnTimerCoroutine = StartCoroutine(TurnTimerCoroutine());
     }
@@ -109,9 +126,12 @@ public class StackBattleManager : NetworkBehaviour
             remainTime -= 1;
         }
         // 제한 시간이 지나면 현재 턴을 자동 종료
-        timeover = true;
-        GameOver();
-        RequestNextTurnServerRpc(currentTurnPlayerId.Value);
+        if (IsServer)
+        {
+            timeover = true;
+            GameOver();
+            RequestNextTurnServerRpc(currentTurnPlayerId.Value);
+        }
     }
 
     [ClientRpc]
@@ -137,8 +157,9 @@ public class StackBattleManager : NetworkBehaviour
             {
                 spawner.DropBlock();
             }
-			
-			int currentIndex = playerIds.IndexOf(senderClientId);
+
+            Debug.Log($"실패? {failed} 시간초과? {timeover}");
+            int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
 
 			int aliveCount = 0;
@@ -154,12 +175,12 @@ public class StackBattleManager : NetworkBehaviour
 					nextIndex = (nextIndex + 1) % playerIds.Count;
 				}
 
-				currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
-
                 if (!timeover && !failed)
-				{
-					spawner.CreateBlock();
-				}
+                {
+                    spawner.CreateBlock();
+                }
+
+                currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
 
                 // 새 턴 시작 시 타이머를 다시 시작
                 StartTurnTimer();

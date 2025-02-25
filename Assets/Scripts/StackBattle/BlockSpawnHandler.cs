@@ -17,12 +17,28 @@ public class BlockSpawnHandler : NetworkBehaviour
 		if (IsServer)
 		{
             Debug.Log("이거");
-			stack.Clear();
-			CreateBlock();
-		}
+
+            // 기존 블록들을 Despawn() 후 리스트 비우기
+            foreach (var block in stack)
+            {
+                if (block != null && block.TryGetComponent(out NetworkObject netObj) && netObj.IsSpawned)
+                {
+                    netObj.Despawn();
+                }
+            }
+
+            stack.Clear();
+            StartCoroutine(DelayedCreateBlock());
+        }
 	}
 
-	public void CreateBlock()
+    private IEnumerator DelayedCreateBlock()
+    {
+        yield return new WaitForSeconds(1f); // 약간의 딜레이 추가 후 실행
+        CreateBlock();
+    }
+
+    public void CreateBlock()
 	{
 		if (!IsServer)
 			return; // 서버에서만 블록 생성
