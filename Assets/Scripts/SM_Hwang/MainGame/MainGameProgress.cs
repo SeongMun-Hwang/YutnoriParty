@@ -10,11 +10,26 @@ public class MainGameProgress : NetworkBehaviour
     private bool chooseCharacter = true;
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
+    private static MainGameProgress instance;
+    public static MainGameProgress Instance { get { return instance; } }
     private void Update()
     {
         if (chooseCharacter)
         {
             ChooseCharacter();
+        }
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
         }
     }
     /*게임 시작*/
@@ -37,6 +52,16 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     public void SpawnInGameCanvasClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        StartCoroutine(WaitForCanvasAndActivate());
+    }
+
+    private IEnumerator WaitForCanvasAndActivate()
+    {
+        while (GameManager.Instance.inGameCanvas == null)
+        {
+            Debug.LogWarning("Waiting for inGameCanvas...");
+            yield return null;
+        }
         GameManager.Instance.inGameCanvas.SetActive(true);
         YutManager.Instance.throwChance++;
     }

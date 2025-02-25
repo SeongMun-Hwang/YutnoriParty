@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6069857070293014205}
   - component: {fileID: 1926944021976204318}
+  - component: {fileID: 5189663565370842970}
   m_Layer: 0
-  m_Name: PlayerInfo
+  m_Name: PlayerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57,3 +58,19 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &5189663565370842970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7340119393489669438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18a01231728d126429df15bc3a21d3f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerCharacter: {fileID: 0}
+  currentCharacters: []
+  progress: {fileID: 0}

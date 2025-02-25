@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class CharacterBoardMovement : NetworkBehaviour
+public class CharacterBoardMovement : MonoBehaviour
 {
     private Animator animator;
     private Node selectedNode;
@@ -12,7 +12,7 @@ public class CharacterBoardMovement : NetworkBehaviour
     Vector3 targetPos;
     float moveSpeed = 10f;
     [SerializeField] GameObject characterOnDes;
-    private void Start()
+    private void Awake()
     {
         StartCoroutine(WaitForStartNode());
         animator = GetComponent<Animator>();
@@ -28,11 +28,13 @@ public class CharacterBoardMovement : NetworkBehaviour
     /*정방향 이동*/
     public void MoveToNextNode(int distance = 1)
     {
+        Debug.Log("Call MoveFunc");
         StartCoroutine(MoveToTargetPos(distance));
     }
     private IEnumerator MoveToTargetPos(int distance)
     {
-        animator.SetFloat("isMoving", 1f);
+        Debug.Log("Start To Move");
+        GetComponent<Animator>().SetFloat("isMoving", 1f);
         int moveCount=Mathf.Abs(distance);
         for (int i = 0; i < moveCount; i++)
         {

@@ -525,4 +525,8 @@ public class YutManager : NetworkBehaviour
             throwChance += num;
         }
     }
+    public void SpawnCharacter()
+    {
+        PlayerManager.Instance.SpawnCharacterServerRpc();
+    }
 }

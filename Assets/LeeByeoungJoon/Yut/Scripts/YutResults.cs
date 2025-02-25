@@ -8,7 +8,7 @@ public class YutResults : NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI yutText;
     YutResult yutResult;
-    
+
     public void SetYutText(YutResult result)
     {
         yutResult = result;
@@ -17,9 +17,9 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
-        if (GameManager.Instance.mainGameProgress.currentCharacter == null)
+        if (MainGameProgress.Instance.currentCharacter==null)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!",2f);
             return;
         }
         //몇 칸 전진하는지 숫자 반환
