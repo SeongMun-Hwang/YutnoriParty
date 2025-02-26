@@ -12,6 +12,7 @@ public class MainGameProgress : NetworkBehaviour
     private GameObject encounteredEnemy;
     private static MainGameProgress instance;
     public static MainGameProgress Instance { get { return instance; } }
+    public ulong winnerId;
     private void Update()
     {
         if (chooseCharacter)

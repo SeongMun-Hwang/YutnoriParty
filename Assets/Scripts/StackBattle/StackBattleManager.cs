@@ -6,6 +6,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StackBattleManager : NetworkBehaviour
@@ -188,9 +189,11 @@ public class StackBattleManager : NetworkBehaviour
 			else
 			{
 				int aliveIndex = isRetire.IndexOf(false);
-				// Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
-				GameFinishedClientRpc(playerIds[aliveIndex]);
-			}
+				Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
+                MainGameProgress.Instance.winnerId = playerIds[aliveIndex];
+                GameFinishedClientRpc(playerIds[aliveIndex]);
+                StartCoroutine(PassTheScene());
+            }
 		}
 	}
 
@@ -248,4 +251,10 @@ public class StackBattleManager : NetworkBehaviour
 		turnButton.interactable = false;
 		Debug.Log("게임 종료");
 	}
+
+    public IEnumerator PassTheScene()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single);
+    }
 }
