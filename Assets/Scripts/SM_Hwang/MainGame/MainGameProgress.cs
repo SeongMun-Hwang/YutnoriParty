@@ -10,11 +10,26 @@ public class MainGameProgress : NetworkBehaviour
     private bool chooseCharacter = true;
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
+    private static MainGameProgress instance;
+    public static MainGameProgress Instance { get { return instance; } }
     private void Update()
     {
         if (chooseCharacter)
         {
             ChooseCharacter();
+        }
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
         }
     }
     /*게임 시작*/
@@ -37,6 +52,16 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     public void SpawnInGameCanvasClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        StartCoroutine(WaitForCanvasAndActivate());
+    }
+
+    private IEnumerator WaitForCanvasAndActivate()
+    {
+        while (GameManager.Instance.inGameCanvas == null)
+        {
+            Debug.LogWarning("Waiting for inGameCanvas...");
+            yield return null;
+        }
         GameManager.Instance.inGameCanvas.SetActive(true);
         YutManager.Instance.throwChance++;
     }
@@ -60,6 +85,11 @@ public class MainGameProgress : NetworkBehaviour
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                 {
                     Debug.Log("Character Choose Success");
+                    if (currentCharacter != null)
+                    {
+                        currentCharacter.GetComponent<Outline>().DisableOutline();
+                    }
+                    hit.collider.gameObject.GetComponent<Outline>().ActiveOutline();
                     currentCharacter = character;
                 }
             }
@@ -128,12 +158,14 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("You Win");
             YutManager.Instance.throwChance++;
-            enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
         }
         else
         {
             Debug.Log("You Lose");
-            currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
     /*턴 종료*/
