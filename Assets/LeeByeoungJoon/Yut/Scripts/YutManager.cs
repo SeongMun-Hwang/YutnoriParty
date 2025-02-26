@@ -372,6 +372,7 @@ public class YutManager : NetworkBehaviour
         if (!yutStable)
         {
             Debug.Log("결과 산출 실패 : 타임아웃");
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Timeout, Throw again!");
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
             ThrowChanceChangeClientRpc(1, senderId);
 
@@ -381,6 +382,7 @@ public class YutManager : NetworkBehaviour
         if (isFaceError)
         {
             Debug.Log("결과 산출 실패 : 면 판단 실패");
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
             ThrowChanceChangeClientRpc(1, senderId);
 
             yield break;
@@ -404,24 +406,30 @@ public class YutManager : NetworkBehaviour
             case 0:
                 AddYutResultClientRpc(YutResult.Mo, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Mo!");
                 break;
             case 1:
                 if (backDo)
                 {
                     AddYutResultClientRpc(YutResult.BackDo, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("oD!");
                     break;
                 }
                 AddYutResultClientRpc(YutResult.Do, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Do!");
                 break;
             case 2:
                 AddYutResultClientRpc(YutResult.Gae, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Gae!");
                 break;
             case 3:
                 AddYutResultClientRpc(YutResult.Gur, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Girl!");
                 break;
             case 4:
                 AddYutResultClientRpc(YutResult.Yut, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Yut!");
                 break;
             default:
                 AddYutResultClientRpc(YutResult.Error, senderId);

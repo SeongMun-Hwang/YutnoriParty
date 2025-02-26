@@ -2,6 +2,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode.Components;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -75,8 +76,35 @@ public class PlayerManager : NetworkBehaviour
         currentCharacters.Remove(noRef);
         currentCharacters.RemoveAll(item => item == null);
     }
-    public List<GameObject> GetCurrentCharacterList()
+    public void OverlapCharacter(GameObject parent, GameObject child)
     {
-        return currentCharacters;
+        Debug.Log("Overlap Character");
+        child.GetComponent<Collider>().enabled = false;
+        OverlapCharacterServerRpc(parent, child);
+    }
+    /*말 업을 때 부모 지정 ServerRpc*/
+    //Reparent는 서버에서 해야됨
+    [ServerRpc(RequireOwnership = default)]
+    private void OverlapCharacterServerRpc(NetworkObjectReference parentNo, NetworkObjectReference childNo)
+    {
+        if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
+        {
+            child.transform.SetParent(parent.transform);
+            Vector3 newPosition = parent.transform.position + new Vector3(0, 2, 0);
+
+            // 서버에서 위치 변경
+            child.transform.position = newPosition;
+
+            // 클라이언트에 위치 동기화 요청
+            UpdateChildPositionClientRpc(childNo, newPosition);
+        }
+    }
+    [ClientRpc]
+    private void UpdateChildPositionClientRpc(NetworkObjectReference childNo, Vector3 newPosition)
+    {
+        if (childNo.TryGet(out NetworkObject child))
+        {
+            child.transform.position = newPosition;
+        }
     }
 }
