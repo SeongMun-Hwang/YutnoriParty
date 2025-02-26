@@ -527,6 +527,6 @@ public class YutManager : NetworkBehaviour
     }
     public void SpawnCharacter()
     {
-        PlayerManager.Instance.SpawnCharacterServerRpc();
+        PlayerManager.Instance.SpawnCharacter();
     }
 }

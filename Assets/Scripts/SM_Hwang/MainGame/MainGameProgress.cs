@@ -85,6 +85,11 @@ public class MainGameProgress : NetworkBehaviour
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                 {
                     Debug.Log("Character Choose Success");
+                    if (currentCharacter != null)
+                    {
+                        currentCharacter.GetComponent<Outline>().DisableOutline();
+                    }
+                    hit.collider.gameObject.GetComponent<Outline>().ActiveOutline();
                     currentCharacter = character;
                 }
             }
@@ -153,12 +158,14 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("You Win");
             YutManager.Instance.throwChance++;
-            enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
         }
         else
         {
             Debug.Log("You Lose");
-            currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+            PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
     /*턴 종료*/
