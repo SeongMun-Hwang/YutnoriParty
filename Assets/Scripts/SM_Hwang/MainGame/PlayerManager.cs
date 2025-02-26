@@ -23,7 +23,7 @@ public class PlayerManager : NetworkBehaviour
     }
     public void SpawnCharacter()
     {
-        if (currentCharacters.Count >= 4)
+        if (currentCharacters.Count >= numOfCharacter)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled",2f);
             return;

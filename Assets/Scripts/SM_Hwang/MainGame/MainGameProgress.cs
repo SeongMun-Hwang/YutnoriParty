@@ -85,6 +85,11 @@ public class MainGameProgress : NetworkBehaviour
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                 {
                     Debug.Log("Character Choose Success");
+                    if (currentCharacter != null)
+                    {
+                        currentCharacter.GetComponent<Outline>().DisableOutline();
+                    }
+                    hit.collider.gameObject.GetComponent<Outline>().ActiveOutline();
                     currentCharacter = character;
                 }
             }
