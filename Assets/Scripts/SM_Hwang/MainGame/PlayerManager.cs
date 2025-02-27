@@ -7,7 +7,7 @@ using NUnit.Framework.Internal.Filters;
 
 public class PlayerManager : NetworkBehaviour
 {
-    private int numOfCharacter = 2; //전체 말 개수
+    private int numOfCharacter = 4; //전체 말 개수
     public List<GameObject> currentCharacters=new List<GameObject>(); //필드 위 말 개수
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
@@ -102,7 +102,8 @@ public class PlayerManager : NetworkBehaviour
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
             child.TrySetParent(parent.transform);
-            Vector3 newPosition = parent.transform.position + new Vector3(0, 2, 0);
+            int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
+            Vector3 newPosition = parent.transform.position + new Vector3(0, 2, 0)*n;
 
             // 서버에서 위치 변경
             child.transform.position = newPosition;
