@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxPlayers: 4
+  maxPlayers: 2
   spawner: {fileID: 1022981537}
   turnText: {fileID: 517040155}
   timerUI: {fileID: 1945610222}
@@ -1293,7 +1293,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1425728253}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1425728255
 Camera:
   m_ObjectHideFlags: 0

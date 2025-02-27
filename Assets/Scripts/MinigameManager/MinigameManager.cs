@@ -1,16 +1,34 @@
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MinigameManager : MonoBehaviour
+public class MinigameManager : NetworkBehaviour
 {
+    private static MinigameManager instance;
+    public static MinigameManager Instance { get { return instance; } }
+
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
     };
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // 미니게임을 시작하기 위해 씬을 이동
     public void StartMinigame(Define.MinigameType type)
@@ -19,7 +37,7 @@ public class MinigameManager : MonoBehaviour
         {
             if (MinigameScenes.TryGetValue(type, out string sceneName))
             {
-                NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
             }
             else
             {
@@ -37,5 +55,10 @@ public class MinigameManager : MonoBehaviour
     public void StartMinigame(int i)
     {
         StartMinigame((Define.MinigameType)i);
+    }
+
+    public void EndMinigame()
+    {
+        MainGameProgress.Instance.endMinigameActions.Invoke();
     }
 }

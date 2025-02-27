@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,7 @@ public class MainGameProgress : NetworkBehaviour
     private GameObject encounteredEnemy;
     private static MainGameProgress instance;
     public static MainGameProgress Instance { get { return instance; } }
+    public System.Action endMinigameActions;
     public ulong winnerId;
     private void Update()
     {
@@ -149,26 +151,62 @@ public class MainGameProgress : NetworkBehaviour
     private void StartMiniGame(GameObject enemy)
     {
         //미니게임 실행
+        StartMiniGameServerRpc();
 
         //미니게임 종료
+        endMinigameActions += (() =>
+        {
+            // 필요한 게임 요소 활성화
+            Camera.main.gameObject.SetActive(true); // 윷놀이 판 전용카메라
 
-        //미니 게임 승자 아이디 받기
-        ulong winnerId = (ulong)Random.Range(0, 2);
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
-        if (winnerId == NetworkManager.LocalClientId)
+            List<GameObject> chars = GameManager.Instance.playerCharacters; // 캐릭터
+            foreach (GameObject c in chars)
+            {
+                c.SetActive(true);
+            }
+
+            Debug.Log("게임 종료");
+
+            //미니 게임 승자 아이디 받기
+            ulong winnerId = (ulong)Random.Range(0, 2);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
+            if (winnerId == NetworkManager.LocalClientId)
+            {
+                Debug.Log("You Win");
+                YutManager.Instance.throwChance++;
+                //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
+            }
+            else
+            {
+                Debug.Log("You Lose");
+                //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+                PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
+            }
+        });
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void StartMiniGameServerRpc()
+    {
+        Debug.Log("미니게임 시작!");
+        MinigameManager.Instance.StartMinigame(Define.MinigameType.StackGame);
+        StartMiniGameClientRpc();
+    }
+
+    [ClientRpc]
+    void StartMiniGameClientRpc()
+    {
+        Debug.Log("미니게임을 위해 특정 오브젝트 비활성화");
+        Camera.main.gameObject.SetActive(false); // 윷놀이 판 전용카메라
+
+        List<GameObject> chars = GameManager.Instance.playerCharacters; // 캐릭터
+        foreach (GameObject c in chars)
         {
-            Debug.Log("You Win");
-            YutManager.Instance.throwChance++;
-            //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
-            PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
-        }
-        else
-        {
-            Debug.Log("You Lose");
-            //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
-            PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
+            c.SetActive(false);
         }
     }
+
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
     [ServerRpc(RequireOwnership = false)]
