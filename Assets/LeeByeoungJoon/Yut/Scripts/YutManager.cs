@@ -406,30 +406,30 @@ public class YutManager : NetworkBehaviour
             case 0:
                 AddYutResultClientRpc(YutResult.Mo, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Mo!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Mo!");
                 break;
             case 1:
                 if (backDo)
                 {
                     AddYutResultClientRpc(YutResult.BackDo, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("oD!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("oD!");
                     break;
                 }
                 AddYutResultClientRpc(YutResult.Do, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Do!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Do!");
                 break;
             case 2:
                 AddYutResultClientRpc(YutResult.Gae, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Gae!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Gae!");
                 break;
             case 3:
                 AddYutResultClientRpc(YutResult.Gur, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Girl!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Girl!");
                 break;
             case 4:
                 AddYutResultClientRpc(YutResult.Yut, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Yut!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Yut!");
                 break;
             default:
                 AddYutResultClientRpc(YutResult.Error, senderId);

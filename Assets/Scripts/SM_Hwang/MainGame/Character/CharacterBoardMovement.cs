@@ -35,11 +35,11 @@ public class CharacterBoardMovement : MonoBehaviour
     {
         Debug.Log("Start To Move");
         GetComponent<Animator>().SetFloat("isMoving", 1f);
-        int moveCount=Mathf.Abs(distance);
+        int moveCount = Mathf.Abs(distance);
         for (int i = 0; i < moveCount; i++)
         {
             Node tmpNode = null;
-            List<Node> possibleNodes = distance>0 ? currentNode.GetNextNode() : currentNode.GetPrevNode();
+            List<Node> possibleNodes = distance > 0 ? currentNode.GetNextNode() : currentNode.GetPrevNode();
 
             if (possibleNodes.Count > 1)
             {
@@ -53,7 +53,8 @@ public class CharacterBoardMovement : MonoBehaviour
 
             if (tmpNode == null)
             {
-                EnterGoal();
+                PlayerManager.Instance.CharacterGoalIn(gameObject);
+                GameManager.Instance.mainGameProgress.EndMove();
                 yield break;
             }
 
@@ -68,7 +69,6 @@ public class CharacterBoardMovement : MonoBehaviour
             transform.position = targetPos;
             currentNode = tmpNode;
         }
-        Debug.Log("End move");
         GameManager.Instance.mainGameProgress.EndMove();
         animator.SetFloat("isMoving", 0f);
         yield break;
