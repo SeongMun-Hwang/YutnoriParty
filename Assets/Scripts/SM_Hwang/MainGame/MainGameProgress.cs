@@ -8,7 +8,6 @@ public class MainGameProgress : NetworkBehaviour
 {
     private int numOfPlayer;
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
-    private bool chooseCharacter = true;
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
     private static MainGameProgress instance;
@@ -17,10 +16,7 @@ public class MainGameProgress : NetworkBehaviour
     public ulong winnerId;
     private void Update()
     {
-        if (chooseCharacter)
-        {
-            ChooseCharacter();
-        }
+        ChooseCharacter();
     }
     public override void OnNetworkSpawn()
     {
@@ -73,6 +69,7 @@ public class MainGameProgress : NetworkBehaviour
     //내 말이 아니면 메시지 출력
     public void ChooseCharacter()
     {
+        if ((int)NetworkManager.LocalClientId != currentPlayerNumber.Value) return; //내 턴이 아니면 작동 X
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -87,12 +84,11 @@ public class MainGameProgress : NetworkBehaviour
                 }
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                 {
-                    Debug.Log("Character Choose Success");
                     if (currentCharacter != null)
                     {
                         currentCharacter.GetComponent<Outline>().DisableOutline();
                     }
-                    hit.collider.gameObject.GetComponent<Outline>().ActiveOutline();
+                    hit.collider.gameObject.GetComponent<Outline>().EnableOutline();
                     currentCharacter = character;
                 }
             }
@@ -126,17 +122,25 @@ public class MainGameProgress : NetworkBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
         foreach (Collider collider in hitColliders)
         {
-            if (collider.TryGetComponent<CharacterBoardMovement>(out var character) &&
-                character.GetComponent<NetworkObject>().OwnerClientId != (ulong)currentPlayerNumber.Value)
+            if (collider.gameObject == currentCharacter.gameObject) continue;
+            if (collider.TryGetComponent<CharacterBoardMovement>(out var character))
             {
-                Debug.Log("Find Enemy");
-                encounteredEnemy = character.gameObject;
-                return true;
+                if (character.GetComponent<NetworkObject>().OwnerClientId != (ulong)currentPlayerNumber.Value) //적이면
+                {
+                    encounteredEnemy = character.gameObject;
+                    return true;
+                }
+                else if (character.GetComponent<NetworkObject>().OwnerClientId == (ulong)currentPlayerNumber.Value)//내 말이면
+                {
+                    PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
+                    currentCharacter.GetComponent<Outline>().DisableOutline();
+                    currentCharacter=character;
+                    character.GetComponent<Outline>().EnableOutline();
+                    return false;
+                }
             }
         }
-        Debug.Log("Cannot Find enemy");
         return false;
-
     }
     private void CheckTurnChange()
     {
