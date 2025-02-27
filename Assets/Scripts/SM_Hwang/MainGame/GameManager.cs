@@ -10,11 +10,9 @@ public class GameManager : NetworkBehaviour
     //유니티에서 물려놓은 변수가 있으면 OnNetworkSpawn이 아닌 Awake에서 초기화해야 됨
     private void Awake()
     {
-        base.OnNetworkSpawn();
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)
         {
