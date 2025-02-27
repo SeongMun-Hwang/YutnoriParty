@@ -9,6 +9,7 @@ public class PlayerManager : NetworkBehaviour
 {
     private int numOfCharacter = 4; //전체 말 개수
     public List<GameObject> currentCharacters=new List<GameObject>(); //필드 위 말 개수
+    public bool isMoving = false;
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
     public override void OnNetworkSpawn()
