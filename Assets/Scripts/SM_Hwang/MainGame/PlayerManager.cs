@@ -3,10 +3,11 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode.Components;
+using NUnit.Framework.Internal.Filters;
 
 public class PlayerManager : NetworkBehaviour
 {
-    private int numOfCharacter = 4; //전체 말 개수
+    private int numOfCharacter = 2; //전체 말 개수
     public List<GameObject> currentCharacters=new List<GameObject>(); //필드 위 말 개수
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
@@ -24,6 +25,11 @@ public class PlayerManager : NetworkBehaviour
     }
     public void SpawnCharacter()
     {
+        if (YutManager.Instance.Results.Count <= 0)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Throw First!");
+            return;
+        }
         if (currentCharacters.Count >= numOfCharacter)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled",2f);
@@ -54,7 +60,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = default)]
-    public void DespawnCharacterServerRpc(NetworkObjectReference noRef, ulong targetClientId)
+    public void DespawnCharacterServerRpc(NetworkObjectReference noRef, ulong targetClientId, bool isGoal=false)
     {
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -64,16 +70,23 @@ public class PlayerManager : NetworkBehaviour
         List<NetworkObject> childObjects = new List<NetworkObject>(no.GetComponentsInChildren<NetworkObject>());
         for(int i=0;i<childObjects.Count;i++)
         {
-            DespawnCharacterClientRpc(childObjects[i], clientRpcParams);
+            DespawnCharacterClientRpc(childObjects[i], isGoal, clientRpcParams);
             childObjects[i].Despawn();
+            Destroy(childObjects[i]);
         }
     }
     [ClientRpc]
-    private void DespawnCharacterClientRpc(NetworkObjectReference noRef,ClientRpcParams clientRpcParams = default)
+    private void DespawnCharacterClientRpc(NetworkObjectReference noRef, bool isGoal = false, ClientRpcParams clientRpcParams = default)
     {
         noRef.TryGet(out NetworkObject no);
         currentCharacters.Remove(noRef);
         currentCharacters.RemoveAll(item => item == null);
+        if (isGoal) numOfCharacter--;
+        Debug.Log("NumofChar : " + numOfCharacter);
+        if (numOfCharacter == 0)
+        {
+            EndGame();
+        }
     }
     public void OverlapCharacter(GameObject parent, GameObject child)
     {
@@ -105,5 +118,15 @@ public class PlayerManager : NetworkBehaviour
         {
             child.transform.position = newPosition;
         }
+    }
+    public void CharacterGoalIn(GameObject character)
+    {
+        GameManager.Instance.announceCanvas.ShowAnnounceText("Goal In!");
+        DespawnCharacterServerRpc(character, NetworkManager.Singleton.LocalClientId, true);
+        Debug.Log(numOfCharacter);
+    }
+    private void EndGame()
+    {
+        Debug.Log("Game End");
     }
 }
