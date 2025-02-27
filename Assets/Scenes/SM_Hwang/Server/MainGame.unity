@@ -805,8 +805,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 312218818}
-  - component: {fileID: 312218817}
   - component: {fileID: 312218819}
+  - component: {fileID: 312218817}
   m_Layer: 0
   m_Name: MinigameManager
   m_TagString: Untagged
@@ -3753,6 +3753,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   currentCharacter: {fileID: 0}
+  maingameCamera: {fileID: 302928133}
   winnerId: 0
 --- !u!4 &1365642761
 Transform:

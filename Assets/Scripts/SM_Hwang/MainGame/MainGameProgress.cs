@@ -10,6 +10,7 @@ public class MainGameProgress : NetworkBehaviour
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
+    public Camera maingameCamera;
     private static MainGameProgress instance;
     public static MainGameProgress Instance { get { return instance; } }
     public System.Action endMinigameActions;
@@ -154,25 +155,36 @@ public class MainGameProgress : NetworkBehaviour
 
     private void StartMiniGame(GameObject enemy)
     {
-        //미니게임 실행
-        StartMiniGameServerRpc();
+        if (!enemy.TryGetComponent<NetworkObject>(out var netObj))
+        {
+            Debug.LogError("enemy는 NetworkObject가 아닙니다!");
+            return;
+        }
 
-        //미니게임 종료
+        // 미니게임 실행
+        StartMiniGameServerRpc(netObj.NetworkObjectId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void StartMiniGameServerRpc(ulong enemyNetworkId)
+    {
+        Debug.Log("미니게임 시작!");
+
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetworkId, out NetworkObject enemyNetObj))
+        {
+            Debug.LogError("enemy NetworkObject를 찾을 수 없습니다!");
+            return;
+        }
+
+        GameObject enemy = enemyNetObj.gameObject; // NetworkObject에서 GameObject로 변환
+
         endMinigameActions += (() =>
         {
-            // 필요한 게임 요소 활성화
-            Camera.main.gameObject.SetActive(true); // 윷놀이 판 전용카메라
-
-            List<GameObject> chars = GameManager.Instance.playerCharacters; // 캐릭터
-            foreach (GameObject c in chars)
-            {
-                c.SetActive(true);
-            }
-
-            Debug.Log("게임 종료");
+            EndMiniGameServerRpc();
 
             //미니 게임 승자 아이디 받기
             ulong winnerId = (ulong)Random.Range(0, 2);
+            Debug.Log(winnerId);
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
             if (winnerId == NetworkManager.LocalClientId)
             {
@@ -188,12 +200,6 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void StartMiniGameServerRpc()
-    {
-        Debug.Log("미니게임 시작!");
         MinigameManager.Instance.StartMinigame(Define.MinigameType.StackGame);
         StartMiniGameClientRpc();
     }
@@ -202,12 +208,30 @@ public class MainGameProgress : NetworkBehaviour
     void StartMiniGameClientRpc()
     {
         Debug.Log("미니게임을 위해 특정 오브젝트 비활성화");
-        Camera.main.gameObject.SetActive(false); // 윷놀이 판 전용카메라
-
-        List<GameObject> chars = GameManager.Instance.playerCharacters; // 캐릭터
+        maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
+        List<GameObject> chars = PlayerManager.Instance.currentCharacters; // 캐릭터 말 비활성화
         foreach (GameObject c in chars)
         {
             c.SetActive(false);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void EndMiniGameServerRpc()
+    {
+        Debug.Log("미니게임 종료!");
+        EndMiniGameClientRpc();
+    }
+
+    [ClientRpc]
+    void EndMiniGameClientRpc()
+    {
+        Debug.Log("미니게임 종료 클라이언트");
+        maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
+        List<GameObject> chars = PlayerManager.Instance.currentCharacters; // 캐릭터 말 비활성화
+        foreach (GameObject c in chars)
+        {
+            c.SetActive(true);
         }
     }
 

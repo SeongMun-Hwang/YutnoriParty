@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BlockSpawnHandler : NetworkBehaviour
 {
@@ -11,6 +12,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 	[SerializeField] private GameObject bottomFrame;
 	[SerializeField] private List<GameObject> stack;
     [SerializeField] private float blockSpeed = 6f;
+    Scene stackScene;
 
     public override void OnNetworkSpawn()
 	{
@@ -67,9 +69,10 @@ public class BlockSpawnHandler : NetworkBehaviour
         {
             blockSpeed += 1f;
         }
-        
+        Scene minigameScene = SceneManager.GetSceneByName("StackScene");
+        SceneManager.MoveGameObjectToScene(activeTile, minigameScene);
 
-		NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
+        NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
 		netObj.Spawn(true); // 네트워크에 생성 등록
 	}
 
