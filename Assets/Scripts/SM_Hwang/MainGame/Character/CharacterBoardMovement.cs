@@ -35,6 +35,8 @@ public class CharacterBoardMovement : MonoBehaviour
     {
         Debug.Log("Start To Move");
         GetComponent<Animator>().SetFloat("isMoving", 1f);
+        PlayerManager.Instance.isMoving = true;
+        Debug.Log("isMoving");
         int moveCount = Mathf.Abs(distance);
         for (int i = 0; i < moveCount; i++)
         {
@@ -61,6 +63,15 @@ public class CharacterBoardMovement : MonoBehaviour
             targetPos = tmpNode.transform.position;
             targetPos.y = transform.position.y;
 
+            Vector3 direction = (targetPos - transform.position).normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            while (Quaternion.Angle(transform.rotation, targetRotation) > 0.1f)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation,targetRotation,10f*Time.deltaTime);
+                yield return null;
+            }
+            transform.rotation = targetRotation;
+
             while (Vector3.Distance(transform.position, targetPos) > 0.01f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
@@ -70,7 +81,9 @@ public class CharacterBoardMovement : MonoBehaviour
             currentNode = tmpNode;
         }
         GameManager.Instance.mainGameProgress.EndMove();
+        PlayerManager.Instance.isMoving = false;
         animator.SetFloat("isMoving", 0f);
+        Debug.Log("isNotMoving");
         yield break;
     }
     private IEnumerator SpawnAndSelectNode(List<Node> possibleNodes)

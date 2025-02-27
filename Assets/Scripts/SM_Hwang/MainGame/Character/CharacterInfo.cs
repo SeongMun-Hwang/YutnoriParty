@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class CharacterInfo : NetworkBehaviour
 {
-
+    public int overlappedCount = 0;
 }
