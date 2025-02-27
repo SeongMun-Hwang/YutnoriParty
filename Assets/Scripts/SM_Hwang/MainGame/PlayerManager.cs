@@ -56,17 +56,16 @@ public class PlayerManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = default)]
     public void DespawnCharacterServerRpc(NetworkObjectReference noRef, ulong targetClientId)
     {
-        noRef.TryGet(out NetworkObject no);
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { targetClientId } }
         };
-        DespawnCharacterClientRpc(noRef, clientRpcParams);
-
-        if (no != null)
+        noRef.TryGet(out NetworkObject no);
+        List<NetworkObject> childObjects = new List<NetworkObject>(no.GetComponentsInChildren<NetworkObject>());
+        for(int i=0;i<childObjects.Count;i++)
         {
-            no.Despawn();
-            Destroy(no);
+            DespawnCharacterClientRpc(childObjects[i], clientRpcParams);
+            childObjects[i].Despawn();
         }
     }
     [ClientRpc]
@@ -89,7 +88,7 @@ public class PlayerManager : NetworkBehaviour
     {
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
-            child.transform.SetParent(parent.transform);
+            child.TrySetParent(parent.transform);
             Vector3 newPosition = parent.transform.position + new Vector3(0, 2, 0);
 
             // 서버에서 위치 변경
