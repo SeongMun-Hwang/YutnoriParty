@@ -117,7 +117,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ca1f154a660b97d458bb4d9e2da6d6ab, type: 2}
+  - {fileID: 2100000, guid: 7f27962442031c94da1e898ac192a09e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -149,10 +149,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3619457977060884359}
   - component: {fileID: 4911389082946874689}
-  - component: {fileID: 1132235250467705152}
+  - component: {fileID: 5521834557609116767}
   - component: {fileID: 5683779139776893250}
   m_Layer: 0
-  m_Name: BlackHoleNode
+  m_Name: IslandNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3765224743
+  GlobalObjectIdHash: 1656328017
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -200,7 +200,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &1132235250467705152
+--- !u!114 &5521834557609116767
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,11 +209,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8865519028264795707}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef5f7b7b619ab8f4088976ae2fccf609, type: 3}
+  m_Script: {fileID: 11500000, guid: f8fb76d9db827e64c9282a36c3bdf9ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  data: {fileID: 11400000, guid: 257980fefe79f1e429c20658727b2db9, type: 2}
+  data: {fileID: 11400000, guid: a58d42de636020543919047a7ea83941, type: 2}
+  spawnInterval: 0
 --- !u!54 &5683779139776893250
 Rigidbody:
   m_ObjectHideFlags: 0

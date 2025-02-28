@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9308fc51cdc368e41b7e78d5797a49d8, type: 3}
   m_Name: BlackHoleNodeData
   m_EditorClassIdentifier: 
+  eventNodeType: 1
   minNode: 1
   maxNode: 1
   lifeTime: 3
