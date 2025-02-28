@@ -224,6 +224,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         Debug.Log("미니게임을 위해 특정 오브젝트 비활성화");
         maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
+        YutManager.Instance.gameObject.SetActive(false);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -238,6 +239,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         Debug.Log("미니게임 종료이므로 특정 오브젝트 활성화");
         maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
+        YutManager.Instance.gameObject.SetActive(true);
     }
 
     /*턴 종료*/

@@ -44,19 +44,13 @@ public class StackBattleManager : NetworkBehaviour
 				RequestNextTurnServerRpc(NetworkManager.Singleton.LocalClientId);
 			}
 		});
-
-		currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
-		currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
-
-        if (IsServer)
-        {
-            // 서버라면 턴이 바뀔 때마다 타이머 재시작
-            currentTurnPlayerId.OnValueChanged += OnTurnChanged;
-        }
     }
 
 	public override void OnNetworkSpawn()
 	{
+        currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
+        currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
+
         if (IsServer)
         {
             foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -64,6 +58,8 @@ public class StackBattleManager : NetworkBehaviour
                 ulong clientId = clientPair.Key;
                 OnPlayerJoined(clientId);
             }
+
+            currentTurnPlayerId.OnValueChanged += OnTurnChanged;
         }
 
         spawner.manager = this;
