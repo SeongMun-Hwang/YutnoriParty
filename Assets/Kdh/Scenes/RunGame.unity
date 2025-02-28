@@ -3515,6 +3515,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tiger
       objectReference: {fileID: 0}
+    - target: {fileID: 863317919959736779, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 4312754742453869637, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2101137442
