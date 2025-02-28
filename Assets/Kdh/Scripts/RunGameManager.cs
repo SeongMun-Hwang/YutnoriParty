@@ -113,7 +113,7 @@ public class RunGameManager : NetworkBehaviour
             {
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
-                    EndGame(playerController);
+                    EndGame(playerController.OwnerClientId);
                     return;
                 }
             }
@@ -138,35 +138,31 @@ public class RunGameManager : NetworkBehaviour
 
         if (alivePlayers.Count == 1)
         {
-            EndGame(alivePlayers[0]);
+            EndGame(alivePlayers[0].OwnerClientId);
         }
     }
 
-    private void EndGame(RunGameController winner)
+    private void EndGame(ulong winnerId)
     {
-        
-
         gameEnded = true;
+        winnerClientId = winnerId;
 
-        Debug.Log(winner.name + "이 승리했습니다!");
-        //winnerClientId = winner.OwnerClientId;
-        // 모든 플레이어의 조작 멈추기
+        Debug.Log($"Player {winnerId} 이 승리했습니다!");
         StopAllPlayersClientRpc();
-        ShowWinnerClientRpc(winner.name);
-       
-        Debug.Log("미니게임이 종료되었습니다.");
+        ShowWinnerClientRpc(winnerId);
 
-        // 3초 후 씬 이동
+        Debug.Log("미니게임이 종료되었습니다.");
         StartCoroutine(LoadNextScene());
     }
+
     [ClientRpc]
-    private void ShowWinnerClientRpc(string winnerName)
+    private void ShowWinnerClientRpc(ulong winnerId)
     {
         if (winnerTextCanvas != null)
             winnerTextCanvas.SetActive(true);
 
         if (winnerText != null)
-            winnerText.text = $"{winnerName} Win!";
+            winnerText.text = $"Player {winnerId} Win!";
     }
     [ClientRpc]
     private void StopAllPlayersClientRpc()

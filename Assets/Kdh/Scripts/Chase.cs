@@ -9,10 +9,14 @@ public class Chase : NetworkBehaviour
     private bool canChase = false;
     private Vector3 chaserPosition; 
     private Animator animator;
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip moveSound;
+    [SerializeField] private AudioClip catchSound;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
     public override void OnNetworkSpawn()
     {
@@ -31,23 +35,32 @@ public class Chase : NetworkBehaviour
 
         if (canChase)
         {
-            MoveGrandmother();
+            MoveChaser();
         }
         else
         {
             animator.SetFloat("MoveSpeed", 0f); // Idle 상태 유지
         }
     }
-    private void MoveGrandmother()
+    private void MoveChaser()
     {
         chaserPosition += chaseDirection * chaseSpeed * Time.deltaTime;
         transform.position = chaserPosition;
         float speedValue = chaseSpeed > 0 ? 1f : 0f; // 속도에 따라 애니메이션 변경
-        animator.SetFloat("MoveSpeed", speedValue);
+        animator.SetFloat("MoveSpeed", speedValue);        
         // 모든 클라이언트에 위치를 동기화
         UpdatePositionClientRpc(chaserPosition, speedValue);
     }
-
+    [ClientRpc]
+    private void PlayMoveSoundClientRpc()
+    {       
+     audioSource.PlayOneShot(moveSound);        
+    }
+    [ClientRpc]
+    private void PlayCatchSoundClientRpc()
+    {       
+     audioSource.PlayOneShot(catchSound);        
+    }
     [ClientRpc]
     private void UpdatePositionClientRpc(Vector3 newPosition, float speedValue)
     {
@@ -64,7 +77,7 @@ public class Chase : NetworkBehaviour
         
         if (other.TryGetComponent<RunGameController>(out RunGameController player))
         {
-            PlayerEliminated(player);
+            PlayerEliminated(player);            
             animator.SetTrigger("hit");
         }
     }

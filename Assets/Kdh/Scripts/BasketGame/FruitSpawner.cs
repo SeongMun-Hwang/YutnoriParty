@@ -4,19 +4,23 @@ using System.Collections;
 
 public class FruitSpawner : NetworkBehaviour
 {
-    [SerializeField] private GameObject[] fruitPrefabs; // 여러 종류의 과일 프리팹 배열
-    [SerializeField] private float spawnInterval = 2f; // 과일이 떨어지는 간격
-    [SerializeField] private float spawnRangeX = 10f; // 과일이 떨어지는 x 범위
-    [SerializeField] private float spawnRangeZ = 10f; // 과일이 떨어지는 z 범위
-    [SerializeField] private float spawnHeight = 10f; // 과일이 떨어지는 높이
+    [SerializeField] private GameObject[] fruitPrefabs; 
+    [SerializeField] private float spawnInterval = 2f; 
+    [SerializeField] private float spawnRangeX = 10f; 
+    [SerializeField] private float spawnRangeZ = 10f; 
+    [SerializeField] private float spawnHeight = 10f;
+    private bool isSpawning = false;
 
-    private void Start()
+    private void Update()
     {
-        if (IsServer)
+        if (IsServer && BasketGameManager.Instance.gameStarted && !isSpawning)
         {
+            isSpawning = true;
             StartCoroutine(SpawnFruits());
         }
     }
+
+        
 
     private IEnumerator SpawnFruits()
     {

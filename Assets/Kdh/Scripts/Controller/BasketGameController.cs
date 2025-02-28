@@ -4,19 +4,23 @@ using UnityEngine.SceneManagement;
 public class BasketGameController : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private GameObject basketObject;
+    
     private Vector3 targetPosition;
-    private Animator animator; 
-    private bool canMove = true;//테스트때매 true한것 매니저에서 true해줘야함 
+    Rigidbody rb;
+    private Animator animator;
+    private bool canMove = false;
     private string currentSceneName;
+    [SerializeField] private int playerScore = 0;
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        
         currentSceneName = SceneManager.GetActiveScene().name;
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
-        UpdateBasketObjectState();
+        
     }
 
     private void OnEnable()
@@ -36,57 +40,44 @@ public class BasketGameController : NetworkBehaviour
         // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
-        transform.position = targetPosition;
-        UpdateBasketObjectState();
-    }
-    private void UpdateBasketObjectState()
-    {
-        if (basketObject != null)
+        if (rb != null)
         {
-            // "BasketGame" 씬일 때만 Basket 오브젝트를 활성화
-            basketObject.SetActive(currentSceneName == "BasketGame");
+            rb.linearVelocity = Vector3.zero;  
+            rb.position = targetPosition; 
+        }
+        else
+        {
+            transform.position = targetPosition;
         }
     }
+
 
 
     private void Update()
     {
         if (!IsOwner || !canMove || SceneManager.GetActiveScene().name != "BasketGame") return;
 
-        //Camera.main.transform.position = transform.position + new Vector3(0, 15, -5);
-        //Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);// 카메라 지울지 말지 고민중
+        float hAxis = Input.GetAxis("Horizontal");  
+        float vAxis = Input.GetAxis("Vertical");   
 
+        Vector3 moveDirection = new Vector3(hAxis, 0, vAxis).normalized; 
 
-        Vector3 moveDirection = Vector3.zero;
-
-        if (Input.GetKey(KeyCode.UpArrow)) moveDirection += Vector3.forward; 
-        if (Input.GetKey(KeyCode.DownArrow)) moveDirection += Vector3.back;     
-        if (Input.GetKey(KeyCode.LeftArrow)) moveDirection += Vector3.left;    
-        if (Input.GetKey(KeyCode.RightArrow)) moveDirection += Vector3.right;   
-
-        
         if (moveDirection != Vector3.zero)
         {
-            moveDirection.Normalize(); 
             MoveServerRpc(OwnerClientId, moveDirection);
         }
 
-        // 현재 위치와 목표 위치를 보간하여 이동
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        // 즉시 이동 방향을 바라보도록 회전 처리
-        if (moveDirection != Vector3.zero)
+        if (rb != null)
         {
-            transform.forward = moveDirection;  // 즉시 회전
+            rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
         }
 
-      
-        float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
+        float moveSpeedValue = rb.linearVelocity.magnitude > 0.01f ? 1f : 0f;
         animator.SetFloat("MoveSpeed", moveSpeedValue);
     }
 
-   
-    [ServerRpc]
+
+        [ServerRpc]
     private void MoveServerRpc(ulong clientId, Vector3 moveDirection)
     {
         if (OwnerClientId != clientId) return;
@@ -113,5 +104,24 @@ public class BasketGameController : NetworkBehaviour
     {
         canMove = enable;
     }
-   
+    [ServerRpc(RequireOwnership = false)]
+    public void AddScoreServerRpc(ulong playerId, int points)
+    {
+        if (!IsServer) return;  
+
+        // 점수 갱신 후 UI 업데이트
+        BasketGameManager.Instance.AddScore(playerId, points);
+    }
+
+    public void AddScore(int scoreValue)
+    {
+        if (!IsOwner) return; 
+
+        playerScore += scoreValue;
+        
+
+        // 점수를 서버로 요청
+        AddScoreServerRpc(OwnerClientId, scoreValue);
+    }
+
 }

@@ -10,13 +10,16 @@ public class RunGameController : NetworkBehaviour
     private Animator animator;
     private bool canMove = false;
     private string currentSceneName;
+    Rigidbody rb;
     public bool IsEliminated { get; private set; } = false;
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         currentSceneName = SceneManager.GetActiveScene().name;
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
+        
     }
 
     private void OnEnable()
@@ -37,13 +40,25 @@ public class RunGameController : NetworkBehaviour
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         transform.position = targetPosition;
+
     }
 
   
 
     private void Update()
     {
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName == "RunGame")
+        {
+            rb.isKinematic = true;
+        }
+        else if (sceneName == "BasketGame")  
+        {
+            rb.isKinematic = false;
+        }
         if (!IsOwner || !canMove || IsEliminated || SceneManager.GetActiveScene().name != "RunGame") return;
+        
         Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
         Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
         if (Input.GetKeyDown(KeyCode.Space))
