@@ -265,7 +265,7 @@ public class YutManager : NetworkBehaviour
                 //잠깐만 멈춰있어도 타이밍 겹치면 완전히 멈춰버린걸로 판정해버림 -> 다음 루프에서도 멈춰있는지 체크
                 //Debug.Log("속도 : " + yut.Rigidbody.linearVelocity.magnitude + " 각속도 : " + yut.Rigidbody.angularVelocity.magnitude);
                 //Debug.Log("리지드바디 잠? " + yut.Rigidbody.IsSleeping());
-                if (yut.Rigidbody.linearVelocity.magnitude < 0.1f && yut.Rigidbody.angularVelocity.magnitude < 0.1f)
+                if (yut.Rigidbody.linearVelocity.magnitude < 0.5f && yut.Rigidbody.angularVelocity.magnitude < 0.5f)
                 {
                     //다 멈추면 true로 유지
                     yutStable = true;
@@ -277,17 +277,19 @@ public class YutManager : NetworkBehaviour
                     //Debug.Log("멈춤");
                     //Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
                     //Debug.Log("윷 서있음? " + yut.IsVertical);
-
-                    //윷 서있으면 안정적이지 않다고 판정, 루프 지속
-                    if (yut.IsVertical)
-                    {
-                        yutStable = false;
-                    }
                 }
                 else
                 {
                     //하나라도 안멈춰있으면 루프 지속
                     yutStable = false;
+                    break;
+                }
+
+                //윷 서있으면 안정적이지 않다고 판정, 루프 지속
+                if (yut.IsVertical)
+                {
+                    yutStable = false;
+                    break;
                 }
             }
 
@@ -319,14 +321,20 @@ public class YutManager : NetworkBehaviour
                 for (int i = 0; i < yutNums; i++)
                 {
                     YutFace curFace = CalcYutResult(yuts[i]);
-                    //면이 에러거나,
+                    
                     //이전 결과랑 이번 결과랑 다르면 안정적이지 않다고 판단, 다시 계산
                     Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + curFace);
                     if (faces[i] == curFace)
                     {
                         faceStable = true;
                     }
-                    else if (faces[i] != curFace || curFace == YutFace.Error)
+                    else
+                    {
+                        faceStable = false;
+                    }
+
+                    //면이 에러면 다시 계산
+                    if (curFace == YutFace.Error)
                     {
                         faceStable = false;
                     }
@@ -358,7 +366,7 @@ public class YutManager : NetworkBehaviour
                     }
                 }
 
-                //면 안정적이지 않으면 루프 지속
+                //면 안정적이면 루프 탈출, 결과 냄
                 if (faceStable)
                 {
                     break;
