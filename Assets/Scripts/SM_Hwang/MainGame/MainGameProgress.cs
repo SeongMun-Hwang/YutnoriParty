@@ -204,7 +204,8 @@ public class MainGameProgress : NetworkBehaviour
             if (winnerId == playerNetObj.OwnerClientId)
             {
                 Debug.Log("Attacker Win / Enemy Lose");
-                YutManager.Instance.throwChance++;
+                AddThrowChanceClientRpc(winnerId);
+                //YutManager.Instance.throwChance++;
                 //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
             }
@@ -215,8 +216,18 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
-        MinigameManager.Instance.StartMinigame(Define.MinigameType.ShootingGame);
+        MinigameManager.Instance.StartMinigame();
         StartMiniGameClientRpc();
+    }
+
+    [ClientRpc]
+    void AddThrowChanceClientRpc(ulong targetId)
+    {
+        if (targetId == NetworkManager.Singleton.LocalClientId)
+        {
+            Debug.Log("기회 얻음");
+            YutManager.Instance.throwChance++;
+        }
     }
 
     [ClientRpc]

@@ -15,6 +15,7 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
     };
+    private Define.MinigameType type;
 
     public override void OnNetworkSpawn()
     {
@@ -50,11 +51,23 @@ public class MinigameManager : NetworkBehaviour
         }
     }
 
+    public void StartMinigame()
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[type], LoadSceneMode.Additive);
+        }
+        else
+        {
+            Debug.LogWarning("서버가 아니라 씬 변경 못함");
+        }
+    }
+
     // 씬에서 버튼에 직접 연결하기 위해 임시로 만든 메서드
     // 추후 코드상에서는 위의 enum 매개변수 타입을 사용할 것
-    public void StartMinigame(int i)
+    public void SelectMinigame(int i)
     {
-        StartMinigame((Define.MinigameType)i);
+        type = (Define.MinigameType)i;
     }
 
     public void EndMinigame()
