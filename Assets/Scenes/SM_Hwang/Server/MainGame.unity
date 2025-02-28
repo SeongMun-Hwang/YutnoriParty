@@ -1130,7 +1130,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 312218817}
         m_TargetAssemblyTypeName: MinigameManager, Assembly-CSharp
-        m_MethodName: StartMinigame
+        m_MethodName: SelectMinigame
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
