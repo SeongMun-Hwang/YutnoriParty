@@ -1,6 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class RunGameController : NetworkBehaviour
 {
     [SerializeField] private float moveDistance = 2f;  // 한 번 이동할 거리
@@ -9,17 +9,56 @@ public class RunGameController : NetworkBehaviour
     private Vector3 targetPosition;
     private Animator animator;
     private bool canMove = false;
+    private string currentSceneName;
+    Rigidbody rb;
     public bool IsEliminated { get; private set; } = false;
     private void Start()
     {
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);//플레이어순서대로 배치
+        rb = GetComponent<Rigidbody>();
+        currentSceneName = SceneManager.GetActiveScene().name;
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
+        
     }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded; 
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; 
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
+        currentSceneName = SceneManager.GetActiveScene().name;
+        // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
+        targetPosition = spawnTransform.position;
+        transform.position = targetPosition;
+
+    }
+
+  
 
     private void Update()
     {
-        if (!IsOwner || !canMove || IsEliminated) return;
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName == "RunGame")
+        {
+            rb.isKinematic = true;
+        }
+        else if (sceneName == "BasketGame")  
+        {
+            rb.isKinematic = false;
+        }
+        if (!IsOwner || !canMove || IsEliminated || SceneManager.GetActiveScene().name != "RunGame") return;
+        
         Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
         Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
         if (Input.GetKeyDown(KeyCode.Space))
