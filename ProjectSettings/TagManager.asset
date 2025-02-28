@@ -30,6 +30,8 @@ TagManager:
   - _KDH(4)
   - _KDH(5)
   - grandma
+  - Fruit
+  - Basket
   layers:
   - Default
   - TransparentFX
