@@ -17,7 +17,6 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
-        Debug.Log(PlayerManager.Instance.isMoving);
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Other Character is moving");

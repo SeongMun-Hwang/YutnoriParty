@@ -28,7 +28,6 @@ public class CharacterBoardMovement : MonoBehaviour
     /*정방향 이동*/
     public void MoveToNextNode(int distance = 1)
     {
-        Debug.Log("Call MoveFunc");
         StartCoroutine(MoveToTargetPos(distance));
     }
     private IEnumerator MoveToTargetPos(int distance)
@@ -36,7 +35,6 @@ public class CharacterBoardMovement : MonoBehaviour
         Debug.Log("Start To Move");
         GetComponent<Animator>().SetFloat("isMoving", 1f);
         PlayerManager.Instance.isMoving = true;
-        Debug.Log("isMoving");
         int moveCount = Mathf.Abs(distance);
         for (int i = 0; i < moveCount; i++)
         {
@@ -80,11 +78,10 @@ public class CharacterBoardMovement : MonoBehaviour
             transform.position = targetPos;
             currentNode = tmpNode;
         }
-        GameManager.Instance.mainGameProgress.EndMove();
         PlayerManager.Instance.isMoving = false;
         animator.SetFloat("isMoving", 0f);
-        Debug.Log("isNotMoving");
-        yield break;
+        yield return new WaitForSeconds(0.5f);
+        GameManager.Instance.mainGameProgress.EndMove();
     }
     private IEnumerator SpawnAndSelectNode(List<Node> possibleNodes)
     {
@@ -119,12 +116,5 @@ public class CharacterBoardMovement : MonoBehaviour
         {
             Destroy(desInstance);
         }
-    }
-
-    private void EnterGoal()
-    {
-        Debug.Log("EnterGoal");
-        gameObject.GetComponent<NetworkObject>().Despawn();
-        Destroy(gameObject);
     }
 }
