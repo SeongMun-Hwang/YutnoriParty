@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5177304061824544899}
   - component: {fileID: 1639867927544858639}
   - component: {fileID: 9216966462056994395}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 847038646
+  GlobalObjectIdHash: 3080971720
   InScenePlacedSourceGlobalObjectIdHash: 3080971720
   DeferredDespawnTick: 0
   Ownership: 1
@@ -260,6 +260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shotEffect: {fileID: 1137233926978328921, guid: 31949f22d7d488346a4a6c2e011a3a2b, type: 3}
+  manager: {fileID: 0}
 --- !u!95 &9216966462056994395
 Animator:
   serializedVersion: 7

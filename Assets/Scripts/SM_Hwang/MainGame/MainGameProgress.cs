@@ -215,7 +215,7 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
-        MinigameManager.Instance.StartMinigame(Define.MinigameType.StackGame);
+        MinigameManager.Instance.StartMinigame(Define.MinigameType.ShootingGame);
         StartMiniGameClientRpc();
     }
 
