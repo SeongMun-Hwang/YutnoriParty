@@ -189,7 +189,7 @@ public class StackBattleManager : NetworkBehaviour
 			else
 			{
 				int aliveIndex = isRetire.IndexOf(false);
-				Debug.Log($"게임 종료! {aliveIndex}플레이어 승리");
+				Debug.Log($"게임 종료! 플레이어 {playerIds[aliveIndex]} 승리");
                 MainGameProgress.Instance.winnerId = playerIds[aliveIndex];
                 GameFinishedClientRpc(playerIds[aliveIndex]);
                 StartCoroutine(PassTheScene());
