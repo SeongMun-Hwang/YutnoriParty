@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DevModeMover : NetworkBehaviour
+public class DevModeMover : MonoBehaviour
 {
     [SerializeField] TMP_InputField inputField;
     
