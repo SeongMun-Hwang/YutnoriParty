@@ -154,8 +154,10 @@ public class MainGameProgress : NetworkBehaviour
         }
     }
 
+    // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy)
     {
+        // 각 말의 NetworkObject를 추출
         if (!currentCharacter.gameObject.TryGetComponent<NetworkObject>(out var playerNetObj) || !playerNetObj.IsSpawned)
         {
             Debug.LogError("attacker는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
@@ -168,38 +170,36 @@ public class MainGameProgress : NetworkBehaviour
             return;
         }
 
-        // 미니게임 실행
+        // 각 말의 NetworkObjectReference를 보내 서버에 미니게임 실행 요청
         StartMiniGameServerRpc(new NetworkObjectReference(playerNetObj), new NetworkObjectReference(enemyNetObj));
     }
 
     [ServerRpc(RequireOwnership = false)]
     void StartMiniGameServerRpc(NetworkObjectReference playerReference, NetworkObjectReference enemyReference)
     {
-        Debug.Log("미니게임 시작!");
-
+        // 각 NetworkObjectReference에서 GameObject 추출
         if (!playerReference.TryGet(out NetworkObject playerNetObj))
         {
-            Debug.LogError("attacker NetworkObject가 없슴");
+            Debug.LogError("attacker NetworkObject가 없습니다!");
             return;
         }
 
         if (!enemyReference.TryGet(out NetworkObject enemyNetObj))
         {
-            Debug.LogError("enemy NetworkObject가 없슴");
+            Debug.LogError("enemy NetworkObject가 없습니다!");
             return;
         }
 
         GameObject player = playerNetObj.gameObject;
         GameObject enemy = enemyNetObj.gameObject;
 
+        // 미니 게임이 끝났을 때 서버에서 발생시킬 이벤트를 지정
         endMinigameActions = null;
         endMinigameActions += (() =>
         {
-            EndMiniGameServerRpc();
+            EndMiniGameClientRpc();
 
-            //미니 게임 승자 아이디 받기
-            //ulong winnerId = (ulong)Random.Range(0, 2);
-            Debug.Log($"{winnerId}가 나{playerNetObj.OwnerClientId}인가?");
+            //미니 게임 승자 판별과 패배한 말 처리
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
             if (winnerId == playerNetObj.OwnerClientId)
             {
@@ -233,24 +233,17 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     void StartMiniGameClientRpc()
     {
-        Debug.Log("미니게임을 위해 특정 오브젝트 비활성화");
+        // 미니게임을 위해 특정 오브젝트 비활성화
         maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(false);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void EndMiniGameServerRpc()
-    {
-        Debug.Log("미니게임 종료!");
-        EndMiniGameClientRpc();
+        YutManager.Instance.gameObject.SetActive(false); // 윷놀이 관련 비활성화
     }
 
     [ClientRpc]
     void EndMiniGameClientRpc()
     {
-        Debug.Log("미니게임 종료이므로 특정 오브젝트 활성화");
+        // 미니게임 종료이므로 특정 오브젝트 활성화
         maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(true);
+        YutManager.Instance.gameObject.SetActive(true); // 윷놀이 관련 활성화
     }
 
     /*턴 종료*/

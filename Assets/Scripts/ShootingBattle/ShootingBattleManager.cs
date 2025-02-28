@@ -123,7 +123,7 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             topPlayerScore = playerScore[id];
             topPlayerId = id;
-            Debug.Log($"현재 1등 {topPlayerId} : {topPlayerScore}");
+            //Debug.Log($"현재 1등 {topPlayerId} : {topPlayerScore}");
         }
     }
 

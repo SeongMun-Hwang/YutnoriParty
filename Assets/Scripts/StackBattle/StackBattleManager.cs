@@ -155,7 +155,7 @@ public class StackBattleManager : NetworkBehaviour
                 spawner.DropBlock();
             }
 
-            Debug.Log($"실패? {failed} 시간초과? {timeover}");
+            // Debug.Log($"실패? {failed} 시간초과? {timeover}");
             int currentIndex = playerIds.IndexOf(senderClientId);
 			int nextIndex = (currentIndex + 1) % playerIds.Count;
 
@@ -205,7 +205,7 @@ public class StackBattleManager : NetworkBehaviour
 
 	private void UpdateTurnUI(ulong previousValue, ulong newValue)
 	{
-		turnText.text = $"Current Turn : Player {newValue}";
+		// turnText.text = $"Current Turn : Player {newValue}";
 
         if (IsClient)
 		{

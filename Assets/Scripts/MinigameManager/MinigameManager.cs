@@ -42,12 +42,12 @@ public class MinigameManager : NetworkBehaviour
             }
             else
             {
-                Debug.LogError($"씬 {type}이 없음");
+                Debug.LogError($"씬 {type}이 없습니다");
             }
         }
         else
         {
-            Debug.LogWarning("서버가 아니라 씬 변경 못함");
+            Debug.LogWarning("씬 변경은 서버에서 수행해야합니다");
         }
     }
 
@@ -59,7 +59,7 @@ public class MinigameManager : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("서버가 아니라 씬 변경 못함");
+            Debug.LogWarning("씬 변경은 서버에서 수행해야합니다");
         }
     }
 
