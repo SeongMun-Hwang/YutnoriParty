@@ -66,7 +66,8 @@ public class MainGameProgress : NetworkBehaviour
     //내 말이 아니면 메시지 출력
     public void ChooseCharacter()
     {
-        if ((int)NetworkManager.LocalClientId != currentPlayerNumber.Value) return; //내 턴이 아니면 작동 X
+        if ((int)NetworkManager.LocalClientId != currentPlayerNumber.Value
+            || PlayerManager.Instance.isMoving) return; //내 턴이 아니면 작동 X
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -107,6 +108,7 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
+        Debug.Log("End Move");
         if (CheckOtherPlayer())
         {
             StartMiniGame(encounteredEnemy);
@@ -141,14 +143,13 @@ public class MainGameProgress : NetworkBehaviour
     }
     private void CheckTurnChange()
     {
+        Debug.Log("Check Turn Change");
         if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
         {
-            Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
             EndTurnServerRpc();
         }
     }
-
     private void StartMiniGame(GameObject enemy)
     {
         //미니게임 실행
