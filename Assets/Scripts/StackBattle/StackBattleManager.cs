@@ -80,7 +80,8 @@ public class StackBattleManager : NetworkBehaviour
 
         if (playerIds.Count == maxPlayers)
         {
-            // 첫 번째 플레이어가 게임 시작 시 첫 턴을 가짐
+            // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
+            int i = UnityEngine.Random.Range(0, playerIds.Count);
             currentTurnPlayerId.Value = playerIds[0];
             StartTurnTimer();
         }
