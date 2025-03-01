@@ -116,9 +116,22 @@ public class MainGameProgress : NetworkBehaviour
         {
             StartMiniGame(encounteredEnemy);
         }
-        CheckTurnChange();
-
+        //CheckTurnChange();
+        StartCoroutine(WaitUntilMinigameEnd());
     }
+
+    public bool isMinigamePlaying = false;
+
+    private IEnumerator WaitUntilMinigameEnd()
+    {
+        while (isMinigamePlaying)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1f);
+        CheckTurnChange();
+    }
+
     private bool CheckOtherPlayer()
     {
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
@@ -157,6 +170,8 @@ public class MainGameProgress : NetworkBehaviour
     // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy)
     {
+        isMinigamePlaying = true;
+
         // 각 말의 NetworkObject를 추출
         if (!currentCharacter.gameObject.TryGetComponent<NetworkObject>(out var playerNetObj) || !playerNetObj.IsSpawned)
         {
@@ -241,7 +256,8 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     void EndMiniGameClientRpc()
     {
-        // 미니게임 종료이므로 특정 오브젝트 활성화
+        // 미니게임 종료이므로 특정 오브젝트 활성화 및 상태 변경
+        isMinigamePlaying = false;
         maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
         YutManager.Instance.gameObject.SetActive(true); // 윷놀이 관련 활성화
     }
