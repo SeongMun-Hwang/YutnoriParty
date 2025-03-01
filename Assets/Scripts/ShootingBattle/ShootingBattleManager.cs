@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 
 public class ShootingBattleManager : NetworkBehaviour
@@ -17,6 +18,8 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> scoreUI;
     [SerializeField] private Texture2D cursorTexture;
+    [SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject loseMessageUI;
 
 
     // 게임 상태 및 진행 관련
@@ -40,12 +43,17 @@ public class ShootingBattleManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        currentId = playerIds.Count;
-        Debug.Log($"플레이어 ID : {currentId}");
         if (IsServer)
         {
-            NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
+            foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                ulong clientId = clientPair.Key;
+                OnPlayerJoined(clientId);
+            }
         }
+
+        currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
+        Debug.Log($"플레이어 ID : {currentId}");
     }
 
     private void OnPlayerJoined(ulong clientId)
@@ -115,7 +123,7 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             topPlayerScore = playerScore[id];
             topPlayerId = id;
-            Debug.Log($"현재 1등 {topPlayerId} : {topPlayerScore}");
+            //Debug.Log($"현재 1등 {topPlayerId} : {topPlayerScore}");
         }
     }
 
@@ -141,7 +149,11 @@ public class ShootingBattleManager : NetworkBehaviour
                 if (IsServer)
                 {
                     isPlaying.Value = false;
-                    Debug.Log($"게임 종료! {topPlayerId} 플레이어 승리");
+                    Debug.Log($"게임 종료! 플레이어 {playerIds[topPlayerId]} 승리");
+
+                    MainGameProgress.Instance.winnerId = playerIds[topPlayerId];
+                    GameFinishedClientRpc(playerIds[topPlayerId]);
+                    StartCoroutine(PassTheScene());
                 }
                 yield break;
             }
@@ -161,5 +173,27 @@ public class ShootingBattleManager : NetworkBehaviour
             yield return new WaitForSecondsRealtime(spawnDuration);
             spawnDuration = Mathf.Clamp(spawnDuration - 0.4f, 0.2f, 1.5f);
         }
+    }
+
+    [ClientRpc]
+    public void GameFinishedClientRpc(ulong winClientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
+        {
+            winMessageUI.SetActive(true);
+        }
+        else
+        {
+            loseMessageUI.SetActive(true);
+        }
+
+        Debug.Log("게임 종료");
+    }
+
+    public IEnumerator PassTheScene()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("ShootingScene"));
+        MinigameManager.Instance.EndMinigame();
     }
 }

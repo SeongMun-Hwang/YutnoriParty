@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BlockSpawnHandler : NetworkBehaviour
 {
@@ -11,17 +12,35 @@ public class BlockSpawnHandler : NetworkBehaviour
 	[SerializeField] private GameObject bottomFrame;
 	[SerializeField] private List<GameObject> stack;
     [SerializeField] private float blockSpeed = 6f;
+    Scene stackScene;
 
     public override void OnNetworkSpawn()
 	{
 		if (IsServer)
 		{
-			stack.Clear();
-			CreateBlock();
-		}
+            Debug.Log("이거");
+
+            // 기존 블록들을 Despawn() 후 리스트 비우기
+            foreach (var block in stack)
+            {
+                if (block != null && block.TryGetComponent(out NetworkObject netObj) && netObj.IsSpawned)
+                {
+                    netObj.Despawn();
+                }
+            }
+
+            stack.Clear();
+            StartCoroutine(DelayedCreateBlock());
+        }
 	}
 
-	public void CreateBlock()
+    private IEnumerator DelayedCreateBlock()
+    {
+        yield return new WaitForSeconds(1f); // 약간의 딜레이 추가 후 실행
+        CreateBlock();
+    }
+
+    public void CreateBlock()
 	{
 		if (!IsServer)
 			return; // 서버에서만 블록 생성
@@ -50,9 +69,10 @@ public class BlockSpawnHandler : NetworkBehaviour
         {
             blockSpeed += 1f;
         }
-        
+        Scene minigameScene = SceneManager.GetSceneByName("StackScene");
+        SceneManager.MoveGameObjectToScene(activeTile, minigameScene);
 
-		NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
+        NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
 		netObj.Spawn(true); // 네트워크에 생성 등록
 	}
 

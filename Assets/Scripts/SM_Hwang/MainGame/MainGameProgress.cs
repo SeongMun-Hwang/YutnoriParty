@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,8 +11,11 @@ public class MainGameProgress : NetworkBehaviour
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
+    public Camera maingameCamera;
     private static MainGameProgress instance;
     public static MainGameProgress Instance { get { return instance; } }
+    public System.Action endMinigameActions;
+    public ulong winnerId;
     private void Update()
     {
         ChooseCharacter();
@@ -66,8 +71,7 @@ public class MainGameProgress : NetworkBehaviour
     //내 말이 아니면 메시지 출력
     public void ChooseCharacter()
     {
-        if ((int)NetworkManager.LocalClientId != currentPlayerNumber.Value
-            || PlayerManager.Instance.isMoving) return; //내 턴이 아니면 작동 X
+        if ((int)NetworkManager.LocalClientId != currentPlayerNumber.Value) return; //내 턴이 아니면 작동 X
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -108,14 +112,26 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
-        Debug.Log("End Move");
         if (CheckOtherPlayer())
         {
             StartMiniGame(encounteredEnemy);
         }
-        CheckTurnChange();
-
+        //CheckTurnChange();
+        StartCoroutine(WaitUntilMinigameEnd());
     }
+
+    public bool isMinigamePlaying = false;
+
+    private IEnumerator WaitUntilMinigameEnd()
+    {
+        while (isMinigamePlaying)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1f);
+        CheckTurnChange();
+    }
+
     private bool CheckOtherPlayer()
     {
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
@@ -143,36 +159,109 @@ public class MainGameProgress : NetworkBehaviour
     }
     private void CheckTurnChange()
     {
-        Debug.Log("Check Turn Change");
         if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
         {
+            Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
             EndTurnServerRpc();
         }
     }
+
+    // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy)
     {
-        //미니게임 실행
+        isMinigamePlaying = true;
 
-        //미니게임 종료
-
-        //미니 게임 승자 아이디 받기
-        ulong winnerId = (ulong)Random.Range(0, 2);
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
-        if (winnerId == NetworkManager.LocalClientId)
+        // 각 말의 NetworkObject를 추출
+        if (!currentCharacter.gameObject.TryGetComponent<NetworkObject>(out var playerNetObj) || !playerNetObj.IsSpawned)
         {
-            Debug.Log("You Win");
-            YutManager.Instance.throwChance++;
-            //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
-            PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
+            Debug.LogError("attacker는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
+            return;
         }
-        else
+
+        if (!enemy.TryGetComponent<NetworkObject>(out var enemyNetObj) || !enemyNetObj.IsSpawned)
         {
-            Debug.Log("You Lose");
-            //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
-            PlayerManager.Instance.DespawnCharacterServerRpc(currentCharacter.gameObject, currentCharacter.GetComponent<NetworkObject>().OwnerClientId);
+            Debug.LogError("enemy는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
+            return;
+        }
+
+        // 각 말의 NetworkObjectReference를 보내 서버에 미니게임 실행 요청
+        StartMiniGameServerRpc(new NetworkObjectReference(playerNetObj), new NetworkObjectReference(enemyNetObj));
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void StartMiniGameServerRpc(NetworkObjectReference playerReference, NetworkObjectReference enemyReference)
+    {
+        // 각 NetworkObjectReference에서 GameObject 추출
+        if (!playerReference.TryGet(out NetworkObject playerNetObj))
+        {
+            Debug.LogError("attacker NetworkObject가 없습니다!");
+            return;
+        }
+
+        if (!enemyReference.TryGet(out NetworkObject enemyNetObj))
+        {
+            Debug.LogError("enemy NetworkObject가 없습니다!");
+            return;
+        }
+
+        GameObject player = playerNetObj.gameObject;
+        GameObject enemy = enemyNetObj.gameObject;
+
+        // 미니 게임이 끝났을 때 서버에서 발생시킬 이벤트를 지정
+        endMinigameActions = null;
+        endMinigameActions += (() =>
+        {
+            EndMiniGameClientRpc();
+
+            //미니 게임 승자 판별과 패배한 말 처리
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
+            if (winnerId == playerNetObj.OwnerClientId)
+            {
+                Debug.Log("Attacker Win / Enemy Lose");
+                AddThrowChanceClientRpc(winnerId);
+                //YutManager.Instance.throwChance++;
+                //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
+            }
+            else
+            {
+                Debug.Log("Attacker Lose / Enemy Win");
+                //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
+                PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
+            }
+        });
+        MinigameManager.Instance.StartMinigame();
+        StartMiniGameClientRpc();
+    }
+
+    [ClientRpc]
+    void AddThrowChanceClientRpc(ulong targetId)
+    {
+        if (targetId == NetworkManager.Singleton.LocalClientId)
+        {
+            Debug.Log("기회 얻음");
+            YutManager.Instance.throwChance++;
         }
     }
+
+    [ClientRpc]
+    void StartMiniGameClientRpc()
+    {
+        // 미니게임을 위해 특정 오브젝트 비활성화
+        maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
+        YutManager.Instance.gameObject.SetActive(false); // 윷놀이 관련 비활성화
+    }
+
+    [ClientRpc]
+    void EndMiniGameClientRpc()
+    {
+        // 미니게임 종료이므로 특정 오브젝트 활성화 및 상태 변경
+        isMinigamePlaying = false;
+        maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
+        YutManager.Instance.gameObject.SetActive(true); // 윷놀이 관련 활성화
+    }
+
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
     [ServerRpc(RequireOwnership = false)]
