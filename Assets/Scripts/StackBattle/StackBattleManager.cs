@@ -82,7 +82,7 @@ public class StackBattleManager : NetworkBehaviour
         {
             // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
             int i = UnityEngine.Random.Range(0, playerIds.Count);
-            currentTurnPlayerId.Value = playerIds[0];
+            currentTurnPlayerId.Value = playerIds[i];
             StartTurnTimer();
         }
 	}
