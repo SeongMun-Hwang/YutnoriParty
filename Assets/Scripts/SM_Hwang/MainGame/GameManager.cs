@@ -24,4 +24,5 @@ public class GameManager : NetworkBehaviour
     public MainGameProgress mainGameProgress;
     public Node startNode;
     public List<GameObject> playerCharacters;
+    public List<Transform> profilePositions;
 }
