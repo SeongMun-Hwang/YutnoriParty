@@ -16,6 +16,9 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
+        //버튼 누르면 윷 사라지게 함
+        YutManager.Instance.HideYutRpc();
+
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Other Character is moving");

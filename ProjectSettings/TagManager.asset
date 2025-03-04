@@ -5,7 +5,6 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ground
-  - _LBJ(2)
   - _LBJ(3)
   - _LBJ(4)
   - _LBJ(5)
@@ -40,7 +39,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - PlayerCharacter
   - 
   - 
   - 

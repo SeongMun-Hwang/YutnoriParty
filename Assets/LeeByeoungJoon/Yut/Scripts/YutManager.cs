@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -111,15 +112,74 @@ public class YutManager : NetworkBehaviour
             yut.originPos = yut.transform.position;
             yut.originRot = yut.transform.rotation;
 
-            //안보이게 하기
-            //yut.gameObject.SetActive(false);
-
             //작은 움직임이 남아도 멈춘걸로 인식하도록 값 조절
             //yut.Rigidbody.sleepThreshold = yutSleepThreshold;
         }
 
         //낙 트리거 등록
         outTrigger.OnYutTriggerd += YutFalled;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void HideYutRpc()
+    {
+        List<NetworkObject> yutList = new List<NetworkObject>();
+
+        for (int i=0; i< yutNum; i++)
+        {
+            Yut yut = yuts[i];
+            yutList.Add(yut.GetComponent<NetworkObject>());
+            //yut.GetComponent<NetworkObject>().NetworkHide((ulong)i);
+            yut.gameObject.SetActive(false);
+        }
+
+        foreach(var client in NetworkManager.Singleton.ConnectedClients)
+        {
+            //서버는 패스
+            if (client.Key == NetworkManager.ServerClientId) continue;
+
+            foreach(var yut in yutList)
+            {
+                //이미 hide 되어있으면 패스
+                if (!yut.IsNetworkVisibleTo(client.Key)) continue;
+
+                //감추기
+                yut.NetworkHide(client.Key);
+                //Debug.Log(client.Key + " 번 플레이어 윷 감춤");
+            }
+        }
+        //Debug.Log("윷 감추기 끝");
+    }
+
+    [Rpc(SendTo.Server)]
+    public void ShowYutRpc()
+    {
+        List<NetworkObject> yutList = new List<NetworkObject>();
+
+        for (int i = 0; i < yutNum; i++)
+        {
+            Yut yut = yuts[i];
+            yutList.Add(yut.GetComponent<NetworkObject>());
+            yut.gameObject.SetActive(true);
+            //yut.GetComponent<NetworkObject>().NetworkShow((ulong)i);
+        }
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        {
+            //서버는 패스
+            if (client.Key == NetworkManager.ServerClientId) continue;
+
+            foreach (var yut in yutList)
+            {
+                //이미 show 되어있으면 패스
+                if (yut.IsNetworkVisibleTo(client.Key)) continue;
+
+                //드러내기
+                yut.NetworkShow(client.Key);
+                //Debug.Log(client.Key + " 번 플레이어 윷 드러내기");
+            }
+        }
+        //Debug.Log("윷 드러내기 끝");
     }
 
     public override void OnNetworkDespawn()
@@ -140,12 +200,12 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            //MyTurn();
-            Debug.Log(throwChance);
-            YutResultCount();
-        }
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    //MyTurn();
+        //    Debug.Log(throwChance);
+        //    YutResultCount();
+        //}
 
         if (isThrowButtonDown)
         {
@@ -214,10 +274,12 @@ public class YutManager : NetworkBehaviour
     {
         Debug.Log("던지는 파워 : " + power);
 
+        //윷 보이게 하기
+        ShowYutRpc();
+
         //낙 해서 키네마틱이던 윷 있으면 풀어줌
         outTrigger.ReleaseYuts();
 
-       
         for (int i = 0; i < yutNums; i++)
         {
             Yut yut = yuts[i];
@@ -226,9 +288,6 @@ public class YutManager : NetworkBehaviour
             yut.transform.localPosition = yut.originPos; //외않됢?
             yut.transform.localRotation = yut.originRot; //외않됢? 이제 됢!
 
-            //보이게 하기
-            //yut.gameObject.SetActive(true);
-
             //윷 던지기
             //던지기 전에 움직임을 없애고(이상한 방향으로 날라가는거 방지)
             yut.Rigidbody.linearVelocity = Vector3.zero;
@@ -236,8 +295,11 @@ public class YutManager : NetworkBehaviour
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
             yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
+
+            //yut.Rigidbody.excludeLayers = LayerMask.GetMask("Player");
         }
 
+        
         StartCoroutine(YutResultCheck(0, yutNums, rpcParams));
     }
 
@@ -405,6 +467,7 @@ public class YutManager : NetworkBehaviour
             //이동 끝 실행해서 턴 넘김
             GameManager.Instance.mainGameProgress.EndMove();
             isYutFalled = false;
+            ThrowChanceChangeClientRpc(-999, senderId);
 
             yield break;
         }
@@ -443,6 +506,7 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
+
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
         yield break;
@@ -538,6 +602,12 @@ public class YutManager : NetworkBehaviour
         //해당 클라이언트의 윷 던지기 횟수를 갱신
         if(senderId == NetworkManager.Singleton.LocalClientId)
         {
+            //-99이하면 턴 0으로 초기화
+            if(num <= -99)
+            {
+                throwChance = 0;
+                return;
+            }
             throwChance += num;
         }
     }

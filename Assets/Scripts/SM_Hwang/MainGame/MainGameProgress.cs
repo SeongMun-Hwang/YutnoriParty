@@ -40,6 +40,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         numOfPlayer = NetworkManager.ConnectedClients.Count;
         currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
+        YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         StartTurn(currentPlayerNumber.Value);
     }
     /*턴 시작*/

@@ -9,7 +9,7 @@ public class Yut : NetworkBehaviour
     new Rigidbody rigidbody;
     float torque;
     float gravity = 9.8f;
-    float gravityFactor = 1;
+    float gravityFactor = 4;
     bool isGrounded = false;
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
