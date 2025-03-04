@@ -53,7 +53,7 @@ public class RunGameController : NetworkBehaviour
         {
             rb.isKinematic = true;
         }
-        else if (sceneName == "BasketGame")  
+        else if (sceneName == "MainGame")  
         {
             rb.isKinematic = false;
         }

@@ -19,6 +19,7 @@ public class BasketGameController : NetworkBehaviour
         currentSceneName = SceneManager.GetActiveScene().name;
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
+        rb.position = targetPosition;
         animator = GetComponent<Animator>();
         
     }

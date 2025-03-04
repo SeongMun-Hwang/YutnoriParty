@@ -193,7 +193,7 @@ public class RunGameManager : NetworkBehaviour
 
         if (IsServer)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("BasketGame", LoadSceneMode.Single); // 모든 클라이언트가 이동
+            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // 모든 클라이언트가 이동
             EnableAllPlayersControlClientRpc(); // 씬 이동 후 즉시 실행
         }
     }
