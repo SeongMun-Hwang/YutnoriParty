@@ -4,6 +4,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode.Components;
 using NUnit.Framework.Internal.Filters;
+using System;
+using Unity.Services.Authentication;
+using System.Threading.Tasks;
+using TMPro;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -12,16 +16,31 @@ public class PlayerManager : NetworkBehaviour
     public bool isMoving = false;
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
+    public static Action<PlayerManager> OnPlayerSpawn;
+    public static Action<PlayerManager> OnPlayerDespawn;
     public override void OnNetworkSpawn()
     {
-        if (instance == null)
-        {
+        //if (instance == null)
+        //{
             instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (instance != this)
+        //    DontDestroyOnLoad(gameObject);
+        //}
+        //else if (instance != this)
+        //{
+        //    Destroy(gameObject);
+        //}
+        Debug.Log("Player Manager Spawned");
+        if (IsServer)
         {
-            Destroy(gameObject);
+            OnPlayerSpawn?.Invoke(this);
+        }
+        if (!IsOwner) return;
+    }
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
+        {
+            OnPlayerDespawn?.Invoke(this);
         }
     }
     public void SpawnCharacter()
