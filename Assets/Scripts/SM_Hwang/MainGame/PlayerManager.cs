@@ -29,7 +29,6 @@ public class PlayerManager : NetworkBehaviour
         //{
         //    Destroy(gameObject);
         //}
-        Debug.Log("Player Manager Spawned");
         if (IsServer)
         {
             OnPlayerSpawn?.Invoke(this);

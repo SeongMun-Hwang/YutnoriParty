@@ -9,6 +9,7 @@ public class MainGameProgress : NetworkBehaviour
 {
     private int numOfPlayer;
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
+    private NetworkVariable<int> gameTurn=new NetworkVariable<int>(0);
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
     public Camera maingameCamera;
@@ -268,11 +269,16 @@ public class MainGameProgress : NetworkBehaviour
     void EndTurnServerRpc()
     {
         Debug.Log("Change Turn");
+        gameTurn.Value++;
         currentPlayerNumber.Value++;
         if (currentPlayerNumber.Value == numOfPlayer)
         {
             currentPlayerNumber.Value = 0;
         }
         StartTurn(currentPlayerNumber.Value);
+    }
+    public int GetCurrentTurn()
+    {
+        return gameTurn.Value;
     }
 }
