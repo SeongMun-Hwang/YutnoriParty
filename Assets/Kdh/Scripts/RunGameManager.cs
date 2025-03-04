@@ -66,7 +66,7 @@ public class RunGameManager : NetworkBehaviour
             countdownText.gameObject.SetActive(false);
     }
 
-    [ClientRpc]
+       [ClientRpc]
     private void StartGameClientRpc()
     {
         gameStarted = true;

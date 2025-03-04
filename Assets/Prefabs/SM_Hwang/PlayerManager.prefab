@@ -71,6 +71,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  playerCharacter: {fileID: 0}
   currentCharacters: []
-  progress: {fileID: 0}
+  isMoving: 0
