@@ -3860,6 +3860,7 @@ MonoBehaviour:
   currentCharacter: {fileID: 0}
   maingameCamera: {fileID: 302928133}
   winnerId: 0
+  isMinigamePlaying: 0
 --- !u!4 &1365642761
 Transform:
   m_ObjectHideFlags: 0
@@ -5765,6 +5766,26 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &2113713794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113713787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66429bd9496a04444936f3c548341136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerBoardParent: {fileID: 2113713788}
+  playerProfilePrefab: {fileID: 4201541151108662989, guid: 2dab1cbf65d7dc74ab455a8901fcfa24, type: 3}
+  profileTransforms:
+  - {fileID: 1890371285}
+  - {fileID: 1098103978}
+  - {fileID: 561051582}
+  - {fileID: 1006494070}
 --- !u!1 &2116696342
 GameObject:
   m_ObjectHideFlags: 0
@@ -5805,7 +5826,6 @@ RectTransform:
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2116696344
-
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5899,7 +5919,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2116696342}
   m_CullTransparentMesh: 1
-
 --- !u!1001 &2129214069
 PrefabInstance:
   m_ObjectHideFlags: 0
