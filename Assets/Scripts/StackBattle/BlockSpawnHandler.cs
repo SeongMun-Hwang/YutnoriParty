@@ -65,7 +65,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 		activeTile.GetComponent<StackableBlock>().spawner = this;
 		activeTile.GetComponent<StackableBlock>().manager = manager;
 		activeTile.GetComponent<StackableBlock>().moveSpeed = blockSpeed;
-        if (stack.Count % manager.maxPlayers == 0)
+        if (stack.Count % MinigameManager.Instance.maxPlayers == 0)
         {
             blockSpeed += 1f;
         }

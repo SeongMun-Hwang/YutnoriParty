@@ -232,6 +232,8 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
+        ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
+        MinigameManager.Instance.SetPlayers(players);
         MinigameManager.Instance.StartMinigame();
         StartMiniGameClientRpc();
     }
