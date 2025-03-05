@@ -5,7 +5,6 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ground
-  - _LBJ(3)
   - _LBJ(4)
   - _LBJ(5)
   - _SCH(1)
@@ -31,6 +30,7 @@ TagManager:
   - grandma
   - Fruit
   - Basket
+  - Yut
   layers:
   - Default
   - TransparentFX
@@ -40,7 +40,7 @@ TagManager:
   - UI
   - Ground
   - PlayerCharacter
-  - 
+  - Yut
   - 
   - 
   - MinigameObject

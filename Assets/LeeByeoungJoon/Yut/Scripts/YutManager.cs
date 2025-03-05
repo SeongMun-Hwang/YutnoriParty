@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,7 +43,7 @@ public class YutManager : NetworkBehaviour
     float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float torque = 80; //토크
+    float torque = 20; //토크
     public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
@@ -128,26 +127,27 @@ public class YutManager : NetworkBehaviour
         for (int i=0; i< yutNum; i++)
         {
             Yut yut = yuts[i];
-            yutList.Add(yut.GetComponent<NetworkObject>());
+            //yutList.Add(yut.GetComponent<NetworkObject>());
             //yut.GetComponent<NetworkObject>().NetworkHide((ulong)i);
-            yut.gameObject.SetActive(false);
+            //yut.gameObject.SetActive(false);
+            yut.transform.localPosition = yut.originPos + new Vector3(0,-10,0);
         }
 
-        foreach(var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            //서버는 패스
-            if (client.Key == NetworkManager.ServerClientId) continue;
+        //foreach(var client in NetworkManager.Singleton.ConnectedClients)
+        //{
+        //    //서버는 패스
+        //    if (client.Key == NetworkManager.ServerClientId) continue;
 
-            foreach(var yut in yutList)
-            {
-                //이미 hide 되어있으면 패스
-                if (!yut.IsNetworkVisibleTo(client.Key)) continue;
+        //    foreach(var yut in yutList)
+        //    {
+        //        //이미 hide 되어있으면 패스
+        //        if (!yut.IsNetworkVisibleTo(client.Key)) continue;
 
-                //감추기
-                yut.NetworkHide(client.Key);
-                //Debug.Log(client.Key + " 번 플레이어 윷 감춤");
-            }
-        }
+        //        //감추기
+        //        yut.NetworkHide(client.Key);
+        //        //Debug.Log(client.Key + " 번 플레이어 윷 감춤");
+        //    }
+        //}
         //Debug.Log("윷 감추기 끝");
     }
 
@@ -159,26 +159,25 @@ public class YutManager : NetworkBehaviour
         for (int i = 0; i < yutNum; i++)
         {
             Yut yut = yuts[i];
-            yutList.Add(yut.GetComponent<NetworkObject>());
-            yut.gameObject.SetActive(true);
-            //yut.GetComponent<NetworkObject>().NetworkShow((ulong)i);
+            //yutList.Add(yut.GetComponent<NetworkObject>());
+            //yut.gameObject.SetActive(true);
         }
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            //서버는 패스
-            if (client.Key == NetworkManager.ServerClientId) continue;
+        //foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        //{
+        //    //서버는 패스
+        //    if (client.Key == NetworkManager.ServerClientId) continue;
 
-            foreach (var yut in yutList)
-            {
-                //이미 show 되어있으면 패스
-                if (yut.IsNetworkVisibleTo(client.Key)) continue;
+        //    foreach (var yut in yutList)
+        //    {
+        //        //이미 show 되어있으면 패스
+        //        if (yut.IsNetworkVisibleTo(client.Key)) continue;
 
-                //드러내기
-                yut.NetworkShow(client.Key);
-                //Debug.Log(client.Key + " 번 플레이어 윷 드러내기");
-            }
-        }
+        //        //드러내기
+        //        yut.NetworkShow(client.Key);
+        //        //Debug.Log(client.Key + " 번 플레이어 윷 드러내기");
+        //    }
+        //}
         //Debug.Log("윷 드러내기 끝");
     }
 
@@ -200,12 +199,13 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    //MyTurn();
-        //    Debug.Log(throwChance);
-        //    YutResultCount();
-        //}
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            //MyTurn();
+            throwChance++;
+            Debug.Log(throwChance);
+            //YutResultCount();
+        }
 
         if (isThrowButtonDown)
         {
@@ -272,10 +272,10 @@ public class YutManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
-        Debug.Log("던지는 파워 : " + power);
-
         //윷 보이게 하기
-        ShowYutRpc();
+        //ShowYutRpc();
+
+        //Debug.Log("던지는 파워 : " + power);
 
         //낙 해서 키네마틱이던 윷 있으면 풀어줌
         outTrigger.ReleaseYuts();
@@ -292,15 +292,26 @@ public class YutManager : NetworkBehaviour
             //던지기 전에 움직임을 없애고(이상한 방향으로 날라가는거 방지)
             yut.Rigidbody.linearVelocity = Vector3.zero;
             yut.Rigidbody.angularVelocity = Vector3.zero;
+
+            //던질때는 캐릭터랑 안부딫히게 잠깐 콜라이더 껐다 켜고
+            yut.Collider.isTrigger = true;
+            StartCoroutine(YutCollisionOn(yut, 0.1f));
+
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
             yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
 
             //yut.Rigidbody.excludeLayers = LayerMask.GetMask("Player");
         }
-
         
         StartCoroutine(YutResultCheck(0, yutNums, rpcParams));
+    }
+
+    IEnumerator YutCollisionOn(Yut yut, float second)
+    {
+        yield return new WaitForSecondsRealtime(second);
+
+        yut.Collider.isTrigger = false;
     }
 
     IEnumerator YutResultCheck(float timePassed, int yutNums, ServerRpcParams rpcParams)
@@ -369,7 +380,7 @@ public class YutManager : NetworkBehaviour
                 yutStabledPrev = false;
             }
 
-            Debug.Log("전에 멈춤 ? : " +  yutStabledPrev + " 이번에 멈춤? : " + yutStable);
+            //Debug.Log("전에 멈춤 ? : " +  yutStabledPrev + " 이번에 멈춤? : " + yutStable);
 
             //이번 루프와 이전 루프 모두 멈춰있었으면 완전히 멈춘걸로 판단
             if (yutStable && yutStabledPrev)
@@ -385,7 +396,7 @@ public class YutManager : NetworkBehaviour
                     YutFace curFace = CalcYutResult(yuts[i]);
                     
                     //이전 결과랑 이번 결과랑 다르면 안정적이지 않다고 판단, 다시 계산
-                    Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + curFace);
+                    //Debug.Log(i + " 이전 결과 : " + faces[i] + " 현재 결과 : " + curFace);
                     if (faces[i] == curFace)
                     {
                         faceStable = true;
@@ -398,6 +409,7 @@ public class YutManager : NetworkBehaviour
                     //면이 에러면 다시 계산
                     if (curFace == YutFace.Error)
                     {
+                        isFaceError = true;
                         faceStable = false;
                     }
 
@@ -407,14 +419,14 @@ public class YutManager : NetworkBehaviour
                     //결과 다르면 최종결과 안나옴
                     if (!faceStable) break;
 
-                    Debug.Log(i + "번 최종 결과 : " + faces[i]);
+                    //Debug.Log(i + "번 최종 결과 : " + faces[i]);
 
                     //윷 결과 계산
-                    if(faces[i] == YutFace.Error)
-                    {
-                        isFaceError = true;
-                        break;
-                    }
+                    //if(faces[i] == YutFace.Error)
+                    //{
+                    //    isFaceError = true;
+                    //    break;
+                    //}
                     if (faces[i] == YutFace.Back)
                     {
                         //백도 계산
