@@ -27,7 +27,7 @@ public class YutManager : NetworkBehaviour
     [SerializeField] Yut backDoYutPrefab;
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
-    [SerializeField] YutOutTrigger outTrigger;
+    [SerializeField] YutOut outCollision;
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
     [SerializeField] Image powerGauge;
@@ -116,7 +116,7 @@ public class YutManager : NetworkBehaviour
         }
 
         //낙 트리거 등록
-        outTrigger.OnYutTriggerd += YutFalled;
+        outCollision.OnYutCollided += YutFalled;
     }
 
     [Rpc(SendTo.Server)]
@@ -184,7 +184,7 @@ public class YutManager : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         //낙 트리거 해제
-        outTrigger.OnYutTriggerd -= YutFalled;
+        outCollision.OnYutCollided -= YutFalled;
     }
 
     void YutFalled(int num)
@@ -276,9 +276,6 @@ public class YutManager : NetworkBehaviour
         //ShowYutRpc();
 
         //Debug.Log("던지는 파워 : " + power);
-
-        //낙 해서 키네마틱이던 윷 있으면 풀어줌
-        outTrigger.ReleaseYuts();
 
         for (int i = 0; i < yutNums; i++)
         {
@@ -422,11 +419,6 @@ public class YutManager : NetworkBehaviour
                     //Debug.Log(i + "번 최종 결과 : " + faces[i]);
 
                     //윷 결과 계산
-                    //if(faces[i] == YutFace.Error)
-                    //{
-                    //    isFaceError = true;
-                    //    break;
-                    //}
                     if (faces[i] == YutFace.Back)
                     {
                         //백도 계산
@@ -441,13 +433,30 @@ public class YutManager : NetworkBehaviour
                 }
 
                 //면 안정적이면 루프 탈출, 결과 냄
-                if (faceStable)
+                if (faceStable || isYutFalled)
                 {
                     break;
                 }
             }
 
             timePassed += waitInterval;
+        }
+
+        if (isYutFalled)
+        {
+            Debug.Log("낙! 턴이 넘어갑니다");
+
+            //윷 결과 비워버리고
+            //낙 판정하는 부울 초기화
+            //던지는 횟수 초기화
+            ClearYutResuliClientRpc();
+            isYutFalled = false;
+            ThrowChanceChangeClientRpc(-999, senderId);
+
+            //이동 끝 실행해서 턴 넘김
+            GameManager.Instance.mainGameProgress.EndMove();
+
+            yield break;
         }
 
         //Debug.Log("총 개수 : " + faceDown);
@@ -466,20 +475,6 @@ public class YutManager : NetworkBehaviour
             Debug.Log("결과 산출 실패 : 면 판단 실패");
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
             ThrowChanceChangeClientRpc(1, senderId);
-
-            yield break;
-        }
-
-        if (isYutFalled)
-        {
-            Debug.Log("낙! 턴이 넘어갑니다");
-
-            //윷 결과 비워버리고
-            ClearYutResuliClientRpc();
-            //이동 끝 실행해서 턴 넘김
-            GameManager.Instance.mainGameProgress.EndMove();
-            isYutFalled = false;
-            ThrowChanceChangeClientRpc(-999, senderId);
 
             yield break;
         }

@@ -133,6 +133,8 @@ public class MainGameProgress : NetworkBehaviour
 
     private bool CheckOtherPlayer()
     {
+        if (currentCharacter == null) return false; //여기 추가
+
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
         foreach (Collider collider in hitColliders)
         {
