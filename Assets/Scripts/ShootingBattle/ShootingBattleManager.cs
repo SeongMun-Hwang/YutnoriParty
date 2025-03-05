@@ -10,7 +10,6 @@ using UnityEngine.SocialPlatforms.Impl;
 public class ShootingBattleManager : NetworkBehaviour
 {
     // 게임에 참여하는 유저 관련
-    [SerializeField] private int maxPlayers;
     private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
     int currentId = -1;
 
@@ -20,7 +19,6 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private Texture2D cursorTexture;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
-
 
     // 게임 상태 및 진행 관련
     [SerializeField] public NetworkVariable<bool> isPlaying;
@@ -58,12 +56,12 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void OnPlayerJoined(ulong clientId)
     {
-        if (!playerIds.Contains(clientId))
+        if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
         {
             playerIds.Add(clientId);
             playerScore.Add(0);
 
-            if (playerIds.Count == maxPlayers)
+            if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
             {
                 isPlaying.Value = true;
             }
@@ -129,7 +127,8 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void UpdateScoreUI()
     {
-        for (int i = 0; i < maxPlayers; i++)
+        Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
+        for (int i = 0; i < MinigameManager.Instance.maxPlayers.Value; i++)
         {
             scoreUI[i].text = playerScore[i].ToString();
         }

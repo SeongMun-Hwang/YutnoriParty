@@ -77,7 +77,7 @@ public class StackBattleManager : NetworkBehaviour
 			isRetire.Add(false);
 		}
 
-        if (playerIds.Count == MinigameManager.Instance.maxPlayers)
+        if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
         {
             // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
             int i = UnityEngine.Random.Range(0, playerIds.Count);

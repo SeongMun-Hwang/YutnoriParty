@@ -10,7 +10,7 @@ public class MinigameManager : NetworkBehaviour
     private static MinigameManager instance;
     public static MinigameManager Instance { get { return instance; } }
 
-    public int maxPlayers;
+    public NetworkVariable<int> maxPlayers;
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
     {
         { Define.MinigameType.StackGame, "StackScene" },
@@ -83,7 +83,7 @@ public class MinigameManager : NetworkBehaviour
     public void SetPlayers(ulong[] players)
     {
         playerTypes = new Dictionary<ulong, Define.MGPlayerType>();
-        maxPlayers = players.Length;
+        maxPlayers.Value = players.Length;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             if (players.Contains(clientId))
