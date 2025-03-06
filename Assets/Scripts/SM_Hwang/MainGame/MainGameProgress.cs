@@ -128,6 +128,15 @@ public class MainGameProgress : NetworkBehaviour
             yield return null;
         }
         yield return new WaitForSeconds(1f);
+        CheckAllPlayerTurnPassed();
+    }
+    private IEnumerator WaitUntilPartygameEnd()
+    {
+        while (isMinigamePlaying)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1f);
         CheckTurnChange();
     }
 
@@ -157,6 +166,21 @@ public class MainGameProgress : NetworkBehaviour
             }
         }
         return false;
+    }
+    private void CheckAllPlayerTurnPassed()
+    {
+        Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
+        if ((gameTurn.Value+1)% NetworkManager.ConnectedClients.Count==0)
+        {
+            Debug.Log("Party game start");
+            //isMinigamePlaying = true;
+            //StartMiniGame(encounteredEnemy);
+            StartCoroutine(WaitUntilPartygameEnd());
+        }
+        else
+        {
+            CheckTurnChange();
+        }
     }
     private void CheckTurnChange()
     {
