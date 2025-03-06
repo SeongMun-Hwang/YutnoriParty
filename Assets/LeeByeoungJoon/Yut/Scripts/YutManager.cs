@@ -208,6 +208,16 @@ public class YutManager : NetworkBehaviour
             //YutResultCount();
         }
 
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Debug.Log("--------" + NetworkManager.Singleton.LocalClientId + " 캐릭터 목록-------");
+            foreach(var character in PlayerManager.Instance.currentCharacters)
+            {
+                Debug.Log("네트워크 오브젝트 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + 
+                    "게임 오브젝트 id : " + character.GetInstanceID());
+            }
+        }
+
         if (isThrowButtonDown)
         {
             if (powerAmount >= 1)
@@ -518,7 +528,6 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
-
         isCalulating = false;
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?

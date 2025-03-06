@@ -104,13 +104,6 @@ public class MainGameProgress : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
             return;
         }
-
-        //움직일 수 있으면 움직임
-        if (!currentCharacter.GetComponent<CharacterInfo>().canMove)
-        {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("That Character Cannot Move!", 2f);
-            return;
-        }
         currentCharacter.MoveToNextNode(n);
     }
     /*이동 종료 함수*/

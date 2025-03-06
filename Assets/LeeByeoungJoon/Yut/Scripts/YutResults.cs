@@ -29,6 +29,13 @@ public class YutResults : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!",2f);
             return;
         }
+
+        //이동 못하는 애 골랐으면 다시 고르라고 안내함
+        if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
+            return;
+        }
         //몇 칸 전진하는지 숫자 반환
         switch (yutResult)
         {

@@ -19,8 +19,6 @@ public class IslandNode : EventNode
 
         //서버에서 무인도에 갇힌 캐릭터들 판정
         TrapPlayersRpc();
-
-
     }
 
     [Rpc(SendTo.Server)]
@@ -51,10 +49,20 @@ public class IslandNode : EventNode
             //SetCharacterMoveRpc(false, enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
             //BlockMoveRpc(enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
 
-            //한턴씩 깎아줌
-            trappedPlayers[player]--;
-
             Debug.Log("남은 턴 : " + trappedPlayers[player]);
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public override void TurnIncreaseRpc()
+    {
+        //base.TurnIncreaseRpc();
+        turnAfterSpawned.Value++;
+
+        //남은 턴 감소
+        foreach (var player in enteredPlayers)
+        {
+            trappedPlayers[player]--;
         }
     }
 

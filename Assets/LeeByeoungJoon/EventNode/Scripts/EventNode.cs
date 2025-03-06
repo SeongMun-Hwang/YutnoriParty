@@ -32,30 +32,54 @@ public class EventNode : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        //서버에서만 판별
-        if(!IsHost) return;
-
         //플레이어가 밟으면 걔 저장
         if (other.TryGetComponent(out enteredPlayer))
         {
-            enteredPlayers.Add(enteredPlayer);
-            Debug.Log(enteredPlayer.OwnerClientId + "들어옴, " + "리스트 수 : " + enteredPlayers.Count);
+            bool contains = false;
+            foreach (var character in PlayerManager.Instance.currentCharacters)
+            {
+                //Debug.Log("목록에 있는 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + " 트리거 들어온놈 id + " + enteredPlayer.NetworkObjectId);
+
+                if (character.GetComponent<NetworkObject>().NetworkObjectId == enteredPlayer.NetworkObjectId)
+                {
+                    contains = true;
+                }
+            }
+            Debug.Log("들어있음? : " + contains);
+
+            //소환된 플레이어 캐릭터 목록에 없으면 리턴
+            if (!contains) return;
+
+            AddPlayerRpc(enteredPlayer);
         }
     }
     protected virtual void OnTriggerExit(Collider other)
     {
-        //서버에서만 판별
-        if (!IsHost) return;
-
         //나가는놈이 트리거 들어와있는거 리스트에 없으면 탈출
         if (other.TryGetComponent(out exitPlayer))
         {
-            if (!enteredPlayers.Contains(exitPlayer)) return;
-
-            //있으면 리스트에서 삭제
-            Debug.Log(exitPlayer.OwnerClientId + "나감");
-            enteredPlayers.Remove(exitPlayer);
+            RemovePlayerRpc(exitPlayer);
         }
+    }
+
+    //리스트는 서버에서만 관리
+    [Rpc(SendTo.Server)]
+    void AddPlayerRpc(NetworkObjectReference player)
+    {
+        enteredPlayers.Add(player);
+        Debug.Log(player.NetworkObjectId + " 들어옴, " + "리스트 수 : " + enteredPlayers.Count);
+    }
+
+    [Rpc(SendTo.Server)]
+    void RemovePlayerRpc(NetworkObjectReference player)
+    {
+        //이미 들어와 있으면 리턴
+        if (enteredPlayers.Contains(player)) return;
+        if (!enteredPlayers.Contains(player)) return;
+
+        //있으면 리스트에서 삭제
+        Debug.Log(player.NetworkObjectId + "나감");
+        enteredPlayers.Remove(player);
     }
 
     [Rpc(SendTo.Server)]
