@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,6 +19,7 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private List<TMP_Text> scoreUI;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
+    [SerializeField] private List<Color32> crosshairColors;
 
     // 게임 상태 및 진행 관련
     [SerializeField] public NetworkVariable<bool> isPlaying;
@@ -40,6 +42,7 @@ public class ShootingBattleManager : NetworkBehaviour
         
     }
 
+    int colorIndex = 0;
     public override void OnNetworkSpawn()
     {
         if (IsServer)
@@ -70,6 +73,8 @@ public class ShootingBattleManager : NetworkBehaviour
 
             NetworkObject cursorNetObj = cursor.GetComponent<NetworkObject>();
             cursorNetObj.SpawnWithOwnership(clientId);
+
+            nc.networkColor.Value = crosshairColors[colorIndex++];
 
             if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
             {

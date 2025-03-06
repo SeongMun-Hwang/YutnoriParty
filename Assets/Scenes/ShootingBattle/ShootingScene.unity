@@ -2770,6 +2770,15 @@ MonoBehaviour:
   - {fileID: 741693459}
   winMessageUI: {fileID: 1007921870}
   loseMessageUI: {fileID: 1599121412}
+  crosshairColors:
+  - serializedVersion: 2
+    rgba: 4278240420
+  - serializedVersion: 2
+    rgba: 4289374977
+  - serializedVersion: 2
+    rgba: 4280615074
+  - serializedVersion: 2
+    rgba: 4284778349
   isPlaying:
     m_InternalValue: 0
   timer: 15
