@@ -40,6 +40,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Character_Bear
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -310,6 +314,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveDistance: 2
   moveSpeed: 5
+  canMove: 0
 --- !u!114 &-8312890273120935374
 MonoBehaviour:
   m_ObjectHideFlags: 0

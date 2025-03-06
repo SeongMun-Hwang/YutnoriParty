@@ -14,11 +14,7 @@ public class BasketGameController : NetworkBehaviour
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        
-        currentSceneName = SceneManager.GetActiveScene().name;
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
+        rb = GetComponent<Rigidbody>();        
         rb.position = targetPosition;
         animator = GetComponent<Animator>();
         
@@ -37,8 +33,7 @@ public class BasketGameController : NetworkBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
-        currentSceneName = SceneManager.GetActiveScene().name;
-        // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
+
         Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
         targetPosition = spawnTransform.position;
         if (rb != null)
@@ -56,7 +51,7 @@ public class BasketGameController : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner || !canMove || SceneManager.GetActiveScene().name != "BasketGame") return;
+        if (!IsOwner || !canMove ) return;
 
         float hAxis = Input.GetAxis("Horizontal");  
         float vAxis = Input.GetAxis("Vertical");   

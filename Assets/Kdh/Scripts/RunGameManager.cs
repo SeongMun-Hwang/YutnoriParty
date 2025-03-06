@@ -71,9 +71,9 @@ public class RunGameManager : NetworkBehaviour
     {
         gameStarted = true;
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var character in PlayerManager.Instance.currentCharacters)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
+            if (character.TryGetComponent(out RunGameController player))
             {
                 player.EnableControl(true);
             }
@@ -105,40 +105,48 @@ public class RunGameManager : NetworkBehaviour
     {
         if (gameEnded) return;
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var character in PlayerManager.Instance.currentCharacters)
         {
-            var playerObject = client.Value.PlayerObject;
+            if (character == null) continue;
 
-            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
+            if (character.TryGetComponent(out RunGameController playerController) && playerController.canMove)
             {
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
-                    EndGame(playerController.OwnerClientId);
+                    Debug.Log($"골인 감지! OwnerClientId: {playerController.OwnerClientId}");
+                    EndGameServerRpc(playerController.OwnerClientId);
                     return;
                 }
             }
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void EndGameServerRpc(ulong winnerId)
+    {
+        EndGame(winnerId);
+    }
+
     public void CheckRemainingPlayers()
     {
         if (gameEnded) return;
 
-        List<RunGameController> alivePlayers = new List<RunGameController>();
+        List<GameObject> alivePlayers = new List<GameObject>();
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var character in PlayerManager.Instance.currentCharacters)
         {
-            var playerObject = client.Value.PlayerObject;
-
-            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
+            if (character != null && character.TryGetComponent(out RunGameController player) && player.canMove)
             {
-                alivePlayers.Add(playerController);
+                alivePlayers.Add(character);
             }
         }
 
+        Debug.Log($"남은 플레이어 수: {alivePlayers.Count}");
+
         if (alivePlayers.Count == 1)
         {
-            EndGame(alivePlayers[0].OwnerClientId);
+            Debug.Log($"한 명 남음! 승리 플레이어: {alivePlayers[0].GetComponent<NetworkObject>().OwnerClientId}");
+            EndGameServerRpc(alivePlayers[0].GetComponent<NetworkObject>().OwnerClientId);
         }
     }
 
@@ -167,9 +175,9 @@ public class RunGameManager : NetworkBehaviour
     [ClientRpc]
     private void StopAllPlayersClientRpc()
     {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var character in PlayerManager.Instance.currentCharacters)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
+            if (character.TryGetComponent(out RunGameController player))
             {
                 player.EnableControl(false); // 조작 비활성화
             }
@@ -177,16 +185,16 @@ public class RunGameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void EndGame_ClientRpc(ulong networkObjectId)
+    private void EndGame_ClientRpc(ulong winnerId)
     {
-        var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-
-        if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController))
+        foreach (var character in PlayerManager.Instance.currentCharacters)
         {
-            playerController.EnableControl(false);
+            if (character.TryGetComponent(out RunGameController playerController))
+            {
+                playerController.EnableControl(false);
+            }
         }
     }
-
     private IEnumerator LoadNextScene()
     {
         yield return new WaitForSeconds(3f);
@@ -194,21 +202,10 @@ public class RunGameManager : NetworkBehaviour
         if (IsServer)
         {
             NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // 모든 클라이언트가 이동
-            EnableAllPlayersControlClientRpc(); // 씬 이동 후 즉시 실행
+           
         }
     }
 
-    [ClientRpc]
-    private void EnableAllPlayersControlClientRpc()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
-            {
-                player.SetEliminated(false);
-                player.EnableControl(true);
-            }
-        }
-    }
+   
 
 }

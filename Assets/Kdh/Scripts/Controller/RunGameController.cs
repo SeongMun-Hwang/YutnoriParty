@@ -8,16 +8,13 @@ public class RunGameController : NetworkBehaviour
 
     private Vector3 targetPosition;
     private Animator animator;
-    private bool canMove = false;
+    public bool canMove = false;
     private string currentSceneName;
     Rigidbody rb;
-    public bool IsEliminated { get; private set; } = false;
+    
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        currentSceneName = SceneManager.GetActiveScene().name;
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
         animator = GetComponent<Animator>();
         
     }
@@ -48,7 +45,7 @@ public class RunGameController : NetworkBehaviour
     private void Update()
     {
         string sceneName = SceneManager.GetActiveScene().name;
-
+        Debug.Log($"IsOwner: {IsOwner}, canMove: {canMove}, CurrentScene: {sceneName}");
         if (sceneName == "RunGame")
         {
             rb.isKinematic = true;
@@ -57,7 +54,7 @@ public class RunGameController : NetworkBehaviour
         {
             rb.isKinematic = false;
         }
-        if (!IsOwner || !canMove || IsEliminated || SceneManager.GetActiveScene().name != "RunGame") return;
+        if (!IsOwner || !canMove) return;
         
         Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
         Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
@@ -75,7 +72,7 @@ public class RunGameController : NetworkBehaviour
     private void MoveForwardServerRpc(ulong clientId)
     {
 
-        if (OwnerClientId != clientId || IsEliminated) return;
+        if (OwnerClientId != clientId) return;
 
         targetPosition += transform.forward * moveDistance;
         MoveClientRpc(targetPosition);
@@ -90,9 +87,5 @@ public class RunGameController : NetworkBehaviour
     {
         canMove = enable;
     }
-    public void SetEliminated(bool isEliminated)
-    {
-        IsEliminated = isEliminated;
-        EnableControl(!isEliminated); // 탈락하면 false, 초기화되면 true
-    }
+   
 }
