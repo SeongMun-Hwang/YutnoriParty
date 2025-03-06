@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 48294581104679151}
   - component: {fileID: 3115733820047356647}
   - component: {fileID: 6365819272254785922}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471275008551765374}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 8ac10b460c067e743b8d8a4d4790d5e7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -263,9 +263,9 @@ GameObject:
   - component: {fileID: 4802452279231007329}
   - component: {fileID: 336654751148047905}
   - component: {fileID: 8051833072341197974}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Yut
-  m_TagString: Untagged
+  m_TagString: Yut
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -328,6 +328,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   originPos: {x: 0, y: 0, z: 0}
   originRot: {x: 0, y: 0, z: 0, w: 0}
+  collider: {fileID: 6365819272254785922}
 --- !u!54 &4802452279231007329
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -337,8 +338,8 @@ Rigidbody:
   m_GameObject: {fileID: 1622924932388262812}
   serializedVersion: 4
   m_Mass: 10
-  m_Drag: 1
-  m_AngularDrag: 1
+  m_Drag: 0
+  m_AngularDrag: 0.1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -406,7 +407,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 1
-  AutoUpdateKinematicState: 0
+  AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 0
 --- !u!1 &4182030651884830828
 GameObject:

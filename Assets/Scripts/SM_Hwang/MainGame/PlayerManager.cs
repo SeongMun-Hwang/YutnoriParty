@@ -4,6 +4,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode.Components;
 using NUnit.Framework.Internal.Filters;
+using System;
+using Unity.Services.Authentication;
+using System.Threading.Tasks;
+using TMPro;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -12,16 +16,30 @@ public class PlayerManager : NetworkBehaviour
     public bool isMoving = false;
     private static PlayerManager instance;
     public static PlayerManager Instance { get { return instance; } }
+    public static Action<PlayerManager> OnPlayerSpawn;
+    public static Action<PlayerManager> OnPlayerDespawn;
     public override void OnNetworkSpawn()
     {
-        if (instance == null)
+        //if (instance == null)
+        //{
+        if(IsOwner) instance = this;
+        //    DontDestroyOnLoad(gameObject);
+        //}
+        //else if (instance != this)
+        //{
+        //    Destroy(gameObject);
+        //}
+        if (IsServer)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+            OnPlayerSpawn?.Invoke(this);
         }
-        else if (instance != this)
+        if (!IsOwner) return;
+    }
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
         {
-            Destroy(gameObject);
+            OnPlayerDespawn?.Invoke(this);
         }
     }
     public void SpawnCharacter()
@@ -29,6 +47,11 @@ public class PlayerManager : NetworkBehaviour
         if (YutManager.Instance.Results.Count <= 0)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Throw First!");
+            return;
+        }
+        if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0]==YutResult.BackDo && currentCharacters.Count > 0)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Cannot spawn when backdo");
             return;
         }
         if (currentCharacters.Count >= numOfCharacter)
@@ -58,6 +81,13 @@ public class PlayerManager : NetworkBehaviour
     private void AddSpawnedCharacterClientRpc(NetworkObjectReference noRef, ClientRpcParams clientRpcParams=default)
     {
         currentCharacters.Add(noRef);
+        noRef.TryGet(out NetworkObject no);
+        if (MainGameProgress.Instance.currentCharacter!=null)
+        {
+            MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
+        }
+        MainGameProgress.Instance.currentCharacter = no.GetComponent<CharacterBoardMovement>();
+        no.GetComponent<Outline>().EnableOutline();
     }
 
     [ServerRpc(RequireOwnership = default)]
@@ -124,6 +154,7 @@ public class PlayerManager : NetworkBehaviour
     public void CharacterGoalIn(GameObject character)
     {
         GameManager.Instance.announceCanvas.ShowAnnounceText("Goal In!");
+        isMoving = false;
         DespawnCharacterServerRpc(character, NetworkManager.Singleton.LocalClientId, true);
         Debug.Log(numOfCharacter);
     }

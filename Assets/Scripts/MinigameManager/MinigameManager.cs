@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,13 +10,18 @@ public class MinigameManager : NetworkBehaviour
     private static MinigameManager instance;
     public static MinigameManager Instance { get { return instance; } }
 
+    public NetworkVariable<int> maxPlayers;
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
     };
-    private Define.MinigameType type;
+    private Define.MinigameType gameType;
+    private Dictionary<ulong, Define.MGPlayerType> playerTypes;
+    public Define.MGPlayerType playerType;
+
+    [SerializeField] private GameObject spectatorUI;
 
     public override void OnNetworkSpawn()
     {
@@ -55,7 +61,7 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[type], LoadSceneMode.Additive);
+            NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[gameType], LoadSceneMode.Additive);
         }
         else
         {
@@ -67,11 +73,65 @@ public class MinigameManager : NetworkBehaviour
     // 추후 코드상에서는 위의 enum 매개변수 타입을 사용할 것
     public void SelectMinigame(int i)
     {
-        type = (Define.MinigameType)i;
+        gameType = (Define.MinigameType)i;
+        Debug.Log($"{gameType} 미니게임 선택됨");
     }
 
     public void EndMinigame()
     {
         MainGameProgress.Instance.endMinigameActions.Invoke();
+        CloseSpectatorUIClientRpc();
+    }
+
+    [ClientRpc]
+    private void UpdateSpectatorClientRpc(ulong[] players)
+    {
+        List<ulong> pl = players.ToList();
+        if (!pl.Contains(NetworkManager.Singleton.LocalClientId))
+        {
+            playerType = Define.MGPlayerType.Spectator;
+            spectatorUI.SetActive(true);
+        }
+        else
+        {
+            playerType = Define.MGPlayerType.Player;
+        }
+
+        Debug.Log($"상태 : {playerType}");
+    }
+
+    [ClientRpc]
+    private void CloseSpectatorUIClientRpc()
+    {
+        spectatorUI.SetActive(false);
+        playerType = Define.MGPlayerType.Unknown;
+    }
+
+    // 미니게임의 관전자와 참가자를 설정
+    // 참가자의 목록만 인자로 지정해주면 나머지는 자동으로 관전자로 정해짐
+    public void SetPlayers(ulong[] players)
+    {
+        playerTypes = new Dictionary<ulong, Define.MGPlayerType>();
+        maxPlayers.Value = players.Length;
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (players.Contains(clientId))
+            {
+                playerTypes.Add(clientId, Define.MGPlayerType.Player);
+                Debug.Log($"{clientId} 참가자");
+            }
+            else
+            {
+                playerTypes.Add(clientId, Define.MGPlayerType.Spectator);
+                Debug.Log($"{clientId} 관전자");
+            }
+        }
+
+        UpdateSpectatorClientRpc(players);
+    }
+
+    public bool IsPlayer(ulong id)
+    {
+        return playerTypes[id] == Define.MGPlayerType.Player;
     }
 }

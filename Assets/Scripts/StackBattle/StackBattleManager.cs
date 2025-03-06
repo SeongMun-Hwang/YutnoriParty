@@ -12,7 +12,6 @@ using UnityEngine.UI;
 public class StackBattleManager : NetworkBehaviour
 {
 	// 게임에 참여하는 유저 관련
-	public int maxPlayers;
 	private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
     int currentId = -1;
 
@@ -72,13 +71,13 @@ public class StackBattleManager : NetworkBehaviour
 
 	private void OnPlayerJoined(ulong clientId)
 	{
-		if (!playerIds.Contains(clientId))
+		if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
 		{
 			playerIds.Add(clientId);
 			isRetire.Add(false);
 		}
 
-        if (playerIds.Count == maxPlayers)
+        if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
         {
             // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
             int i = UnityEngine.Random.Range(0, playerIds.Count);
@@ -231,7 +230,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameOverClientRpc(ulong id)
 	{
-		if (NetworkManager.Singleton.LocalClientId == id)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == id)
 		{
 			loseMessageUI.SetActive(true);
 		}
@@ -240,7 +241,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameFinishedClientRpc(ulong winClientId)
 	{
-		if (NetworkManager.Singleton.LocalClientId == winClientId)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
 		{
 			winMessageUI.SetActive(true);
 		}

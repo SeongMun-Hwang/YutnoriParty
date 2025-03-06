@@ -73,3 +73,5 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   currentCharacters: []
   isMoving: 0
+  playerName: 
+  playerProfilePrefab: {fileID: 7394297829719055433, guid: 2dab1cbf65d7dc74ab455a8901fcfa24, type: 3}

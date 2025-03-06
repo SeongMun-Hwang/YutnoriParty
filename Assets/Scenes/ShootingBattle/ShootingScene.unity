@@ -1741,7 +1741,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1438433757}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -2334,7 +2334,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1438433754}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1438433757
 Camera:
   m_ObjectHideFlags: 0
@@ -2762,21 +2762,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxPlayers: 2
   timerUI: {fileID: 687331245}
   scoreUI:
   - {fileID: 784526053}
   - {fileID: 1403991593}
   - {fileID: 146911231}
   - {fileID: 741693459}
-  cursorTexture: {fileID: 2800000, guid: 8c89ed5746a4faa48bb97701cc2f2e35, type: 3}
   winMessageUI: {fileID: 1007921870}
   loseMessageUI: {fileID: 1599121412}
+  crosshairColors:
+  - serializedVersion: 2
+    rgba: 4278240420
+  - serializedVersion: 2
+    rgba: 4289374977
+  - serializedVersion: 2
+    rgba: 4280615074
+  - serializedVersion: 2
+    rgba: 4284778349
   isPlaying:
     m_InternalValue: 0
   timer: 15
   spawnDuration: 3
+  mainCamera: {fileID: 1438433757}
   StarPrefab: {fileID: 3281761353814920671, guid: f27bbf69db802a64fb4fa56d7b8a1293, type: 3}
+  CursorPrefab: {fileID: 1401839732034789134, guid: 80a7a658c15dfae458d3abd6ce5d20e5, type: 3}
 --- !u!1 &1958560225
 GameObject:
   m_ObjectHideFlags: 0

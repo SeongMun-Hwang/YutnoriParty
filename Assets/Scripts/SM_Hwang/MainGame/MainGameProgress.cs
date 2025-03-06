@@ -1,14 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MainGameProgress : NetworkBehaviour
 {
     private int numOfPlayer;
     private NetworkVariable<int> currentPlayerNumber = new NetworkVariable<int>(0);
+    private NetworkVariable<int> gameTurn=new NetworkVariable<int>(0);
     public CharacterBoardMovement currentCharacter;
     private GameObject encounteredEnemy;
     public Camera maingameCamera;
@@ -39,6 +37,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         numOfPlayer = NetworkManager.ConnectedClients.Count;
         currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
+        YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         StartTurn(currentPlayerNumber.Value);
     }
     /*턴 시작*/
@@ -129,11 +128,22 @@ public class MainGameProgress : NetworkBehaviour
             yield return null;
         }
         yield return new WaitForSeconds(1f);
+        CheckAllPlayerTurnPassed();
+    }
+    private IEnumerator WaitUntilPartygameEnd()
+    {
+        while (isMinigamePlaying)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1f);
         CheckTurnChange();
     }
 
     private bool CheckOtherPlayer()
     {
+        if (currentCharacter == null) return false; //여기 추가
+
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 2f);
         foreach (Collider collider in hitColliders)
         {
@@ -157,9 +167,25 @@ public class MainGameProgress : NetworkBehaviour
         }
         return false;
     }
+    private void CheckAllPlayerTurnPassed()
+    {
+        Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
+        if ((gameTurn.Value+1)% NetworkManager.ConnectedClients.Count==0)
+        {
+            Debug.Log("Party game start");
+            //isMinigamePlaying = true;
+            //StartMiniGame(encounteredEnemy);
+            StartCoroutine(WaitUntilPartygameEnd());
+        }
+        else
+        {
+            CheckTurnChange();
+        }
+    }
     private void CheckTurnChange()
     {
-        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
+        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0
+            && !YutManager.Instance.isCalulating)
         {
             Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
@@ -231,6 +257,8 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
+        ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
+        MinigameManager.Instance.SetPlayers(players);
         MinigameManager.Instance.StartMinigame();
         StartMiniGameClientRpc();
     }
@@ -268,11 +296,16 @@ public class MainGameProgress : NetworkBehaviour
     void EndTurnServerRpc()
     {
         Debug.Log("Change Turn");
+        gameTurn.Value++;
         currentPlayerNumber.Value++;
         if (currentPlayerNumber.Value == numOfPlayer)
         {
             currentPlayerNumber.Value = 0;
         }
         StartTurn(currentPlayerNumber.Value);
+    }
+    public int GetCurrentTurn()
+    {
+        return gameTurn.Value;
     }
 }
