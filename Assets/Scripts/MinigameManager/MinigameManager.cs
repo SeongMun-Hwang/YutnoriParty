@@ -19,6 +19,9 @@ public class MinigameManager : NetworkBehaviour
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
+    public Define.MGPlayerType playerType;
+
+    [SerializeField] private GameObject spectatorUI;
 
     public override void OnNetworkSpawn()
     {
@@ -71,11 +74,37 @@ public class MinigameManager : NetworkBehaviour
     public void SelectMinigame(int i)
     {
         gameType = (Define.MinigameType)i;
+        Debug.Log($"{gameType} 미니게임 선택됨");
     }
 
     public void EndMinigame()
     {
         MainGameProgress.Instance.endMinigameActions.Invoke();
+        CloseSpectatorUIClientRpc();
+    }
+
+    [ClientRpc]
+    private void UpdateSpectatorClientRpc(ulong[] players)
+    {
+        List<ulong> pl = players.ToList();
+        if (!pl.Contains(NetworkManager.Singleton.LocalClientId))
+        {
+            playerType = Define.MGPlayerType.Spectator;
+            spectatorUI.SetActive(true);
+        }
+        else
+        {
+            playerType = Define.MGPlayerType.Player;
+        }
+
+        Debug.Log($"상태 : {playerType}");
+    }
+
+    [ClientRpc]
+    private void CloseSpectatorUIClientRpc()
+    {
+        spectatorUI.SetActive(false);
+        playerType = Define.MGPlayerType.Unknown;
     }
 
     // 미니게임의 관전자와 참가자를 설정
@@ -97,6 +126,8 @@ public class MinigameManager : NetworkBehaviour
                 Debug.Log($"{clientId} 관전자");
             }
         }
+
+        UpdateSpectatorClientRpc(players);
     }
 
     public bool IsPlayer(ulong id)

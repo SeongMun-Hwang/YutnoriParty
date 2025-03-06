@@ -230,7 +230,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameOverClientRpc(ulong id)
 	{
-		if (NetworkManager.Singleton.LocalClientId == id)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == id)
 		{
 			loseMessageUI.SetActive(true);
 		}
@@ -239,7 +241,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameFinishedClientRpc(ulong winClientId)
 	{
-		if (NetworkManager.Singleton.LocalClientId == winClientId)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
 		{
 			winMessageUI.SetActive(true);
 		}
