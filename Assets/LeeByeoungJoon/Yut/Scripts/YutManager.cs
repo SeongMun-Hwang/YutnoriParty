@@ -57,6 +57,7 @@ public class YutManager : NetworkBehaviour
 
     public int yutNum = 4;
     public int throwChance = 0;
+    public bool isCalulating = false;
 
     //싱글톤 아님
     static YutManager instance;
@@ -272,6 +273,7 @@ public class YutManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
+        isCalulating = true;
         //윷 보이게 하기
         //ShowYutRpc();
 
@@ -456,6 +458,7 @@ public class YutManager : NetworkBehaviour
             //이동 끝 실행해서 턴 넘김
             GameManager.Instance.mainGameProgress.EndMove();
 
+            isCalulating = false;
             yield break;
         }
 
@@ -467,6 +470,7 @@ public class YutManager : NetworkBehaviour
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
             ThrowChanceChangeClientRpc(1, senderId);
 
+            isCalulating = false;
             yield break;
         }
 
@@ -476,6 +480,7 @@ public class YutManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
             ThrowChanceChangeClientRpc(1, senderId);
 
+            isCalulating = false;
             yield break;
         }
 
@@ -514,6 +519,7 @@ public class YutManager : NetworkBehaviour
                 break;
         }
 
+        isCalulating = false;
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
         yield break;
