@@ -49,6 +49,11 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Throw First!");
             return;
         }
+        if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0]==YutResult.BackDo && currentCharacters.Count > 0)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Cannot spawn when backdo");
+            return;
+        }
         if (currentCharacters.Count >= numOfCharacter)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled",2f);
