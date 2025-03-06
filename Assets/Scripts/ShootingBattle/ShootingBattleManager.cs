@@ -16,7 +16,6 @@ public class ShootingBattleManager : NetworkBehaviour
     // UI 관련
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> scoreUI;
-    [SerializeField] private Texture2D cursorTexture;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
 
@@ -32,7 +31,9 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private float spawnDuration = 1.5f;
 
     // 게임 요소 관련
+    [SerializeField] Camera mainCamera;
     [SerializeField] GameObject StarPrefab;
+    [SerializeField] GameObject CursorPrefab;
 
     private void Start()
     {
@@ -61,6 +62,15 @@ public class ShootingBattleManager : NetworkBehaviour
             playerIds.Add(clientId);
             playerScore.Add(0);
 
+            GameObject cursor = Instantiate(CursorPrefab);
+            NetworkCrosshair nc = cursor.GetComponent<NetworkCrosshair>();
+
+            Scene minigameScene = SceneManager.GetSceneByName("ShootingScene");
+            SceneManager.MoveGameObjectToScene(cursor, minigameScene);
+
+            NetworkObject cursorNetObj = cursor.GetComponent<NetworkObject>();
+            cursorNetObj.SpawnWithOwnership(clientId);
+
             if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
             {
                 isPlaying.Value = true;
@@ -74,8 +84,6 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             if (!gameStart)
             {
-                Vector2 hotspot = new Vector2(cursorTexture.width / 2f, cursorTexture.height / 2f);
-                Cursor.SetCursor(cursorTexture, hotspot, CursorMode.Auto);
                 StartCoroutine(SpawnStar());
                 StartCoroutine(CountTimer());
                 gameStart = true;
@@ -83,13 +91,6 @@ public class ShootingBattleManager : NetworkBehaviour
             else
             {
                 UpdateScoreUI();
-            }
-        }
-        else
-        {
-            if (gameStart)
-            {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             }
         }
 
@@ -127,7 +128,7 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void UpdateScoreUI()
     {
-        Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
+        // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
         for (int i = 0; i < MinigameManager.Instance.maxPlayers.Value; i++)
         {
             scoreUI[i].text = playerScore[i].ToString();
