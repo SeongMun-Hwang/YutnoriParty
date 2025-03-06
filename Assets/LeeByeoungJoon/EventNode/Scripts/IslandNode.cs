@@ -36,20 +36,25 @@ public class IslandNode : EventNode
             {
                 trappedPlayers.Add(player, trapTurn);
             }
-            //딕셔너리에 들어와있으면 캐릭터 이동 못하게 한다 == 선택을 못하게 함
-            else
-            {
-                //남은 턴 0이하 되면 탈출
-                if (trappedPlayers[player] <= 0)
-                {
-                    Debug.Log("탈출");
-                }
 
-                BlockMoveRpc(enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
-                
-                //한턴씩 깎아줌
-                trappedPlayers[player]--;
+            //남은 턴 0이하 되면 탈출
+            if (trappedPlayers[player] <= 0)
+            {
+                player.GetComponent<CharacterInfo>().canMove = true;
+                Debug.Log("탈출");
+                return;
             }
+
+            //못움직이게 막음
+            player.GetComponent<CharacterInfo>().canMove = false;
+
+            //SetCharacterMoveRpc(false, enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
+            //BlockMoveRpc(enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
+
+            //한턴씩 깎아줌
+            trappedPlayers[player]--;
+
+            Debug.Log("남은 턴 : " + trappedPlayers[player]);
         }
     }
 
@@ -64,5 +69,12 @@ public class IslandNode : EventNode
             Debug.Log("무인도에 갇힌 캐릭임");
             GameManager.Instance.mainGameProgress.currentCharacter = null;
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    void SetCharacterMoveRpc(bool canMove, int idx, RpcParams rpcParams)
+    {
+        var player = enteredPlayers[idx];
+        player.GetComponent<CharacterInfo>().canMove = canMove;
     }
 }

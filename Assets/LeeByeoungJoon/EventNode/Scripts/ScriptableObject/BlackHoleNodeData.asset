@@ -15,5 +15,5 @@ MonoBehaviour:
   eventNodeType: 1
   minNode: 1
   maxNode: 1
-  lifeTime: 3
+  lifeTime: 10000
   spawnPositions: []

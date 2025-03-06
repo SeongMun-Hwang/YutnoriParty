@@ -104,6 +104,13 @@ public class MainGameProgress : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
             return;
         }
+
+        //움직일 수 있으면 움직임
+        if (!currentCharacter.GetComponent<CharacterInfo>().canMove)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("That Character Cannot Move!", 2f);
+            return;
+        }
         currentCharacter.MoveToNextNode(n);
     }
     /*이동 종료 함수*/
@@ -111,6 +118,8 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
+        EventNodeManager.Instance.CheckStepOnServerRpc(); //이벤트 노드 밟았는지 확인
+
         if (CheckOtherPlayer())
         {
             StartMiniGame(encounteredEnemy);
@@ -277,6 +286,8 @@ public class MainGameProgress : NetworkBehaviour
         if (currentPlayerNumber.Value == numOfPlayer)
         {
             currentPlayerNumber.Value = 0;
+            //한바퀴 돌았음
+            EventNodeManager.Instance.TurnCountServerRpc();
         }
         StartTurn(currentPlayerNumber.Value);
     }

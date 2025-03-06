@@ -12,16 +12,14 @@ public class EventNode : NetworkBehaviour
     protected int lifeTime = 0;
     public int MinNode { get { return minNode; } }
     public int MaxNode { get {return maxNode; } }
-    
 
     //실시간으로 바뀌어야 할 정보들
-    int turnAfterSpawned = 0;
+    protected NetworkVariable<int> turnAfterSpawned = new NetworkVariable<int>(0);
     protected NetworkObject enteredPlayer;
     protected NetworkObject exitPlayer;
     protected List<NetworkObject> enteredPlayers = new List<NetworkObject>();
 
     //가끔 바뀌는 정보?
-    public Action<int> OnDeactive;
     [SerializeField] int spawnInterval = 0;
 
     //네트워크 스폰시 변수들 초기화
@@ -34,36 +32,43 @@ public class EventNode : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+        //서버에서만 판별
+        if(!IsHost) return;
+
         //플레이어가 밟으면 걔 저장
         if (other.TryGetComponent(out enteredPlayer))
         {
-            //Debug.Log(enteredPlayer.OwnerClientId + "들어옴");
             enteredPlayers.Add(enteredPlayer);
+            Debug.Log(enteredPlayer.OwnerClientId + "들어옴, " + "리스트 수 : " + enteredPlayers.Count);
         }
     }
     protected virtual void OnTriggerExit(Collider other)
     {
+        //서버에서만 판별
+        if (!IsHost) return;
+
         //나가는놈이 트리거 들어와있는거 리스트에 없으면 탈출
         if (other.TryGetComponent(out exitPlayer))
         {
             if (!enteredPlayers.Contains(exitPlayer)) return;
 
             //있으면 리스트에서 삭제
-            //Debug.Log(exitPlayer.OwnerClientId + "나감");
+            Debug.Log(exitPlayer.OwnerClientId + "나감");
             enteredPlayers.Remove(exitPlayer);
         }
     }
 
-    [ClientRpc]
-    public virtual void TurnIncreaseClientRpc()
+    [Rpc(SendTo.Server)]
+    public virtual void TurnIncreaseRpc()
     {
-        turnAfterSpawned++;
+        turnAfterSpawned.Value++;
 
         //제한 턴이 되면 노드 삭제
-        if(lifeTime <= turnAfterSpawned)
+        if(lifeTime <= turnAfterSpawned.Value)
         {
             //99보다 크면 무한히 지속되도록 함
             if (lifeTime > 99) return;
+
             Debug.Log("지속턴 다 됨");
             DeactiveNodeRpc();
         }
@@ -80,15 +85,6 @@ public class EventNode : NetworkBehaviour
             Debug.Log("아무도 안밟음");
             return;
         }
-
-        //노드에 방문한 플레이어의 id를 비교해 이벤트 시작 판정?
-        //foreach(var player in enteredPlayers)
-        //{
-        //    if(player.OwnerClientId == NetworkManager.Singleton.LocalClientId)
-        //    {
-
-        //    }
-        //}
     }
 
     //이벤트를 시작하면 개별적인 처리를 끝내고
@@ -108,7 +104,7 @@ public class EventNode : NetworkBehaviour
     protected virtual void ActiveNodeRpc(Vector3 pos)
     {
         //모든 변수 초기화
-        turnAfterSpawned = 0;
+        turnAfterSpawned.Value = 0;
 
         //위치 옮기고
         gameObject.transform.position = pos;

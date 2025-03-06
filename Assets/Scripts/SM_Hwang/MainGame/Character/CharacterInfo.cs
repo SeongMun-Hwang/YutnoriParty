@@ -1,8 +1,7 @@
 using Unity.Netcode;
-using Unity.VisualScripting.Antlr3.Runtime;
-using UnityEngine;
 
 public class CharacterInfo : NetworkBehaviour
 {
+    public bool canMove = true;
     public int overlappedCount = 0;
 }

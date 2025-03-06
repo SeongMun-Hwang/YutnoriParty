@@ -16,7 +16,7 @@ public class EventNodeManager : NetworkBehaviour
 {
     //각 이벤트 노드 종류별로 리스트를 들고 있음??
     //그냥 이벤트 노드로 들고 있고 각 인스턴스에 맡김??
-    [SerializeField] List<EventNode> spawnedNodes;
+    List<EventNode> spawnedNodes;
 
     //인스턴시에이트 해야하니까 노드는 다 갖고 있어야함
     [SerializeField] EventNode islandNodePrefab;
@@ -48,14 +48,14 @@ public class EventNodeManager : NetworkBehaviour
     {
         //if (!IsServer) return;
         //임시로 턴 돌아가는 카운터 이걸로 씀
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            TurnCountServerRpc();
-        }
-        if(Input.GetKeyDown(KeyCode.X))
-        {
-            CheckStepOnServerRpc();
-        }
+        //if (Input.GetKeyDown(KeyCode.Z))
+        //{
+        //    TurnCountServerRpc();
+        //}
+        //if(Input.GetKeyDown(KeyCode.X))
+        //{
+        //    CheckStepOnServerRpc();
+        //}
     }
 
     public override void OnNetworkSpawn()
@@ -67,6 +67,8 @@ public class EventNodeManager : NetworkBehaviour
         //방 비었는지 체크하는 리스트 초기화
         isFulledNode = new List<int>();
         despawnSchedule = new List<EventNode>();
+        spawnedNodes = new List<EventNode>();
+
         //이벤트 노드 체크하는 딕셔너리 초기화
         eventNodeTypeNum = new Dictionary<EventNodeType, int>();
         foreach(EventNodeType type in Enum.GetValues(typeof(EventNodeType)))
@@ -90,7 +92,7 @@ public class EventNodeManager : NetworkBehaviour
 
         foreach (var node in spawnedNodes)
         {
-            node.TurnIncreaseClientRpc();
+            node.TurnIncreaseRpc();
         }
     } 
 
@@ -104,7 +106,6 @@ public class EventNodeManager : NetworkBehaviour
         Debug.Log("밟은 노드에 이벤트 있는지 체크");
 
         //모든 노드에서 이벤트 실행
-        //밟으면 사라지는 이벤트의 경우 리스트 인덱스가 바뀌어서 에러남;;
         foreach (var node in spawnedNodes)
         {
             node.EventStartRpc();
@@ -161,6 +162,7 @@ public class EventNodeManager : NetworkBehaviour
             Debug.Log("빈 노드 없음");
             return;
         }
+        Debug.Log("노드 타입 : " +  type);
 
         EventNode nodePrefab;
 
@@ -168,20 +170,19 @@ public class EventNodeManager : NetworkBehaviour
         {
             case EventNodeType.Island:
                 nodePrefab = islandNodePrefab;
-                //spawnedNodes.Add(Instantiate(islandNodePrefab, nodeTransform.position, Quaternion.identity));
                 break;
             case EventNodeType.BlackHole:
                 nodePrefab = blackHoleNodePrefab;
-                //spawnedNodes.Add(Instantiate(blackHoleNodePrefab, nodeTransform.position, Quaternion.identity));
                 break;
             case EventNodeType.Item:
                 nodePrefab = itemNodePrefab;
-                //spawnedNodes.Add(Instantiate(itemNodePrefab, nodeTransform.position, Quaternion.identity));
                 break;
             default:
                 Debug.Log("에러 : 이벤트 타입 판별 불가");
                 return;
         }
+
+        //Debug.Log(nodePrefab + " 할당");
 
         //해당 타입 노드가 최대 노드 수 까지 만들어졌다면 더 안만들고 리턴
         if (nodePrefab.MaxNode <= eventNodeTypeNum[type])
@@ -191,15 +192,20 @@ public class EventNodeManager : NetworkBehaviour
 
         //해당 타입 노드를 트랜스폼에 인스턴시에이트하고 리스트에 추가
         spawnedNodes.Add(Instantiate(nodePrefab, nodeTransform.position, Quaternion.identity));
+        //Debug.Log(type + " 인스턴스화 성공");
 
         //네트워크 스폰
         spawnedNodes.Last().GetComponent<NetworkObject>().Spawn();
+        //Debug.Log(type + " 네트워크 스폰 성공");
 
         //모든 처리가 끝나 노드가 생성되었으면 딕셔너리 숫자 증가
         eventNodeTypeNum[type]++;
+        //Debug.Log(type + " 딕셔너리++");
 
         //방 찼다는거 표시
         isFulledNode.Add(allNodes.IndexOf(nodeTransform));
+
+        //Debug.Log(type + " 스폰 완료");
     }
 
     void DespawnEventNode(EventNode node)

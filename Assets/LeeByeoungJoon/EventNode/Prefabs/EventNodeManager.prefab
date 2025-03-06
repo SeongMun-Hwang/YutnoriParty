@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2326776542407497839}
   - component: {fileID: 4347954862860756553}
   m_Layer: 0
-  m_Name: EventNodeSpawner
+  m_Name: EventNodeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -71,8 +71,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  spawnedNodes: []
-  islandNodePrefab: {fileID: 0}
+  islandNodePrefab: {fileID: 5521834557609116767, guid: 5920d8ff385e2d44db743a19db84d640, type: 3}
   blackHoleNodePrefab: {fileID: 1132235250467705152, guid: 062d35da264f4bf499945f4adebd9d55, type: 3}
   itemNodePrefab: {fileID: 0}
   allNodes: []
