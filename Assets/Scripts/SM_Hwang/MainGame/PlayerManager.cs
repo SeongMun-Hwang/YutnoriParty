@@ -76,6 +76,13 @@ public class PlayerManager : NetworkBehaviour
     private void AddSpawnedCharacterClientRpc(NetworkObjectReference noRef, ClientRpcParams clientRpcParams=default)
     {
         currentCharacters.Add(noRef);
+        noRef.TryGet(out NetworkObject no);
+        if (MainGameProgress.Instance.currentCharacter!=null)
+        {
+            MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
+        }
+        MainGameProgress.Instance.currentCharacter = no.GetComponent<CharacterBoardMovement>();
+        no.GetComponent<Outline>().EnableOutline();
     }
 
     [ServerRpc(RequireOwnership = default)]

@@ -9,7 +9,7 @@ public class CharacterBoardMovement : MonoBehaviour
     private Animator animator;
     private Node selectedNode;
     Node currentNode;
-    Node prevNode;
+    Node prevNode = null;
     Vector3 targetPos;
     float moveSpeed = 10f;
     [SerializeField] GameObject characterOnDes;
@@ -55,8 +55,16 @@ public class CharacterBoardMovement : MonoBehaviour
                         tmpNode=possibleNodes[0];
                     }
                     else {
-                        tmpNode = prevNode;
-                        currentNode = prevNode.GetPrevNode()[0];
+                        if (prevNode == null)
+                        {
+                            tmpNode=currentNode.GetNextNode()[0];
+                            currentNode=GameManager.Instance.startNode;
+                        }
+                        else
+                        {
+                            tmpNode = prevNode;
+                            currentNode = prevNode.GetPrevNode()[0];
+                        }
                     }
                 }
                 else
