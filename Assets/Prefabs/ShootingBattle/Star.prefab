@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 675993713094348069}
   - component: {fileID: 5177304061824544899}
   - component: {fileID: 1639867927544858639}
-  - component: {fileID: 9216966462056994395}
+  - component: {fileID: 2090480924392158310}
+  - component: {fileID: 3792862528587142696}
   m_Layer: 12
   m_Name: Star
   m_TagString: Untagged
@@ -259,9 +260,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84fcc7ec55bd26444b0f66bd6c5dcbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   shotEffect: {fileID: 1137233926978328921, guid: 31949f22d7d488346a4a6c2e011a3a2b, type: 3}
   manager: {fileID: 0}
---- !u!95 &9216966462056994395
+--- !u!114 &2090480924392158310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3281761353814920671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!95 &3792862528587142696
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
