@@ -18,8 +18,6 @@ public class GamePrepareCanvas : NetworkBehaviour
     }
     public void GameStart()
     {
-        Debug.Log(GameManager.Instance == null);
-        Debug.Log(GameManager.Instance.announceCanvas == null);
         if(NetworkManager.ConnectedClients.Count > 1)
         {
             GameManager.Instance.mainGameProgress.StartGame();

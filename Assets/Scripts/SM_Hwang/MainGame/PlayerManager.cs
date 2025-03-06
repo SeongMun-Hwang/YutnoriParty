@@ -142,6 +142,7 @@ public class PlayerManager : NetworkBehaviour
     public void CharacterGoalIn(GameObject character)
     {
         GameManager.Instance.announceCanvas.ShowAnnounceText("Goal In!");
+        isMoving = false;
         DespawnCharacterServerRpc(character, NetworkManager.Singleton.LocalClientId, true);
         Debug.Log(numOfCharacter);
     }

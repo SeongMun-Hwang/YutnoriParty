@@ -9,6 +9,7 @@ public class CharacterBoardMovement : MonoBehaviour
     private Animator animator;
     private Node selectedNode;
     Node currentNode;
+    Node prevNode;
     Vector3 targetPos;
     float moveSpeed = 10f;
     [SerializeField] GameObject characterOnDes;
@@ -40,15 +41,28 @@ public class CharacterBoardMovement : MonoBehaviour
         {
             Node tmpNode = null;
             List<Node> possibleNodes = distance > 0 ? currentNode.GetNextNode() : currentNode.GetPrevNode();
-
-            if (possibleNodes.Count > 1)
+            if (possibleNodes.Count > 1 && i==0)
             {
                 yield return StartCoroutine(SpawnAndSelectNode(possibleNodes));
                 tmpNode = selectedNode;
             }
             else
             {
-                tmpNode = possibleNodes.Count == 1 ? possibleNodes[0] : null;
+                if (possibleNodes.Count > 0)
+                {
+                    if (distance > 0)
+                    {
+                        tmpNode=possibleNodes[0];
+                    }
+                    else {
+                        tmpNode = prevNode;
+                        currentNode = prevNode.GetPrevNode()[0];
+                    }
+                }
+                else
+                {
+                    tmpNode = null;
+                }
             }
 
             if (tmpNode == null)
@@ -57,7 +71,8 @@ public class CharacterBoardMovement : MonoBehaviour
                 GameManager.Instance.mainGameProgress.EndMove();
                 yield break;
             }
-
+            prevNode = currentNode;
+            Debug.Log(prevNode.name);
             targetPos = tmpNode.transform.position;
             targetPos.y = transform.position.y;
 
