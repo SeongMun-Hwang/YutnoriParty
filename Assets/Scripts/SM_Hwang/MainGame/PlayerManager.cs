@@ -22,7 +22,7 @@ public class PlayerManager : NetworkBehaviour
     {
         //if (instance == null)
         //{
-            instance = this;
+        if(IsOwner) instance = this;
         //    DontDestroyOnLoad(gameObject);
         //}
         //else if (instance != this)
