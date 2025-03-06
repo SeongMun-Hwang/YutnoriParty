@@ -39,7 +39,7 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void Start()
     {
-        
+
     }
 
     int colorIndex = 0;
@@ -72,7 +72,7 @@ public class ShootingBattleManager : NetworkBehaviour
             SceneManager.MoveGameObjectToScene(cursor, minigameScene);
 
             NetworkObject cursorNetObj = cursor.GetComponent<NetworkObject>();
-            cursorNetObj.SpawnWithOwnership(clientId);
+            cursorNetObj.SpawnWithOwnership(clientId, true);
 
             nc.networkColor.Value = crosshairColors[colorIndex++];
 
@@ -99,7 +99,7 @@ public class ShootingBattleManager : NetworkBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 클릭
+        if (Input.GetMouseButtonDown(0) && isPlaying.Value) // 마우스 왼쪽 클릭
         {
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
@@ -167,6 +167,11 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private IEnumerator SpawnStar()
     {
+        if (!IsServer)
+        {
+            yield break;
+        }
+
         while (isPlaying.Value)
         {
             yield return null;
@@ -174,6 +179,7 @@ public class ShootingBattleManager : NetworkBehaviour
             Vector3 randomPos = new Vector3(Random.Range(-7f, 7f), Random.Range(-2f, 2f), 0);
             GameObject star = Instantiate(StarPrefab, randomPos, transform.rotation);
             star.GetComponent<ShootableStar>().manager = this;
+            star.GetComponent<NetworkObject>().Spawn(true);
 
             yield return new WaitForSecondsRealtime(spawnDuration);
             spawnDuration = Mathf.Clamp(spawnDuration - 0.4f, 0.2f, 1.5f);
