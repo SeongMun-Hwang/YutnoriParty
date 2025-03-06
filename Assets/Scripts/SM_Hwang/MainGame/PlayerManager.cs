@@ -49,6 +49,11 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Throw First!");
             return;
         }
+        if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0]==YutResult.BackDo && currentCharacters.Count > 0)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Cannot spawn when backdo");
+            return;
+        }
         if (currentCharacters.Count >= numOfCharacter)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled",2f);
@@ -76,6 +81,13 @@ public class PlayerManager : NetworkBehaviour
     private void AddSpawnedCharacterClientRpc(NetworkObjectReference noRef, ClientRpcParams clientRpcParams=default)
     {
         currentCharacters.Add(noRef);
+        noRef.TryGet(out NetworkObject no);
+        if (MainGameProgress.Instance.currentCharacter!=null)
+        {
+            MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
+        }
+        MainGameProgress.Instance.currentCharacter = no.GetComponent<CharacterBoardMovement>();
+        no.GetComponent<Outline>().EnableOutline();
     }
 
     [ServerRpc(RequireOwnership = default)]
@@ -142,6 +154,7 @@ public class PlayerManager : NetworkBehaviour
     public void CharacterGoalIn(GameObject character)
     {
         GameManager.Instance.announceCanvas.ShowAnnounceText("Goal In!");
+        isMoving = false;
         DespawnCharacterServerRpc(character, NetworkManager.Singleton.LocalClientId, true);
         Debug.Log(numOfCharacter);
     }

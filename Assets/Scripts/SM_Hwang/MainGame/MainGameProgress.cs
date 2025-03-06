@@ -160,7 +160,8 @@ public class MainGameProgress : NetworkBehaviour
     }
     private void CheckTurnChange()
     {
-        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0)
+        if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0
+            && !YutManager.Instance.isCalulating)
         {
             Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
