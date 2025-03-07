@@ -12,7 +12,6 @@ using UnityEngine.UI;
 public class StackBattleManager : NetworkBehaviour
 {
 	// 게임에 참여하는 유저 관련
-	public int maxPlayers;
 	private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
     int currentId = -1;
 
@@ -22,7 +21,7 @@ public class StackBattleManager : NetworkBehaviour
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
 
-    private int timer = 5; // 턴 제한시간
+    private int timer = 10; // 턴 제한시간
     private Coroutine turnTimerCoroutine; // 턴 제한시간 타이머 코루틴
     private bool failed = false;
     private bool timeover = false;
@@ -72,20 +71,36 @@ public class StackBattleManager : NetworkBehaviour
 
 	private void OnPlayerJoined(ulong clientId)
 	{
-		if (!playerIds.Contains(clientId))
+		if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
 		{
 			playerIds.Add(clientId);
 			isRetire.Add(false);
 		}
 
-        if (playerIds.Count == maxPlayers)
+        if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
         {
-            // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
-            int i = UnityEngine.Random.Range(0, playerIds.Count);
-            currentTurnPlayerId.Value = playerIds[i];
-            StartTurnTimer();
+            StartCoroutine(StartGameTimer(5));
         }
 	}
+
+    private IEnumerator StartGameTimer(int timer = 3)
+    {
+        while (timer > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            timer--;
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
+            yield return null;
+        }
+
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+
+        // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
+        int i = UnityEngine.Random.Range(0, playerIds.Count);
+        currentTurnPlayerId.Value = playerIds[i];
+        StartTurnTimer();
+        spawner.CreateBlock();
+    }
 
     private void OnTurnChanged(ulong previousValue, ulong newValue)
     {
@@ -231,7 +246,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameOverClientRpc(ulong id)
 	{
-		if (NetworkManager.Singleton.LocalClientId == id)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == id)
 		{
 			loseMessageUI.SetActive(true);
 		}
@@ -240,7 +257,9 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameFinishedClientRpc(ulong winClientId)
 	{
-		if (NetworkManager.Singleton.LocalClientId == winClientId)
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
 		{
 			winMessageUI.SetActive(true);
 		}

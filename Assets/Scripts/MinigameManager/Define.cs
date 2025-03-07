@@ -8,4 +8,11 @@ public class Define
         ShootingGame, // 사격게임
         RunningGame, // 달리기게임
     }
+
+    public enum MGPlayerType
+    {
+        Unknown, // 기본값
+        Player, // 플레이어
+        Spectator, // 관전자
+    }
 }

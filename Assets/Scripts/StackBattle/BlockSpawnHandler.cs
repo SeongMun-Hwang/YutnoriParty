@@ -30,15 +30,8 @@ public class BlockSpawnHandler : NetworkBehaviour
             }
 
             stack.Clear();
-            StartCoroutine(DelayedCreateBlock());
         }
 	}
-
-    private IEnumerator DelayedCreateBlock()
-    {
-        yield return new WaitForSeconds(1f); // 약간의 딜레이 추가 후 실행
-        CreateBlock();
-    }
 
     public void CreateBlock()
 	{
@@ -61,11 +54,11 @@ public class BlockSpawnHandler : NetworkBehaviour
 		stack.Add(activeTile);
 		activeTile.transform.localScale = previousTile.transform.localScale;
 		activeTile.transform.position = previousTile.transform.position + Vector3.up;
-		activeTile.GetComponent<StackableBlock>().moveX = stack.Count % 2 == 0;
+		activeTile.GetComponent<StackableBlock>().moveX = Random.Range(0, 2) == 0;
 		activeTile.GetComponent<StackableBlock>().spawner = this;
 		activeTile.GetComponent<StackableBlock>().manager = manager;
 		activeTile.GetComponent<StackableBlock>().moveSpeed = blockSpeed;
-        if (stack.Count % manager.maxPlayers == 0)
+        if (stack.Count % MinigameManager.Instance.maxPlayers.Value == 0)
         {
             blockSpeed += 1f;
         }

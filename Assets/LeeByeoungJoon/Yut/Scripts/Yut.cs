@@ -6,6 +6,7 @@ public class Yut : NetworkBehaviour
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
     
+    [SerializeField] new Collider collider;
     new Rigidbody rigidbody;
     float torque;
     float gravity = 9.8f;
@@ -13,8 +14,8 @@ public class Yut : NetworkBehaviour
     bool isGrounded = false;
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
-    public GameObject GameObject { get { return gameObject; } }
     public Rigidbody Rigidbody { get { return rigidbody; } }
+    public Collider Collider { get { return collider; } }
 
     private void Awake()
     {

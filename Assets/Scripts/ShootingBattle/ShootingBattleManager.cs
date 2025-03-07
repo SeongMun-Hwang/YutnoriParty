@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,17 +11,15 @@ using UnityEngine.SocialPlatforms.Impl;
 public class ShootingBattleManager : NetworkBehaviour
 {
     // 게임에 참여하는 유저 관련
-    [SerializeField] private int maxPlayers;
     private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
     int currentId = -1;
 
     // UI 관련
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> scoreUI;
-    [SerializeField] private Texture2D cursorTexture;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
-
+    [SerializeField] private List<Color32> crosshairColors;
 
     // 게임 상태 및 진행 관련
     [SerializeField] public NetworkVariable<bool> isPlaying;
@@ -34,13 +33,16 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private float spawnDuration = 1.5f;
 
     // 게임 요소 관련
+    [SerializeField] Camera mainCamera;
     [SerializeField] GameObject StarPrefab;
+    [SerializeField] GameObject CursorPrefab;
 
     private void Start()
     {
-        
+
     }
 
+    int colorIndex = 0;
     public override void OnNetworkSpawn()
     {
         if (IsServer)
@@ -58,16 +60,42 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void OnPlayerJoined(ulong clientId)
     {
-        if (!playerIds.Contains(clientId))
+        if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
         {
             playerIds.Add(clientId);
             playerScore.Add(0);
 
-            if (playerIds.Count == maxPlayers)
+            GameObject cursor = Instantiate(CursorPrefab);
+            NetworkCrosshair nc = cursor.GetComponent<NetworkCrosshair>();
+
+            Scene minigameScene = SceneManager.GetSceneByName("ShootingScene");
+            SceneManager.MoveGameObjectToScene(cursor, minigameScene);
+
+            NetworkObject cursorNetObj = cursor.GetComponent<NetworkObject>();
+            cursorNetObj.SpawnWithOwnership(clientId, true);
+
+            nc.networkColor.Value = crosshairColors[colorIndex++];
+
+            if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
             {
-                isPlaying.Value = true;
+                StartCoroutine(StartGameTimer(5));
             }
         }
+    }
+
+    private IEnumerator StartGameTimer(int timer = 3)
+    {
+        while (timer > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            timer--;
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
+            yield return null;
+        }
+
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+
+        isPlaying.Value = true;
     }
 
     private void Update()
@@ -76,8 +104,6 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             if (!gameStart)
             {
-                Vector2 hotspot = new Vector2(cursorTexture.width / 2f, cursorTexture.height / 2f);
-                Cursor.SetCursor(cursorTexture, hotspot, CursorMode.Auto);
                 StartCoroutine(SpawnStar());
                 StartCoroutine(CountTimer());
                 gameStart = true;
@@ -87,16 +113,11 @@ public class ShootingBattleManager : NetworkBehaviour
                 UpdateScoreUI();
             }
         }
-        else
-        {
-            if (gameStart)
-            {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            }
-        }
 
-        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 클릭
+        if (Input.GetMouseButtonDown(0) && isPlaying.Value) // 마우스 왼쪽 클릭
         {
+            if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { Debug.Log("관전중"); return; }
+
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
@@ -106,7 +127,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 ShootableStar star = hit.collider.GetComponent<ShootableStar>();
                 if (star != null)
                 {
-                    star.OnClick();
+                    star.OnClick(crosshairColors[currentId]);
                     AddScoreServerRpc(currentId);
                 }
             }
@@ -129,7 +150,8 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private void UpdateScoreUI()
     {
-        for (int i = 0; i < maxPlayers; i++)
+        // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
+        for (int i = 0; i < MinigameManager.Instance.maxPlayers.Value; i++)
         {
             scoreUI[i].text = playerScore[i].ToString();
         }
@@ -162,6 +184,11 @@ public class ShootingBattleManager : NetworkBehaviour
 
     private IEnumerator SpawnStar()
     {
+        if (!IsServer)
+        {
+            yield break;
+        }
+
         while (isPlaying.Value)
         {
             yield return null;
@@ -169,6 +196,7 @@ public class ShootingBattleManager : NetworkBehaviour
             Vector3 randomPos = new Vector3(Random.Range(-7f, 7f), Random.Range(-2f, 2f), 0);
             GameObject star = Instantiate(StarPrefab, randomPos, transform.rotation);
             star.GetComponent<ShootableStar>().manager = this;
+            star.GetComponent<NetworkObject>().Spawn(true);
 
             yield return new WaitForSecondsRealtime(spawnDuration);
             spawnDuration = Mathf.Clamp(spawnDuration - 0.4f, 0.2f, 1.5f);
@@ -178,6 +206,8 @@ public class ShootingBattleManager : NetworkBehaviour
     [ClientRpc]
     public void GameFinishedClientRpc(ulong winClientId)
     {
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
         if (NetworkManager.Singleton.LocalClientId == winClientId)
         {
             winMessageUI.SetActive(true);
