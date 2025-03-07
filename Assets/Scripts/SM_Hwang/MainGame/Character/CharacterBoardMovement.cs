@@ -81,7 +81,6 @@ public class CharacterBoardMovement : MonoBehaviour
                 yield break;
             }
             prevNode = currentNode;
-            Debug.Log(prevNode.name);
             targetPos = tmpNode.transform.position;
             targetPos.y = transform.position.y;
 

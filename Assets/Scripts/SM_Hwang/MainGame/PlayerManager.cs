@@ -18,6 +18,7 @@ public class PlayerManager : NetworkBehaviour
     public static PlayerManager Instance { get { return instance; } }
     public static Action<PlayerManager> OnPlayerSpawn;
     public static Action<PlayerManager> OnPlayerDespawn;
+    public static Action<ulong, int> OnGoaled;
     public override void OnNetworkSpawn()
     {
         //if (instance == null)
@@ -113,7 +114,6 @@ public class PlayerManager : NetworkBehaviour
         currentCharacters.Remove(noRef);
         currentCharacters.RemoveAll(item => item == null);
         if (isGoal) numOfCharacter--;
-        Debug.Log("NumofChar : " + numOfCharacter);
         if (numOfCharacter == 0)
         {
             EndGame();
@@ -123,6 +123,7 @@ public class PlayerManager : NetworkBehaviour
     {
         Debug.Log("Overlap Character");
         child.GetComponent<Collider>().enabled = false;
+        parent.GetComponent<CharacterInfo>().overlappedCount++;
         OverlapCharacterServerRpc(parent, child);
     }
     /*말 업을 때 부모 지정 ServerRpc*/
@@ -155,8 +156,14 @@ public class PlayerManager : NetworkBehaviour
     {
         GameManager.Instance.announceCanvas.ShowAnnounceText("Goal In!");
         isMoving = false;
+        UpdateProfileServerRpc(OwnerClientId, character.GetComponent<CharacterInfo>().overlappedCount+1);
         DespawnCharacterServerRpc(character, NetworkManager.Singleton.LocalClientId, true);
-        Debug.Log(numOfCharacter);
+    }
+    [ServerRpc(RequireOwnership =default)]
+    private void UpdateProfileServerRpc(ulong clientId, int num)
+    {
+        Debug.Log(num);
+        OnGoaled?.Invoke(clientId, num);
     }
     private void EndGame()
     {
