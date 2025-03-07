@@ -38,13 +38,13 @@ public class IslandNode : EventNode
             //남은 턴 0이하 되면 탈출
             if (trappedPlayers[player] <= 0)
             {
-                player.GetComponent<CharacterInfo>().canMove.Value = true;
-                Debug.Log("탈출");
+                EscapeIslandRpc(player);
                 continue;
             }
 
             //못움직이게 막음
             player.GetComponent<CharacterInfo>().canMove.Value = false;
+            player.GetComponent<CharacterInfo>().inIsland.Value = true;
 
             //SetCharacterMoveRpc(false, enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
             //BlockMoveRpc(enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
@@ -71,6 +71,28 @@ public class IslandNode : EventNode
                 trappedPlayers[player]--;
             }
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void EscapeIslandRpc(NetworkObjectReference no)
+    {
+        if(!no.TryGet(out NetworkObject player))
+        {
+            Debug.Log("네트워크 오브젝트 없음");
+            return;
+        }
+        
+        //딕셔너리에 없으면 걍 스킵
+        if (!trappedPlayers.ContainsKey(player))
+        {
+            Debug.Log("딕셔너리에 없음");
+            return;
+        }
+
+        player.GetComponent<CharacterInfo>().canMove.Value = true;
+        player.GetComponent<CharacterInfo>().inIsland.Value = false;
+        trappedPlayers.Remove(player); //딕셔너리에서 지워도 인덱스 문제 안나겠지..?
+        Debug.Log("탈출");
     }
 
     //이동 못하게 함, 특정 클라이언트만 실행

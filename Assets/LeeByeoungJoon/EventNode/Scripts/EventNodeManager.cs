@@ -227,4 +227,25 @@ public class EventNodeManager : NetworkBehaviour
     {
         despawnSchedule.Add(node);
     }
+
+
+    [Rpc(SendTo.Server)]
+    public void EscapeIslandCallRpc(NetworkObjectReference no)
+    {
+        if (!no.TryGet(out NetworkObject character))
+        {
+            Debug.Log("네트워크 오브젝트 없음");
+            return;
+        }
+
+        //스폰 노드중에 무인도 노드 찾아서 캐릭터 삭제 시도요청
+        foreach(var node in spawnedNodes)
+        {
+            IslandNode island;
+            if (node.TryGetComponent(out island))
+            {
+                island.EscapeIslandRpc(character);
+            }
+        }
+    }
 }
