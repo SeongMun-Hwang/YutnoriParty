@@ -47,6 +47,7 @@ public class StackBattleManager : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
+        turnButton.interactable = false;
         currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
         currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
 
@@ -65,8 +66,6 @@ public class StackBattleManager : NetworkBehaviour
 
         currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
         Debug.Log($"플레이어 ID : {currentId}");
-
-        turnButton.interactable = (GetCurrentTurnPlayerId() == NetworkManager.Singleton.LocalClientId);
 	}
 
 	private void OnPlayerJoined(ulong clientId)
