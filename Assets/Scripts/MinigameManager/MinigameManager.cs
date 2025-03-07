@@ -22,10 +22,21 @@ public class MinigameManager : NetworkBehaviour
     public Define.MGPlayerType playerType;
 
     [SerializeField] private GameObject spectatorUI;
+    [SerializeField] private GameObject MinigameButtonUI;
+    [SerializeField] private GameObject FadeUI;
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        if (IsServer)
+        {
+            MinigameButtonUI.SetActive(true);
+        }
+        else
+        {
+            MinigameButtonUI.SetActive(false);
+        }
+
         if (instance == null)
         {
             instance = this;
@@ -42,6 +53,7 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            MinigameButtonUI.SetActive(false);
             if (MinigameScenes.TryGetValue(type, out string sceneName))
             {
                 NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
@@ -61,6 +73,7 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            MinigameButtonUI.SetActive(false);
             NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[gameType], LoadSceneMode.Additive);
         }
         else
@@ -79,6 +92,7 @@ public class MinigameManager : NetworkBehaviour
 
     public void EndMinigame()
     {
+        MinigameButtonUI.SetActive(true);
         MainGameProgress.Instance.endMinigameActions.Invoke();
         CloseSpectatorUIClientRpc();
     }
