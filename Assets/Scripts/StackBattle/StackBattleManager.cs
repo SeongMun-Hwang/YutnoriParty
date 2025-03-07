@@ -79,12 +79,28 @@ public class StackBattleManager : NetworkBehaviour
 
         if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
         {
-            // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
-            int i = UnityEngine.Random.Range(0, playerIds.Count);
-            currentTurnPlayerId.Value = playerIds[i];
-            StartTurnTimer();
+            StartCoroutine(StartGameTimer(5));
         }
 	}
+
+    private IEnumerator StartGameTimer(int timer = 3)
+    {
+        while (timer > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            timer--;
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
+            yield return null;
+        }
+
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+
+        // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
+        int i = UnityEngine.Random.Range(0, playerIds.Count);
+        currentTurnPlayerId.Value = playerIds[i];
+        StartTurnTimer();
+        spawner.CreateBlock();
+    }
 
     private void OnTurnChanged(ulong previousValue, ulong newValue)
     {

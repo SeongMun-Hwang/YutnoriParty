@@ -78,9 +78,24 @@ public class ShootingBattleManager : NetworkBehaviour
 
             if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
             {
-                isPlaying.Value = true;
+                StartCoroutine(StartGameTimer(5));
             }
         }
+    }
+
+    private IEnumerator StartGameTimer(int timer = 3)
+    {
+        while (timer > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            timer--;
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
+            yield return null;
+        }
+
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+
+        isPlaying.Value = true;
     }
 
     private void Update()
