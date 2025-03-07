@@ -128,7 +128,10 @@ public class MainGameProgress : NetworkBehaviour
             yield return null;
         }
         yield return new WaitForSeconds(1f);
-        CheckAllPlayerTurnPassed();
+        if (YutManager.Instance.YutResultCount() == 0)
+        {
+            CheckAllPlayerTurnPassed();
+        }
     }
     private IEnumerator WaitUntilPartygameEnd()
     {
@@ -173,6 +176,7 @@ public class MainGameProgress : NetworkBehaviour
         if ((gameTurn.Value+1)% NetworkManager.ConnectedClients.Count==0)
         {
             Debug.Log("Party game start");
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Party time");
             //isMinigamePlaying = true;
             //StartMiniGame(encounteredEnemy);
             StartCoroutine(WaitUntilPartygameEnd());
