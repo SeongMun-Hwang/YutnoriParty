@@ -19,5 +19,6 @@ public class PlayerProfile : MonoBehaviour
         this.score = score;
 
         playerNameTmp.text = username.ToString();
+        characterNumber.text = score + "/4";
     }
 }
