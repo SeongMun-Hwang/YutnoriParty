@@ -967,6 +967,8 @@ MonoBehaviour:
     m_InternalValue: 0
   playerType: 0
   spectatorUI: {fileID: 269970427}
+  MinigameButtonUI: {fileID: 1308161019}
+  FadeUI: {fileID: 0}
 --- !u!4 &312218818
 Transform:
   m_ObjectHideFlags: 0
