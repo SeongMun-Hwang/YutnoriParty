@@ -16,17 +16,19 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
-        //버튼 누르면 윷 사라지게 함
-        YutManager.Instance.HideYutRpc();
-
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Other Character is moving");
             return;
         }
-        if (MainGameProgress.Instance.currentCharacter==null)
+        if (MainGameProgress.Instance.currentCharacter == null)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!",2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
+            return;
+        }
+        if (YutManager.Instance.isCalulating)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Yut Result", 2f);
             return;
         }
 
@@ -37,6 +39,10 @@ public class YutResults : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
             return;
         }
+
+        //버튼 누르면 윷 사라지게 함
+        YutManager.Instance.HideYutRpc();
+        
         //몇 칸 전진하는지 숫자 반환
         switch (yutResult)
         {
