@@ -30,8 +30,9 @@ public class YutResults : NetworkBehaviour
             return;
         }
 
+        //Debug.Log("이동 가능? : " + MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value);
         //이동 못하는 애 골랐으면 다시 고르라고 안내함
-        if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove)
+        if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
             return;

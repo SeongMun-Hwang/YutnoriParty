@@ -38,13 +38,13 @@ public class IslandNode : EventNode
             //남은 턴 0이하 되면 탈출
             if (trappedPlayers[player] <= 0)
             {
-                player.GetComponent<CharacterInfo>().canMove = true;
+                player.GetComponent<CharacterInfo>().canMove.Value = true;
                 Debug.Log("탈출");
-                return;
+                continue;
             }
 
             //못움직이게 막음
-            player.GetComponent<CharacterInfo>().canMove = false;
+            player.GetComponent<CharacterInfo>().canMove.Value = false;
 
             //SetCharacterMoveRpc(false, enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
             //BlockMoveRpc(enteredPlayers.IndexOf(player), RpcTarget.Single(player.OwnerClientId, RpcTargetUse.Temp));
@@ -56,13 +56,20 @@ public class IslandNode : EventNode
     [Rpc(SendTo.Server)]
     public override void TurnIncreaseRpc()
     {
-        //base.TurnIncreaseRpc();
         turnAfterSpawned.Value++;
 
         //남은 턴 감소
         foreach (var player in enteredPlayers)
         {
-            trappedPlayers[player]--;
+            if (!trappedPlayers.ContainsKey(player))
+            {
+                Debug.Log("딕셔너리에 없음");
+                return;
+            }
+            if(trappedPlayers[player] > 0)
+            {
+                trappedPlayers[player]--;
+            }
         }
     }
 
@@ -83,6 +90,6 @@ public class IslandNode : EventNode
     void SetCharacterMoveRpc(bool canMove, int idx, RpcParams rpcParams)
     {
         var player = enteredPlayers[idx];
-        player.GetComponent<CharacterInfo>().canMove = canMove;
+        player.GetComponent<CharacterInfo>().canMove.Value = canMove;
     }
 }
