@@ -112,7 +112,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 ShootableStar star = hit.collider.GetComponent<ShootableStar>();
                 if (star != null)
                 {
-                    star.OnClick();
+                    star.OnClick(crosshairColors[currentId]);
                     AddScoreServerRpc(currentId);
                 }
             }

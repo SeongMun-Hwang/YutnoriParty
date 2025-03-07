@@ -52,15 +52,22 @@ public class ShootableStar : NetworkBehaviour
         }
     }
 
-    public void OnClick()
+    public void OnClick(Color32 color)
     {
         if (IsSpawned)
         {
             Debug.Log("클릭");
-            GameObject effect = Instantiate(shotEffect, transform.position, transform.rotation);
-            Destroy(effect, 2f);
-            DestroyStarServerRpc(0f);
+            DestroyStarServerRpc(0f, true, color);
         }
+    }
+
+    [ClientRpc]
+    private void DrawEffectClientRpc(Color32 color)
+    {
+        GameObject effect = Instantiate(shotEffect, transform.position, transform.rotation);
+        var main = effect.GetComponent<ParticleSystem>().main;
+        main.startColor = new ParticleSystem.MinMaxGradient(color);
+        Destroy(effect, 2f);
     }
 
     private IEnumerator ResetCoroutine(float duration)
@@ -99,11 +106,15 @@ public class ShootableStar : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void DestroyStarServerRpc(float duration)
+    private void DestroyStarServerRpc(float duration, bool effect = false, Color32 color = new Color32())
     {
         if (!IsSpawned) return;
         if (destroyCoroutine == null)
         {
+            if (effect)
+            {
+                DrawEffectClientRpc(color);
+            }
             Debug.Log($"[Netcode] DestroyStarServerRpc 실행: {gameObject.name} (NetworkObjectId: {NetworkObjectId})");
             destroyCoroutine = StartCoroutine(ResetCoroutine(duration));
         }

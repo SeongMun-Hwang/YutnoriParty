@@ -21,7 +21,7 @@ public class StackBattleManager : NetworkBehaviour
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
 
-    private int timer = 5; // 턴 제한시간
+    private int timer = 10; // 턴 제한시간
     private Coroutine turnTimerCoroutine; // 턴 제한시간 타이머 코루틴
     private bool failed = false;
     private bool timeover = false;

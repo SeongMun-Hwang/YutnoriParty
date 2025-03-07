@@ -41,29 +41,29 @@ public class CharacterBoardMovement : MonoBehaviour
         {
             Node tmpNode = null;
             List<Node> possibleNodes = distance > 0 ? currentNode.GetNextNode() : currentNode.GetPrevNode();
-            if (possibleNodes.Count > 1 && i==0)
+            if (possibleNodes.Count > 1 && i==0) //갈림길일 때
             {
                 yield return StartCoroutine(SpawnAndSelectNode(possibleNodes));
                 tmpNode = selectedNode;
             }
             else
             {
-                if (possibleNodes.Count > 0)
+                if (possibleNodes.Count > 0) //이동 가능한 하나이고(외길)
                 {
-                    if (distance > 0)
+                    if (distance > 0) //전진이면
                     {
                         tmpNode=possibleNodes[0];
                     }
-                    else {
-                        if (prevNode == null)
+                    else { //후진이면
+                        if (currentNode.GetPrevNode() == null) //이전 노드가 없으면 == 말 없는데 백도면
                         {
-                            tmpNode=currentNode.GetNextNode()[0];
-                            currentNode=GameManager.Instance.startNode;
+                            Debug.Log("Prev Node is null");
+                            tmpNode=currentNode.GetNextNode()[0]; //방향을 앞으로 설정
                         }
-                        else
+                        else //이전 노드가 있으면
                         {
-                            tmpNode = prevNode;
-                            currentNode = prevNode.GetPrevNode()[0];
+                            Debug.Log("Prev Node not null");
+                            tmpNode = currentNode.GetPrevNode()[0];
                         }
                     }
                 }
@@ -72,6 +72,7 @@ public class CharacterBoardMovement : MonoBehaviour
                     tmpNode = null;
                 }
             }
+            if(possibleNodes==null) tmpNode = null;
 
             if (tmpNode == null)
             {
