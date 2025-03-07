@@ -7,9 +7,10 @@ public class AnnounceCanvas : NetworkBehaviour
 {
     [SerializeField] GameObject announceTmp;
 
-    public void ShowAnnounceText(string str, float time = 2f)
+    public void ShowAnnounceText(string str, float time = 2f, Color? color = null)
     {
-        StartCoroutine(ShowAnnounceTextIEnumerator(str, time));
+        if (color == null) color = Color.black;
+        StartCoroutine(ShowAnnounceTextIEnumerator(str, time, color.Value));
     }
     [ClientRpc]
     public void ShowAnnounceTextClientRpc(string str, float time = 2f, Vector4 color=new Vector4())
