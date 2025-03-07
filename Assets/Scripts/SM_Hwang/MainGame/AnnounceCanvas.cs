@@ -13,12 +13,12 @@ public class AnnounceCanvas : NetworkBehaviour
         StartCoroutine(ShowAnnounceTextIEnumerator(str, time, color.Value));
     }
     [ClientRpc]
-    public void ShowAnnounceTextClientRpc(string str, float time = 2f, Color? color = null)
+    public void ShowAnnounceTextClientRpc(string str, float time = 2f, Vector4 color=new Vector4())
     {
         if (color == null) color = Color.black;
-        StartCoroutine(ShowAnnounceTextIEnumerator(str, time, color.Value));
+        StartCoroutine(ShowAnnounceTextIEnumerator(str, time, color));
     }
-    private IEnumerator ShowAnnounceTextIEnumerator(string str, float time, Color color)
+    private IEnumerator ShowAnnounceTextIEnumerator(string str, float time, Vector4 color)
     {
         GameObject go = Instantiate(announceTmp, transform.position, Quaternion.identity, transform);
         go.GetComponent<TextMeshProUGUI>().text = str;
