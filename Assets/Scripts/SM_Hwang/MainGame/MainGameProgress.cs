@@ -81,12 +81,13 @@ public class MainGameProgress : NetworkBehaviour
             if (collider.gameObject == currentCharacter.gameObject) continue;
             if (collider.TryGetComponent<CharacterBoardMovement>(out var character))
             {
-                if (character.GetComponent<NetworkObject>().OwnerClientId != (ulong)currentPlayerNumber.Value) //적이면
+                Debug.Log("compare id : " + character.GetComponent<NetworkObject>().OwnerClientId+" | "+ NetworkManager.Singleton.LocalClientId);
+                if (character.GetComponent<NetworkObject>().OwnerClientId != NetworkManager.Singleton.LocalClientId) //적이면
                 {
                     encounteredEnemy = character.gameObject;
                     return true;
                 }
-                else if (character.GetComponent<NetworkObject>().OwnerClientId == (ulong)currentPlayerNumber.Value)//내 말이면
+                else if (character.GetComponent<NetworkObject>().OwnerClientId == NetworkManager.Singleton.LocalClientId)//내 말이면
                 {
                     PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
                     currentCharacter.GetComponent<Outline>().DisableOutline();
