@@ -63,6 +63,8 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public void EndMove()
     {
+        EventNodeManager.Instance.CheckStepOnServerRpc(); //이동 끝나고 노드 밟았는지 체크
+
         if (CheckOtherPlayer()) //이동이 끝나고 주변 체크
         {
             StartMiniGame(encounteredEnemy);
@@ -156,6 +158,8 @@ public class MainGameProgress : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void EndTurnServerRpc()
     {
+        EventNodeManager.Instance.TurnCountServerRpc(); //이벤트 노드 턴 계산
+
         Debug.Log("Change Turn");
         gameTurn.Value++;
         currentPlayerNumber.Value++;
@@ -236,6 +240,10 @@ public class MainGameProgress : NetworkBehaviour
         GameObject player = playerNetObj.gameObject;
         GameObject enemy = enemyNetObj.gameObject;
 
+        //하나라도 섬에 있으면 섬전투로 취급
+        bool isIslandBattle = (playerNetObj.GetComponent<CharacterInfo>().inIsland.Value || enemyNetObj.GetComponent<CharacterInfo>().inIsland.Value);
+        Debug.Log("섬 전투임? : " + isIslandBattle);
+
         // 미니 게임이 끝났을 때 서버에서 발생시킬 이벤트를 지정
         endMinigameActions = null;
         endMinigameActions += (() =>
@@ -247,6 +255,13 @@ public class MainGameProgress : NetworkBehaviour
             if (winnerId == playerNetObj.OwnerClientId)
             {
                 Debug.Log("Attacker Win / Enemy Lose");
+
+                //승자가 섬을 바로 탈출
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.EscapeIslandCallRpc(playerNetObj);
+                    return;
+                }
                 AddThrowChanceClientRpc(winnerId);
                 //YutManager.Instance.throwChance++;
                 //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
@@ -255,6 +270,12 @@ public class MainGameProgress : NetworkBehaviour
             else
             {
                 Debug.Log("Attacker Lose / Enemy Win");
+                //승자가 섬을 바로 탈출
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
+                    return;
+                }
                 //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
