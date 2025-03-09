@@ -16,7 +16,7 @@ public class StackBattleManager : NetworkBehaviour
     int currentId = -1;
 
     // 현재 차례 플레이어 ID
-    private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(0);
+    private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(100);
 	
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
@@ -47,6 +47,7 @@ public class StackBattleManager : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
+        Debug.Log("네트워크 스폰");
         turnButton.interactable = false;
         currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
         currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
@@ -97,12 +98,15 @@ public class StackBattleManager : NetworkBehaviour
         // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
         int i = UnityEngine.Random.Range(0, playerIds.Count);
         currentTurnPlayerId.Value = playerIds[i];
+        Debug.Log(currentTurnPlayerId.Value.ToString() + "에게 첫 턴");
         StartTurnTimer();
         spawner.CreateBlock();
     }
 
     private void OnTurnChanged(ulong previousValue, ulong newValue)
     {
+        Debug.Log("턴 변경");
+
         if (IsServer)
         {
             if (turnTimerCoroutine != null)
