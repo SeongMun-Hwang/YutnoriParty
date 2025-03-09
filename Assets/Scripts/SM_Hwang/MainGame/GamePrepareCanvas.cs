@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Linq;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
@@ -21,11 +22,11 @@ public class GamePrepareCanvas : NetworkBehaviour
         }
         var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
         Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyIds[0]);
-        roomCodeTmp.text= lobby.Name;
+        roomCodeTmp.text = lobby.Name;
     }
     public void GameStart()
     {
-        if(NetworkManager.ConnectedClients.Count > 1)
+        if (NetworkManager.ConnectedClients.Count > 1)
         {
             GameManager.Instance.mainGameProgress.StartGame();
             gameObject.GetComponent<NetworkObject>().Despawn();

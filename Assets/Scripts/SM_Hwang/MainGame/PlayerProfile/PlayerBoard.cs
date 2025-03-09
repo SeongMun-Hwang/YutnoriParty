@@ -11,10 +11,10 @@ public class PlayerBoard : NetworkBehaviour
     [SerializeField] List<RectTransform> profileTransforms;
     Vector2[] corners = new Vector2[4]
 {
-                            new Vector2(208, -972),  // 좌하단 (↖)
-                            new Vector2( 1708 , -969),  // 우하단 (↗)
-                            new Vector2( 1708 ,  -114),  // 우상단 (↘)
-                            new Vector2(208 ,  -114)   // 좌상단 (↙)
+                            new Vector2(208, -972),  // 좌하단
+                            new Vector2( 1708 , -969),  // 우하단
+                            new Vector2( 1708 ,  -114),  // 우상단
+                            new Vector2(208 ,  -114)   // 좌상단
 };
     NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
     List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
@@ -42,6 +42,7 @@ public class PlayerBoard : NetworkBehaviour
 
             PlayerManager.OnPlayerSpawn += HandlePlayerSpawned;
             PlayerManager.OnPlayerDespawn += HandlePlayerDespawned;
+            PlayerManager.OnGoaled += HandleGetScore;
         }
     }
     public override void OnNetworkDespawn()
@@ -54,6 +55,7 @@ public class PlayerBoard : NetworkBehaviour
         {
             PlayerManager.OnPlayerSpawn -= HandlePlayerSpawned;
             PlayerManager.OnPlayerDespawn -= HandlePlayerDespawned;
+            PlayerManager.OnGoaled -= HandleGetScore;
         }
     }
     private void HandlePlayerSpawned(PlayerManager player)
@@ -86,7 +88,7 @@ public class PlayerBoard : NetworkBehaviour
                     {
                         int index = playerProfileDatas.IndexOf(changeEvent.Value);
                         PlayerProfile item = Instantiate(playerProfilePrefab, playerBoardParent);
-                        item.GetComponent<RectTransform>().anchoredPosition =corners[index];
+                        item.GetComponent<RectTransform>().anchoredPosition = corners[index];
                         item.SetData(changeEvent.Value.clientId, changeEvent.Value.userName, changeEvent.Value.score);
                         playerProfiles.Add(item);
                     }
