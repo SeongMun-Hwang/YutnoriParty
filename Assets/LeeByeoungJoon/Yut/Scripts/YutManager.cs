@@ -25,6 +25,7 @@ public class YutManager : NetworkBehaviour
 {
     [SerializeField] Yut yutPrefab;
     [SerializeField] Yut backDoYutPrefab;
+    [SerializeField] RectTransform viewport;
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
     [SerializeField] YutOut outCollision;
@@ -38,7 +39,7 @@ public class YutManager : NetworkBehaviour
 
     int faceDown = 0;
     int powerAmountSign = 1;
-    float yutRaycastLength = 3;
+    float yutRaycastLength = 10;
     float minThrowPower = 200; //최소 파워
     float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
@@ -600,6 +601,7 @@ public class YutManager : NetworkBehaviour
         if (senderId == NetworkManager.Singleton.LocalClientId)
         {
             results.Add(result);
+            //SetViewportTransform();
             Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
         }
     }
@@ -609,6 +611,42 @@ public class YutManager : NetworkBehaviour
     {
         //Debug.Log("id : " + NetworkManager.Singleton.LocalClientId + "" + result + "삭제");
         results.Remove(result);
+        //SetViewportTransform();
+    }
+
+    //윷 결과를 중앙에 정렬하기 위한 함수
+    void SetViewportTransform()
+    {
+        float positionX = 295;
+        float scaleW = 485;
+
+        //1개 295,  2개 205, 3개 115, 4개 25, 5개이상 0
+        if (results.Count <= 1)
+        {
+            //원점
+            positionX = 295;
+            scaleW = 485;
+        }
+        else if(results.Count > 1)
+        {
+            //리스트 개수따라 위치 조절
+            positionX = 295 - (results.Count - 1) * 90;
+            scaleW = 485 + (results.Count - 1) * 90;
+        }
+        else if(results.Count > 4)
+        {
+            //0으로 고정
+            positionX = 0;
+            scaleW = 780;
+        }
+        else
+        {
+            //오류?
+            Debug.Log("뷰포트 위치 계산 실패 : 예상되지 않은 케이스");
+        }
+        Debug.Log("스케일 : " + scaleW);
+        viewport.anchoredPosition = new Vector3(Mathf.Clamp(positionX, 0, 295), viewport.anchoredPosition.y);
+        viewport.sizeDelta.Set(Mathf.Clamp(scaleW, 485, 780), viewport.sizeDelta.y);
     }
 
     [ClientRpc]
