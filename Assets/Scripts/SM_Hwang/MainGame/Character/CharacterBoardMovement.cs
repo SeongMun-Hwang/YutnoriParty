@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
 {
+    [SerializeField] CharacterInfo characterInfo;
     private Animator animator;
     private Node selectedNode;
     Node currentNode;
@@ -35,6 +36,13 @@ public class CharacterBoardMovement : MonoBehaviour
         GetComponent<Animator>().SetFloat("isMoving", 1f); //걷기 애니메이션 시작
         PlayerManager.Instance.isMoving = true;
         int moveCount = Mathf.Abs(distance);
+
+        if (characterInfo.isReverse.Value)
+        {
+            distance *= -1;
+            ItemManager.Instance.SetItemServerRpc(GetComponent<NetworkObject>(),false);
+        }
+
         //한 칸 씩 전진
         for (int i = 0; i < moveCount; i++)
         {

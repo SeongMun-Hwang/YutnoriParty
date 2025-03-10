@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6ffa0f4f679c4a8e2f52f0fb438be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterOnDes: {fileID: 3171602940925265327}
+  characterInfo: {fileID: -2864590278399593435}
 --- !u!54 &-2529744278826332895
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -249,7 +249,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
   overlappedCount: 0
+  isReverse: 0
 --- !u!114 &318697466270937128
 MonoBehaviour:
   m_ObjectHideFlags: 0

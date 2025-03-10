@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6ffa0f4f679c4a8e2f52f0fb438be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterOnDes: {fileID: 6720154922840694447}
+  characterInfo: {fileID: 5605361747289146209}
 --- !u!114 &5605361747289146209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,7 +197,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
   overlappedCount: 0
+  isReverse: 0
 --- !u!136 &5905374286713868406
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -278,7 +283,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
   overlappedCount: 0
+  isReverse: 0
 --- !u!114 &1447087924121448639
 MonoBehaviour:
   m_ObjectHideFlags: 0

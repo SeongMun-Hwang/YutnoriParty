@@ -1,10 +1,12 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public enum ItemName
 {
     ResultUp,
+    ReverseMove,
     None
 }
 public class ItemManager : NetworkBehaviour
@@ -28,19 +30,30 @@ public class ItemManager : NetworkBehaviour
     {
         Debug.Log("Player" + targetId + "Get Item");
         if (NetworkManager.Singleton.LocalClientId != targetId) return;
-        switch (item)
+        GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
+        switch (RandomItem())
         {
-            case ItemName.ResultUp:
-                GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
+            case ItemName.ResultUp:            
                 go.GetComponent<Item>().SetItemName(ItemName.ResultUp);
-                itemLists.Add(go);
+                break;
+            case ItemName.ReverseMove:
+                go.GetComponent<Item>().SetItemName(ItemName.ReverseMove);
                 break;
         }
+        itemLists.Add(go);
+
+    }
+    private ItemName RandomItem()
+    {
+        Array itemEnum=Enum.GetValues(typeof(ItemName));
+        ItemName name = (ItemName)itemEnum.GetValue(UnityEngine.Random.Range(0, itemEnum.Length));
+        if (name == ItemName.None) return RandomItem();
+        return name;
     }
     public ItemName CheckItemActive()
     {
         Debug.Log("Check actived item");
-        foreach(var item in itemLists)
+        foreach (var item in itemLists)
         {
             if (item.GetComponent<Item>().IsToggled())
             {
@@ -58,5 +71,11 @@ public class ItemManager : NetworkBehaviour
             Destroy(currentItem);
             currentItem = null;
         }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void SetItemServerRpc(NetworkObjectReference noRef, bool value)
+    {
+        noRef.TryGet(out NetworkObject no);
+        no.GetComponent<CharacterInfo>().isReverse.Value = value;
     }
 }
