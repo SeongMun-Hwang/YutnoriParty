@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -123,8 +125,7 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("Party game start");
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Party time");
-            //isMinigamePlaying = true;
-            //StartMiniGame(encounteredEnemy);
+            StartMiniGame();
             StartCoroutine(WaitUntilPartygameEnd()); //파티게임 끝나기 대기(미니게임과 동일)
         }
         //파티할 시간이 아니면 턴 변경할 지 확인
@@ -171,25 +172,31 @@ public class MainGameProgress : NetworkBehaviour
         StartTurn(currentPlayerNumber.Value);
     }
     // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
-    private void StartMiniGame(GameObject enemy)
+    private void StartMiniGame(GameObject enemy = null)
     {
         isMinigamePlaying = true;
-
-        // 각 말의 NetworkObject를 추출
-        if (!currentCharacter.gameObject.TryGetComponent<NetworkObject>(out var playerNetObj) || !playerNetObj.IsSpawned)
+        if (enemy != null)
         {
-            Debug.LogError("attacker는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
-            return;
-        }
+            // 각 말의 NetworkObject를 추출
+            if (!currentCharacter.gameObject.TryGetComponent<NetworkObject>(out var playerNetObj) || !playerNetObj.IsSpawned)
+            {
+                Debug.LogError("attacker는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
+                return;
+            }
 
-        if (!enemy.TryGetComponent<NetworkObject>(out var enemyNetObj) || !enemyNetObj.IsSpawned)
+            if (!enemy.TryGetComponent<NetworkObject>(out var enemyNetObj) || !enemyNetObj.IsSpawned)
+            {
+                Debug.LogError("enemy는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
+                return;
+            }
+
+            // 각 말의 NetworkObjectReference를 보내 서버에 미니게임 실행 요청
+            StartMiniGameServerRpc(new NetworkObjectReference(playerNetObj), new NetworkObjectReference(enemyNetObj));
+        }
+        else
         {
-            Debug.LogError("enemy는 NetworkObject가 아니거나 아직 Spawn되지 않았습니다!");
-            return;
+            StartPartyGameServerRpc();
         }
-
-        // 각 말의 NetworkObjectReference를 보내 서버에 미니게임 실행 요청
-        StartMiniGameServerRpc(new NetworkObjectReference(playerNetObj), new NetworkObjectReference(enemyNetObj));
     }
     /*캐릭터 선택*/
     //Ray를 통해 이동할 말 선택
@@ -225,6 +232,7 @@ public class MainGameProgress : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void StartMiniGameServerRpc(NetworkObjectReference playerReference, NetworkObjectReference enemyReference)
     {
+        Debug.Log("MiniGame Start!");
         // 각 NetworkObjectReference에서 GameObject 추출
         if (!playerReference.TryGet(out NetworkObject playerNetObj))
         {
@@ -283,6 +291,31 @@ public class MainGameProgress : NetworkBehaviour
         });
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
         MinigameManager.Instance.SetPlayers(players);
+        MinigameManager.Instance.StartMinigame();
+        StartMiniGameClientRpc();
+    }
+    [ServerRpc(RequireOwnership =false)]
+    void StartPartyGameServerRpc()
+    {
+        Debug.Log("PartyGame Start!");
+        isMinigamePlaying = true;
+        List<ulong> playerIds=new List<ulong>();
+
+        foreach(var client in NetworkManager.Singleton.ConnectedClients)
+        {
+            ulong clientId = client.Key;
+            playerIds.Add(clientId);
+        }
+        endMinigameActions = null;
+        endMinigameActions += (() =>
+        {
+            EndMiniGameClientRpc();
+
+            //미니 게임 승자 판별과 패배한 말 처리
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);            
+            ItemManager.Instance.GetItemClientRpc(ItemName.ResultUp,winnerId);
+        });
+        MinigameManager.Instance.SetPlayers(playerIds.ToArray());
         MinigameManager.Instance.StartMinigame();
         StartMiniGameClientRpc();
     }
