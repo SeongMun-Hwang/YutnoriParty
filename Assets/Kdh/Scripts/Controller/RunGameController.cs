@@ -8,25 +8,31 @@ public class RunGameController : NetworkBehaviour
 
     private Vector3 targetPosition;
     private Animator animator;
-    public bool canMove = false;
-   
-  
+    public NetworkVariable<bool> canMove = new NetworkVariable<bool>(true);
+
+    private void Start()
+    {
+        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
+        targetPosition = spawnTransform.position;
+    }
 
     private void Update()
     {
 
-        if (!IsOwner || !canMove) return;
-        
-        Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
-        Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (IsOwner && canMove.Value)
         {
-            MoveForwardServerRpc(OwnerClientId);  
-        }
 
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
-        animator.SetFloat("MoveSpeed", moveSpeedValue);
+            Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
+            Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                MoveForwardServerRpc(OwnerClientId);
+            }
+
+            transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
+            animator.SetFloat("MoveSpeed", moveSpeedValue);
+        }
     }
 
     [ServerRpc]
@@ -46,7 +52,8 @@ public class RunGameController : NetworkBehaviour
     }
     public void EnableControl(bool enable)
     {
-        canMove = enable;
+        canMove.Value = enable; 
     }
-   
+
+
 }
