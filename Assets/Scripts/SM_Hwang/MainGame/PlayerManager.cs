@@ -125,7 +125,7 @@ public class PlayerManager : NetworkBehaviour
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
             child.TrySetParent(parent.transform);
-            int n = parent.GetComponent<CharacterInfo>().overlappedCount+1;
+            int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;
             Debug.Log("parent : " + parent.GetComponent<CharacterInfo>().overlappedCount);
             Vector3 newPosition = parent.transform.position + new Vector3(0, 2, 0) * n;

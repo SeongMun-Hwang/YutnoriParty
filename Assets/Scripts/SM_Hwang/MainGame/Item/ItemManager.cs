@@ -7,6 +7,7 @@ public enum ItemName
 {
     ResultUp,
     ReverseMove,
+    Obstacle,
     None
 }
 public class ItemManager : NetworkBehaviour
@@ -19,12 +20,23 @@ public class ItemManager : NetworkBehaviour
     private List<GameObject> itemLists = new List<GameObject>();
     [SerializeField] Transform spawnTransform;
     [SerializeField] GameObject itemPrefab;
+    [SerializeField] GameObject obstaclePrefab;
     public GameObject currentItem;
     public override void OnNetworkSpawn()
     {
         if (IsClient) { instance = this; }
     }
-
+    private void Update()
+    {
+        if(Input.GetKeyUp(KeyCode.Keypad0))
+        {
+            GetItemClientRpc(ItemName.Obstacle, 0);
+        }
+        if (Input.GetKeyUp(KeyCode.Keypad1))
+        {
+            GetItemClientRpc(ItemName.Obstacle, 1);
+        }
+    }
     [ClientRpc]
     public void GetItemClientRpc(ItemName item, ulong targetId)
     {
@@ -38,6 +50,9 @@ public class ItemManager : NetworkBehaviour
                 break;
             case ItemName.ReverseMove:
                 go.GetComponent<Item>().SetItemName(ItemName.ReverseMove);
+                break;
+            case ItemName.Obstacle:
+                go.GetComponent<Item>().SetItemName(ItemName.Obstacle);
                 break;
         }
         itemLists.Add(go);
@@ -72,10 +87,21 @@ public class ItemManager : NetworkBehaviour
             currentItem = null;
         }
     }
+    public Item ReturnCurrentItem()
+    {
+        if(currentItem != null) return currentItem.GetComponent<Item>();
+        return null;    
+    }
     [ServerRpc(RequireOwnership = false)]
     public void SetItemServerRpc(NetworkObjectReference noRef, bool value)
     {
         noRef.TryGet(out NetworkObject no);
         no.GetComponent<CharacterInfo>().isReverse.Value = value;
+    }
+    [ServerRpc(RequireOwnership =false)]
+    public void SetObstacleServerRpc(Vector3 pos)
+    {
+        GameObject go=Instantiate(obstaclePrefab,pos,Quaternion.identity);
+        go.GetComponent<NetworkObject>().Spawn();
     }
 }

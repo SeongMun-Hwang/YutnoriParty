@@ -23,11 +23,20 @@ public class Item : MonoBehaviour
             case ItemName.ReverseMove:
                 itemTmp.text = "<>";
                 break;
+            case ItemName.Obstacle:
+                itemTmp.text = "ㅁ";
+                break;
         }
     }
 
     void ToggleState()
     {
+        Item currentItem = ItemManager.Instance.ReturnCurrentItem();
+        if (currentItem != null && currentItem!=this)
+        {
+            currentItem.isToggled = !isToggled;
+            currentItem.button.GetComponent<Image>().color = Color.white;
+        }
         isToggled = !isToggled;
         button.GetComponent<Image>().color = isToggled ? Color.gray : Color.white;
         if (isToggled)
@@ -38,6 +47,11 @@ public class Item : MonoBehaviour
             {
                 GameManager.Instance.announceCanvas.ShowAnnounceText("Choose target!",2f);
                 coroutine = StartCoroutine(ChooseTarget());
+            }
+            if(itemName == ItemName.Obstacle)
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Node!", 2f);
+                coroutine = StartCoroutine(ChooseNode());
             }
         }
         else
@@ -73,7 +87,26 @@ public class Item : MonoBehaviour
             yield return null;
         }
     }
-
+    private IEnumerator ChooseNode()
+    {
+        while (true)
+        {
+            if (Input.GetMouseButtonDown(0)) // 마우스 클릭 감지
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    if (hit.collider.TryGetComponent<Node>(out Node no))
+                    {
+                        Debug.Log("Find Node");
+                        ItemManager.Instance.SetObstacleServerRpc(no.transform.position+new Vector3(0,1,0));
+                        ItemManager.Instance.RemoveItem();
+                    }
+                }
+            }
+            yield return null;
+        }
+    }
     public bool IsToggled()
     {
         return isToggled;   

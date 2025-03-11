@@ -2970,6 +2970,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   spawnTransform: {fileID: 6736059868983641031}
   itemPrefab: {fileID: 4282492769358396506, guid: 1397cef20d01d694da6001b75295a248, type: 3}
+  obstaclePrefab: {fileID: 1186526596623444057, guid: 20a71f724070ac14f9e0a139c4c230cd, type: 3}
+  currentItem: {fileID: 0}
 --- !u!1 &4219623502567522067
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ public class CharacterBoardMovement : MonoBehaviour
     private CharacterInfo characterInfo;
     private Animator animator;
     private Node selectedNode;
+    private bool meetObstacle = false;
     Node currentNode;
     Vector3 targetPos;
     float moveSpeed = 10f;
@@ -117,6 +118,12 @@ public class CharacterBoardMovement : MonoBehaviour
 
             //이동이 끝났으니 현재 노드를 목표로 했던 노드로 변경
             currentNode = tmpNode;
+            if (meetObstacle)
+            {
+                Debug.Log("meet obstacle");
+                meetObstacle = false;
+                break;
+            }
         }
         //이동 종료 후 처리
         PlayerManager.Instance.isMoving = false;
@@ -158,6 +165,15 @@ public class CharacterBoardMovement : MonoBehaviour
         foreach (GameObject desInstance in spawnedDesObjects)
         {
             Destroy(desInstance);
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Obstacle"))
+        {
+            meetObstacle = true;
+            MainGameProgress.Instance.DespawnNetworkObjectServerRpc(other.gameObject);
+            Debug.Log("Obstacle!");
         }
     }
 }
