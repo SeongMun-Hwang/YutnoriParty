@@ -21,6 +21,7 @@ public class ItemManager : NetworkBehaviour
     [SerializeField] Transform spawnTransform;
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject obstaclePrefab;
+    [SerializeField] GameObject reverseEffectPrefab;
     public GameObject currentItem;
     public override void OnNetworkSpawn()
     {
@@ -103,5 +104,27 @@ public class ItemManager : NetworkBehaviour
     {
         GameObject go=Instantiate(obstaclePrefab,pos,Quaternion.identity);
         go.GetComponent<NetworkObject>().Spawn();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnItemEffectServerRpc(NetworkObjectReference noRef)
+    {
+        noRef.TryGet(out NetworkObject no);
+        int n = no.GetComponent<CharacterInfo>().overlappedCount;
+        GameObject go = Instantiate(reverseEffectPrefab, no.transform.position 
+            + new Vector3(0, 2*(n+1), 0), Quaternion.identity);
+        go.GetComponent<NetworkObject>().Spawn();
+        go.GetComponent<NetworkObject>().TrySetParent(no.transform);
+        no.GetComponent<CharacterInfo>().ItemEffect = go;
+    }
+    [ServerRpc(RequireOwnership =false)]
+    public void DespawnItemEffectServerRpc(NetworkObjectReference noRef)
+    {
+        noRef.TryGet(out NetworkObject no);
+        GameObject go = no.GetComponent<CharacterInfo>().ItemEffect;
+        if(go != null)
+        {
+            go.GetComponent<NetworkObject>().Despawn();
+            Destroy(go);
+        }
     }
 }
