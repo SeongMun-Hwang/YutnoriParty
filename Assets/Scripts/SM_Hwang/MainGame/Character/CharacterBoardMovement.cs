@@ -128,7 +128,7 @@ public class CharacterBoardMovement : MonoBehaviour
         //이동 종료 후 처리
         PlayerManager.Instance.isMoving = false;
         animator.SetFloat("isMoving", 0f);
-        //yield return new WaitForSeconds(0.5f);
+        ItemManager.Instance.DespawnItemEffectServerRpc(gameObject);
         GameManager.Instance.mainGameProgress.EndMove();
     }
     /*이동 가능 목적지에 캐릭터 복제, 마우스로 클릭*/

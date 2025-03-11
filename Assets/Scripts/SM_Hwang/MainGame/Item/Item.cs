@@ -78,6 +78,7 @@ public class Item : MonoBehaviour
                         {
                             Debug.Log("Find target");
                             ItemManager.Instance.RemoveItem();
+                            ItemManager.Instance.SpawnItemEffectServerRpc(no);
                             ItemManager.Instance.SetItemServerRpc(no, true);
                             break;
                         }
