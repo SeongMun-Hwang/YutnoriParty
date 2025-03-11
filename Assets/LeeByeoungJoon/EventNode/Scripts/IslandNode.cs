@@ -27,8 +27,13 @@ public class IslandNode : EventNode
         Debug.Log("무인도 밟음");
 
         //무인도 노드 안에 들어와 있는 모든 캐릭터들한테 적용
-        foreach(var player in enteredPlayers)
+        foreach(var playerReference in enteredPlayers)
         {
+            if (!playerReference.TryGet(out NetworkObject player))
+            {
+                return;
+            }
+
             //딕셔너리에 없는 애들은 추가해주고
             if (!trappedPlayers.ContainsKey(player))
             {
@@ -92,14 +97,17 @@ public class IslandNode : EventNode
         player.GetComponent<CharacterInfo>().canMove.Value = true;
         player.GetComponent<CharacterInfo>().inIsland.Value = false;
         trappedPlayers.Remove(player); //딕셔너리에서 지워도 인덱스 문제 안나겠지..?
-        Debug.Log("탈출");
+        //Debug.Log(player.NetworkObjectId + " 탈출");
     }
 
     //이동 못하게 함, 특정 클라이언트만 실행
     [Rpc(SendTo.SpecifiedInParams)]
     void BlockMoveRpc(int idx, RpcParams rpcParams)
     {
-        var player = enteredPlayers[idx];
+        if(!enteredPlayers[idx].TryGet(out NetworkObject player))
+        {
+            return;
+        }
         //지금 플레이하려는 캐릭터랑 무인도에 갇힌 캐릭터가 같으면 currentCharacter를 비워버린다
         if (player.GetComponent<CharacterBoardMovement>() == GameManager.Instance.mainGameProgress.currentCharacter)
         {
@@ -111,7 +119,10 @@ public class IslandNode : EventNode
     [Rpc(SendTo.Server)]
     void SetCharacterMoveRpc(bool canMove, int idx, RpcParams rpcParams)
     {
-        var player = enteredPlayers[idx];
+        if (!enteredPlayers[idx].TryGet(out NetworkObject player))
+        {
+            return;
+        }
         player.GetComponent<CharacterInfo>().canMove.Value = canMove;
     }
 }
