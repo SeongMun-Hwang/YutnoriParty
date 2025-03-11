@@ -223,7 +223,6 @@ public class ShootingBattleManager : NetworkBehaviour
     public IEnumerator PassTheScene()
     {
         yield return new WaitForSecondsRealtime(2f);
-        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("ShootingScene"));
         MinigameManager.Instance.EndMinigame();
     }
 }

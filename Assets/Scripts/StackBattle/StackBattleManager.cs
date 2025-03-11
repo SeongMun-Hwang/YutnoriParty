@@ -274,7 +274,7 @@ public class StackBattleManager : NetworkBehaviour
     public IEnumerator PassTheScene()
     {
         yield return new WaitForSecondsRealtime(2f);
-        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("StackScene"));
         MinigameManager.Instance.EndMinigame();
+        
     }
 }
