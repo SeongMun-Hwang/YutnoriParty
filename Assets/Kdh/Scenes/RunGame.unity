@@ -604,7 +604,17 @@ MonoBehaviour:
   loseMessageUI: {fileID: 0}
   isPlaying:
     m_InternalValue: 0
-  runPrefab: {fileID: 4333027581788519372, guid: 571225b1b9e9d9347817f20f6fa35675, type: 3}
+  runPrefab:
+  - {fileID: 6720154922840694447, guid: 317c2f691b226064d8e7d8bf7d01bca9, type: 3}
+  - {fileID: 3171602940925265327, guid: 258b21a41c5a9f843ba1c6daea33efc6, type: 3}
+  - {fileID: 911400357625491355, guid: f6796edac67656f42a86de4098e3c4d4, type: 3}
+  - {fileID: 4333027581788519372, guid: 571225b1b9e9d9347817f20f6fa35675, type: 3}
+  spawnPos:
+  - {fileID: 4781647973135780664}
+  - {fileID: 4781647973135780663}
+  - {fileID: 4781647973135780662}
+  - {fileID: 4781647973135780661}
+  runGameCamera: {fileID: 2033560871}
 --- !u!1001 &361715621
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3175,6 +3185,26 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 600ef046081c2114c87984c089088649, type: 3}
+--- !u!4 &4781647973135780661 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 561241144409094932, guid: 600ef046081c2114c87984c089088649, type: 3}
+  m_PrefabInstance: {fileID: 4781647973135780660}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4781647973135780662 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 330692410841996126, guid: 600ef046081c2114c87984c089088649, type: 3}
+  m_PrefabInstance: {fileID: 4781647973135780660}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4781647973135780663 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2167504623642868360, guid: 600ef046081c2114c87984c089088649, type: 3}
+  m_PrefabInstance: {fileID: 4781647973135780660}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4781647973135780664 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6658344186212125902, guid: 600ef046081c2114c87984c089088649, type: 3}
+  m_PrefabInstance: {fileID: 4781647973135780660}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6663422636162935096
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3448,6 +3478,10 @@ PrefabInstance:
     - target: {fileID: 863317919959736779, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
       propertyPath: m_TagString
       value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 3921098486439412464, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
+      propertyPath: chaseSpeed
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4312754742453869637, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
       propertyPath: GlobalObjectIdHash

@@ -25,13 +25,20 @@ public class RunGameManager : NetworkBehaviour
     private bool gameStart = false;
     private bool gameEnd = false;
 
-    [SerializeField] private GameObject runPrefab;
+    [SerializeField] private List<GameObject> runPrefab =new List<GameObject>();
+    [SerializeField] public List<Transform> spawnPos= new List<Transform>();
 
-    private void Start()
+    /*추가 부분*/
+    [SerializeField] public Camera runGameCamera;
+    private static RunGameManager instance;
+    public static RunGameManager Instance
     {
-
+        get { return instance; }
     }
-
+    private void Awake()
+    {
+        instance = this;
+    }
     public override void OnNetworkSpawn()
     {
         if (IsServer)
@@ -55,7 +62,7 @@ public class RunGameManager : NetworkBehaviour
             canMoveList.Add(true); // 새로운 플레이어는 처음에 이동 가능 상태
 
             // RunPrefab 인스턴스화
-            GameObject rp = Instantiate(runPrefab);
+            GameObject rp = Instantiate(runPrefab[(int)clientId]);
             RunGameController rc = rp.GetComponent<RunGameController>();
 
             // NetworkObject 설정
@@ -148,7 +155,12 @@ public class RunGameManager : NetworkBehaviour
         foreach (var clientId in playerIds)
         {
             int clientIndex = playerIds.IndexOf(clientId);
-            var playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+
+            GameObject playerObject=null;
+            if (runObjects.Count > clientIndex)
+            {
+                playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+            }
 
             if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController) && playerController.canMove.Value)
             {
@@ -187,7 +199,11 @@ public class RunGameManager : NetworkBehaviour
         foreach (var clientId in playerIds)
         {
             int clientIndex = playerIds.IndexOf(clientId);
-            var playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+            GameObject playerObject = null;
+            if (runObjects.Count > clientIndex)
+            {
+                playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+            }
 
             if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController) && playerController.canMove.Value)
             {

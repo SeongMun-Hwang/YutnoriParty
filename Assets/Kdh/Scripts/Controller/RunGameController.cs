@@ -10,20 +10,24 @@ public class RunGameController : NetworkBehaviour
     private Animator animator;
     public NetworkVariable<bool> canMove = new NetworkVariable<bool>(true);
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
+        if (IsServer)
+        {
+            Transform spawnTransform = RunGameManager.Instance.spawnPos[(int)OwnerClientId];
+            targetPosition = spawnTransform.position;
+        }
     }
 
     private void Update()
     {
-
         if (IsOwner && canMove.Value)
         {
-
-            Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
-            Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+            if (Camera.main != null)
+            {
+                Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
+                Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+            }
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 MoveForwardServerRpc(OwnerClientId);
@@ -31,7 +35,7 @@ public class RunGameController : NetworkBehaviour
 
             transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
             float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
-            animator.SetFloat("MoveSpeed", moveSpeedValue);
+            GetComponent<Animator>().SetFloat("MoveSpeed", moveSpeedValue);
         }
     }
 
@@ -52,7 +56,7 @@ public class RunGameController : NetworkBehaviour
     }
     public void EnableControl(bool enable)
     {
-        canMove.Value = enable; 
+        canMove.Value = enable;
     }
 
 
