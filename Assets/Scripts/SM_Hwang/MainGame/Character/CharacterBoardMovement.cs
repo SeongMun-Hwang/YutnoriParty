@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
 {
-    [SerializeField] CharacterInfo characterInfo;
+    private CharacterInfo characterInfo;
     private Animator animator;
     private Node selectedNode;
     Node currentNode;
@@ -16,6 +16,7 @@ public class CharacterBoardMovement : MonoBehaviour
     {
         StartCoroutine(WaitForStartNode());
         animator = GetComponent<Animator>();
+        characterInfo = GetComponent<CharacterInfo>();
     }
     private IEnumerator WaitForStartNode()
     {
