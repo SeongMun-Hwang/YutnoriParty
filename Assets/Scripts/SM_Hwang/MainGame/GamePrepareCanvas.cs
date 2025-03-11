@@ -29,6 +29,7 @@ public class GamePrepareCanvas : NetworkBehaviour
         if (NetworkManager.ConnectedClients.Count > 1)
         {
             GameManager.Instance.mainGameProgress.StartGame();
+            HostSingleton.Instance.BlockLobbyJoin();
             gameObject.GetComponent<NetworkObject>().Despawn();
         }
         else

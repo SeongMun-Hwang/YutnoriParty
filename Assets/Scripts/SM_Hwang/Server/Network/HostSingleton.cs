@@ -130,4 +130,20 @@ public class HostSingleton : MonoBehaviour
         }
         ServerSingleton.Instance.OnClientLeft-= HandleClientLeft;
     }
+    public async void BlockLobbyJoin()
+    {
+        if (lobbyId.IsNullOrEmpty()) return;
+        try
+        {
+            await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
+            {
+                IsPrivate = true
+            });
+            Debug.Log("Block lobby join");
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogException(e);
+        }
+    }
 }
