@@ -27,11 +27,11 @@ public class StackBattleManager : NetworkBehaviour
     private bool timeover = false;
 	public BlockSpawnHandler spawner;
 
-	// UI관련
-	[SerializeField] private TMP_Text turnText;
+    // UI관련
+    public Button turnButton;
+    [SerializeField] private TMP_Text turnText;
 	[SerializeField] private TMP_Text timerUI;
-	[SerializeField] private Button turnButton;
-	[SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject winMessageUI;
 	[SerializeField] private GameObject loseMessageUI;
 
 	private void Start()

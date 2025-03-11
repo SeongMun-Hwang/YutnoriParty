@@ -274,9 +274,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   spawner: {fileID: 1022981537}
+  turnButton: {fileID: 579193351}
   turnText: {fileID: 517040155}
   timerUI: {fileID: 1945610222}
-  turnButton: {fileID: 579193351}
   winMessageUI: {fileID: 6324233}
   loseMessageUI: {fileID: 750252710}
 --- !u!114 &16148911
@@ -877,7 +877,7 @@ GameObject:
   - component: {fileID: 143966583}
   - component: {fileID: 143966582}
   m_Layer: 11
-  m_Name: Crowd Animal (5)
+  m_Name: Crowd Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -912,6 +912,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!95 &143966583
 Animator:
   serializedVersion: 7
@@ -1564,7 +1567,7 @@ GameObject:
   - component: {fileID: 256682595}
   - component: {fileID: 256682594}
   m_Layer: 11
-  m_Name: Crowd Animal (1)
+  m_Name: Crowd Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1599,6 +1602,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!95 &256682595
 Animator:
   serializedVersion: 7
@@ -7272,7 +7278,7 @@ GameObject:
   - component: {fileID: 1459713015}
   - component: {fileID: 1459713014}
   m_Layer: 11
-  m_Name: Crowd Animal (4)
+  m_Name: Crowd Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7307,6 +7313,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!95 &1459713015
 Animator:
   serializedVersion: 7
@@ -8793,7 +8802,7 @@ GameObject:
   - component: {fileID: 1829109401}
   - component: {fileID: 1829109400}
   m_Layer: 11
-  m_Name: Crowd Animal (2)
+  m_Name: Crowd Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8828,6 +8837,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!95 &1829109401
 Animator:
   serializedVersion: 7
@@ -8927,7 +8939,7 @@ GameObject:
   - component: {fileID: 1850191207}
   - component: {fileID: 1850191206}
   m_Layer: 11
-  m_Name: Crowd Animal (3)
+  m_Name: Crowd Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8962,6 +8974,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!95 &1850191207
 Animator:
   serializedVersion: 7
@@ -13899,6 +13914,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!4 &6609991647404836615
 Transform:
   m_ObjectHideFlags: 0
@@ -14030,6 +14048,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!1 &6738178126669446379
 GameObject:
   m_ObjectHideFlags: 0
@@ -14950,6 +14971,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!1 &7903497510217188219
 GameObject:
   m_ObjectHideFlags: 0
@@ -15146,6 +15170,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!1 &8243536487732873213
 GameObject:
   m_ObjectHideFlags: 0
@@ -15769,6 +15796,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5463dc98412e1034f9212ef2c040e2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 16148910}
+  jumpHeight: 1
+  jumpDuration: 0.2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
