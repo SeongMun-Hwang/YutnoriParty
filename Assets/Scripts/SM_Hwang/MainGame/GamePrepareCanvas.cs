@@ -22,7 +22,7 @@ public class GamePrepareCanvas : NetworkBehaviour
         }
         var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
         Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyIds[0]);
-        roomCodeTmp.text = lobby.Name;
+        roomCodeTmp.text = GameManager.Instance.lobbyId.Value.ToString();
     }
     public void GameStart()
     {

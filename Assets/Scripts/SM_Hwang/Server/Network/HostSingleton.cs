@@ -14,6 +14,7 @@ using System.Text;
 using Unity.Services.Authentication;
 using System;
 using WebSocketSharp;
+using Unity.Collections;
 public class HostSingleton : MonoBehaviour
 {
     static HostSingleton instance;
@@ -145,5 +146,9 @@ public class HostSingleton : MonoBehaviour
         {
             Debug.LogException(e);
         }
+    }
+    public FixedString128Bytes ReturnJoinCode()
+    {
+        return joinCode;
     }
 }
