@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  gameDuration: 999999
+  gameDuration: 60
   countdownText: {fileID: 542981318}
   remainingTimeText: {fileID: 1934465021}
   scoreBoardText: {fileID: 1616687525}

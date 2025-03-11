@@ -9,51 +9,12 @@ public class RunGameController : NetworkBehaviour
     private Vector3 targetPosition;
     private Animator animator;
     public bool canMove = false;
-    private string currentSceneName;
-    Rigidbody rb;
-    
-    private void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-        
-    }
-
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded; 
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded; 
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
-        currentSceneName = SceneManager.GetActiveScene().name;
-        // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
-        transform.position = targetPosition;
-
-    }
-
+   
   
 
     private void Update()
     {
-        string sceneName = SceneManager.GetActiveScene().name;
-        Debug.Log($"IsOwner: {IsOwner}, canMove: {canMove}, CurrentScene: {sceneName}");
-        if (sceneName == "RunGame")
-        {
-            rb.isKinematic = true;
-        }
-        else if (sceneName == "MainGame")  
-        {
-            rb.isKinematic = false;
-        }
+
         if (!IsOwner || !canMove) return;
         
         Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
