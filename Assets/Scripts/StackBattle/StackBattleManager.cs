@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -17,6 +18,7 @@ public class StackBattleManager : NetworkBehaviour
 
     // 현재 차례 플레이어 ID
     private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(100);
+    private NetworkVariable<FixedString128Bytes> currentTurnPlayerName = new NetworkVariable<FixedString128Bytes>(".");
 	
 	// 게임오버된 플레이어 리스트
 	private NetworkList<bool> isRetire = new NetworkList<bool>();
@@ -51,6 +53,7 @@ public class StackBattleManager : NetworkBehaviour
         turnButton.interactable = false;
         currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
         currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
+        currentTurnPlayerName.OnValueChanged += UpdateTurnPlayerNameUI;
 
         if (IsServer)
         {
@@ -98,7 +101,8 @@ public class StackBattleManager : NetworkBehaviour
         // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
         int i = UnityEngine.Random.Range(0, playerIds.Count);
         currentTurnPlayerId.Value = playerIds[i];
-        Debug.Log(currentTurnPlayerId.Value.ToString() + "에게 첫 턴");
+        currentTurnPlayerName.Value = ServerSingleton.Instance.clientIdToUserData[playerIds[i]].userName;
+        Debug.Log(currentTurnPlayerName.Value.ToString() + "에게 첫 턴");
         StartTurnTimer();
         spawner.CreateBlock();
     }
@@ -106,7 +110,6 @@ public class StackBattleManager : NetworkBehaviour
     private void OnTurnChanged(ulong previousValue, ulong newValue)
     {
         Debug.Log("턴 변경");
-
         if (IsServer)
         {
             if (turnTimerCoroutine != null)
@@ -148,6 +151,11 @@ public class StackBattleManager : NetworkBehaviour
             GameOver();
             RequestNextTurnServerRpc(currentTurnPlayerId.Value);
         }
+    }
+
+    private void UpdateTurnPlayerNameUI(FixedString128Bytes previousValue, FixedString128Bytes newValue)
+    {
+        turnText.text = $"{newValue}";
     }
 
     [ClientRpc]
@@ -197,7 +205,7 @@ public class StackBattleManager : NetworkBehaviour
                 }
 
                 currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
-
+                currentTurnPlayerName.Value = ServerSingleton.Instance.clientIdToUserData[playerIds[nextIndex]].userName;
                 // 새 턴 시작 시 타이머를 다시 시작
                 StartTurnTimer();
             }
@@ -224,7 +232,7 @@ public class StackBattleManager : NetworkBehaviour
 
 	private void UpdateTurnUI(ulong previousValue, ulong newValue)
 	{
-		// turnText.text = $"Current Turn : Player {newValue}";
+        turnText.text = $"{currentTurnPlayerName.Value}";
 
         if (IsClient)
 		{

@@ -60,7 +60,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 		activeTile.GetComponent<StackableBlock>().moveSpeed = blockSpeed;
         if (stack.Count % MinigameManager.Instance.maxPlayers.Value == 0)
         {
-            blockSpeed += 1f;
+            blockSpeed += 0.25f;
         }
         Scene minigameScene = SceneManager.GetSceneByName("StackScene");
         SceneManager.MoveGameObjectToScene(activeTile, minigameScene);
