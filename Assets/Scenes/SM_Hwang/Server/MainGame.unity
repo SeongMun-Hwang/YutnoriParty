@@ -5004,6 +5004,7 @@ MonoBehaviour:
   announceCanvas: {fileID: 2113713792}
   inGameCanvas: {fileID: 897736197}
   mainGameProgress: {fileID: 1365642760}
+  playerBoard: {fileID: 2113713794}
   startNode: {fileID: 1219398259}
   playerCharacters:
   - {fileID: 6720154922840694447, guid: b68bdab0e5c190f4dace2b55f49dfb5b, type: 3}

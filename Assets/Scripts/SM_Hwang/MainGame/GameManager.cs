@@ -22,6 +22,7 @@ public class GameManager : NetworkBehaviour
     public AnnounceCanvas announceCanvas;
     public GameObject inGameCanvas;
     public MainGameProgress mainGameProgress;
+    public PlayerBoard playerBoard;
     public Node startNode;
     public List<GameObject> playerCharacters;
     public List<Transform> profilePositions;

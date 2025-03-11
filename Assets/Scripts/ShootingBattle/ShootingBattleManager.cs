@@ -1,12 +1,9 @@
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class ShootingBattleManager : NetworkBehaviour
 {
@@ -16,6 +13,7 @@ public class ShootingBattleManager : NetworkBehaviour
 
     // UI 관련
     [SerializeField] private TMP_Text timerUI;
+    [SerializeField] private List<TMP_Text> usernameUI;
     [SerializeField] private List<TMP_Text> scoreUI;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
@@ -37,14 +35,10 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] GameObject StarPrefab;
     [SerializeField] GameObject CursorPrefab;
 
-    private void Start()
-    {
-
-    }
-
     int colorIndex = 0;
     public override void OnNetworkSpawn()
     {
+        isPlaying.OnValueChanged += InitScoreBoardUI;
         if (IsServer)
         {
             foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
@@ -96,6 +90,22 @@ public class ShootingBattleManager : NetworkBehaviour
         GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
 
         isPlaying.Value = true;
+    }
+
+    public void InitScoreBoardUI(bool previousValue, bool newValue)
+    {
+        for (int i = 0; i < playerIds.Count; i++)
+        {
+            usernameUI[i].transform.parent.gameObject.SetActive(true);
+            foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
+            {
+                if (data.clientId == playerIds[i])
+                {
+                    usernameUI[i].text = data.userName.ToString();
+                }
+            }
+            
+        }
     }
 
     private void Update()
