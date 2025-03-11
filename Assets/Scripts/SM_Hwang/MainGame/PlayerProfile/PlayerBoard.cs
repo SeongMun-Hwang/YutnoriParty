@@ -87,6 +87,8 @@ public class PlayerBoard : NetworkBehaviour
                     if (!playerProfiles.Any(x => x.clientId == changeEvent.Value.clientId))
                     {
                         int index = playerProfileDatas.IndexOf(changeEvent.Value);
+
+                        Debug.Log("Player index : " + index);
                         PlayerProfile item = Instantiate(playerProfilePrefab, playerBoardParent);
                         item.GetComponent<RectTransform>().anchoredPosition = corners[index];
                         item.SetData(changeEvent.Value.clientId, changeEvent.Value.userName, changeEvent.Value.score);
