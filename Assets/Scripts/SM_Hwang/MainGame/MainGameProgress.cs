@@ -347,4 +347,11 @@ public class MainGameProgress : NetworkBehaviour
     {
         return gameTurn.Value;
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void DespawnNetworkObjectServerRpc(NetworkObjectReference noRef)
+    {
+        noRef.TryGet(out NetworkObject no);
+        no.Despawn();
+        Destroy(no.gameObject);
+    }
 }
