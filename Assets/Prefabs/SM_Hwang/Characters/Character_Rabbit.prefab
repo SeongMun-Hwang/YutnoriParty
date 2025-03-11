@@ -63,10 +63,10 @@ PrefabInstance:
       addedObject: {fileID: 5792212194284606273}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 582427524133558507}
+      addedObject: {fileID: 7643665115769099989}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7643665115769099989}
+      addedObject: {fileID: -8463519690655942632}
   m_SourcePrefab: {fileID: 100100000, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
 --- !u!1 &4333027581788519372 stripped
 GameObject:
@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6ffa0f4f679c4a8e2f52f0fb438be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterInfo: {fileID: 582427524133558507}
+  characterInfo: {fileID: 0}
 --- !u!54 &-4927738856756028618
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -236,25 +236,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &582427524133558507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4333027581788519372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3bfb369affbf5342b338b29eb7582ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  inIsland:
-    m_InternalValue: 0
-  canMove:
-    m_InternalValue: 1
-  overlappedCount: 0
-  isReverse: 0
 --- !u!114 &7643665115769099989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,3 +254,23 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &-8463519690655942632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4333027581788519372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3bfb369affbf5342b338b29eb7582ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
+  overlappedCount: 0
+  isReverse:
+    m_InternalValue: 0
