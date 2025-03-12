@@ -227,7 +227,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 6
   m_CollisionDetection: 0
 --- !u!114 &76976285531097734
 MonoBehaviour:
@@ -244,7 +244,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveDistance: 2
   moveSpeed: 5
-  canMove: 0
+  canMove:
+    m_InternalValue: 0
 --- !u!114 &5011218703766719188
 MonoBehaviour:
   m_ObjectHideFlags: 0
