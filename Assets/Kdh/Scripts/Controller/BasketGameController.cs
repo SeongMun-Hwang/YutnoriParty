@@ -8,8 +8,8 @@ public class BasketGameController : NetworkBehaviour
     private Vector3 targetPosition;
     Rigidbody rb;
     private Animator animator;
-    private bool canMove = false;
-    private string currentSceneName;
+    public NetworkVariable<bool> canMove = new NetworkVariable<bool>(false);
+    
     [SerializeField] private int playerScore = 0;
 
     private void Start()
@@ -20,30 +20,12 @@ public class BasketGameController : NetworkBehaviour
         
     }
 
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded; 
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
-
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
-        if (rb != null)
+        if (IsServer)
         {
-            rb.linearVelocity = Vector3.zero;  
-            rb.position = targetPosition; 
-        }
-        else
-        {
-            transform.position = targetPosition;
+            Transform spawnTransform = BasketGameManager.Instance.spawnPos[(int)OwnerClientId];
+            targetPosition = spawnTransform.position;
         }
     }
 
@@ -51,7 +33,7 @@ public class BasketGameController : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner || !canMove ) return;
+        if (!IsOwner || !canMove.Value) return;
 
         float hAxis = Input.GetAxis("Horizontal");  
         float vAxis = Input.GetAxis("Vertical");   
@@ -98,8 +80,9 @@ public class BasketGameController : NetworkBehaviour
 
     public void EnableControl(bool enable)
     {
-        canMove = enable;
+        canMove.Value = enable;
     }
+
     [ServerRpc(RequireOwnership = false)]
     public void AddScoreServerRpc(ulong playerId, int points)
     {

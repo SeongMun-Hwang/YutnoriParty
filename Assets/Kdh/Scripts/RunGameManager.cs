@@ -257,7 +257,7 @@ public class RunGameManager : NetworkBehaviour
     public IEnumerator PassTheScene()
     {
         yield return new WaitForSecondsRealtime(2f);
-        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("RunGame"));
+        //NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("RunGame"));
         MinigameManager.Instance.EndMinigame();
     }
 }
