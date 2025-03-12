@@ -112,10 +112,10 @@ public class BlackHoleNode : EventNode
         }
 
         //모든 말 이동이 끝날때까지 대기
-        StartCoroutine(WaitForMoveEnd(playerIds, characterGameobjects));
+        StartCoroutine(WaitForMoveEnd(triggeredCharacter, playerIds, characterGameobjects));
     }
 
-    IEnumerator WaitForMoveEnd(List<ulong> playerIds ,List<NetworkObjectReference> characters)
+    IEnumerator WaitForMoveEnd(NetworkObject triggeredCharacter, List<ulong> playerIds ,List<NetworkObjectReference> characters)
     {
         int timeOut = 10;
 

@@ -201,7 +201,7 @@ public class MainGameProgress : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     public void StartMiniGameTogetherServerRpc(ulong[] playerIds, NetworkObjectReference[] characterList)
     {
         Debug.Log("여러명 미니게임 시작");
@@ -243,6 +243,8 @@ public class MainGameProgress : NetworkBehaviour
                     }
                 });
             }
+
+            EndMove();
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
@@ -264,16 +266,12 @@ public class MainGameProgress : NetworkBehaviour
 
         for(int i=1; i< characters.Count; i++)
         {
-            PlayerManager.Instance.OverlapCharacter(characters[i], characters[i-1]); //겹치고
-            characters[i - 1].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
-            
-            //마지막 캐릭터만 실행
-            if(i == characters.Count)
-            {
-                currentCharacter = characters[i].GetComponent<CharacterBoardMovement>(); //현재 캐릭터 제일 밑에 있는애로 바꿔주고
-                characters[i].GetComponent<Outline>().EnableOutline(); //밑에 있는 애 아웃라인 켜고
-            }
+            PlayerManager.Instance.OverlapCharacter(characters[0], characters[i]); //겹치고
+            characters[i].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
         }
+
+        currentCharacter = characters[0].GetComponent<CharacterBoardMovement>(); //현재 캐릭터 제일 밑에 있는애로 바꿔주고
+        characters[0].GetComponent<Outline>().EnableOutline(); //밑에 있는 애 아웃라인 켜고
     }
 
     /*캐릭터 선택*/
