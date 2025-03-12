@@ -18,13 +18,13 @@ public class MinigameManager : NetworkBehaviour
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
-        { Define.MinigameType.RunningGame, "RunGame" },
-        { Define.MinigameType.BasketGame, "BasketGame" },
-        { Define.MinigameType.Randomize, "??" },
+        { Define.MinigameType.RunningGame, "RunGame" }
+        //{ Define.MinigameType.BasketGame, "BasketGame" },
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
     public Define.MGPlayerType playerType;
+    private bool isRandomGame = false;
 
     public Camera maingameCamera;
 
@@ -73,7 +73,14 @@ public class MinigameManager : NetworkBehaviour
     public void SelectMinigame(int i)
     {
         gameType = (Define.MinigameType)i;
+        isRandomGame = false;
         Debug.Log($"{gameType} 미니게임 선택됨");
+    }
+
+    public void OnRandomToggleChanged()
+    {
+        isRandomGame = !isRandomGame;
+        Debug.Log($"미니게임 랜덤 선택 : {isRandomGame}");
     }
 
     public void EndMinigame()
@@ -138,7 +145,11 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     void StartMiniGameClientRpc()
     {
-        // 미니게임을 위해 특정 오브젝트 비활성화
+        if (isRandomGame)
+        {
+            gameType = (Define.MinigameType)Random.Range(0, MinigameScenes.Count);
+            Debug.Log($"랜덤으로 {gameType} 선택");
+        }
         StartCoroutine(LoadSceneWithFade(1f, false));
     }
 
