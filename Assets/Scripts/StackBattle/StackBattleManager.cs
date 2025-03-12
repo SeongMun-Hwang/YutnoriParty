@@ -17,7 +17,7 @@ public class StackBattleManager : NetworkBehaviour
     int currentId = -1;
 
     // 현재 차례 플레이어 ID
-    private NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(100);
+    public NetworkVariable<ulong> currentTurnPlayerId = new NetworkVariable<ulong>(100);
     private NetworkVariable<FixedString128Bytes> currentTurnPlayerName = new NetworkVariable<FixedString128Bytes>(".");
 	
 	// 게임오버된 플레이어 리스트
@@ -57,6 +57,7 @@ public class StackBattleManager : NetworkBehaviour
         turnButton.interactable = false;
         currentTurnPlayerId.OnValueChanged += UpdateButtonInteractable;
         currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
+        isRetire.OnListChanged += UpdateTurnUI;
         currentTurnPlayerName.OnValueChanged += UpdateTurnPlayerNameUI;
 
         if (IsServer)
@@ -75,6 +76,11 @@ public class StackBattleManager : NetworkBehaviour
         currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
         Debug.Log($"플레이어 ID : {currentId}");
 	}
+
+    private void UpdateTurnUI(NetworkListEvent<bool> changeEvent)
+    {
+        UpdateTurnUI(0, 0);
+    }
 
     private void OnPlayerJoined(ulong clientId)
 	{
@@ -174,7 +180,7 @@ public class StackBattleManager : NetworkBehaviour
     }
 
     private void UpdateTurnPlayerNameUI(FixedString128Bytes previousValue, FixedString128Bytes newValue)
-    {
+    {  
         turnText.text = $"{newValue}";
     }
 
@@ -253,13 +259,26 @@ public class StackBattleManager : NetworkBehaviour
 
 	private void UpdateTurnUI(ulong previousValue, ulong newValue)
 	{
-        turnText.text = $"{currentTurnPlayerName.Value}";
-
-        if (IsClient)
-		{
-			// Debug.Log(isRetire[playerIds.IndexOf(NetworkManager.Singleton.LocalClientId)]);
-		}
-	}
+        Debug.Log("UI 갱신");
+        for (int i = 0; i < playerIds.Count; i++)
+        {
+            if (isRetire[i])
+            {
+                usernameUI[i].color = Color.red;
+            }
+            else
+            {
+                if (GetCurrentTurnPlayerId() == playerIds[i])
+                {
+                    usernameUI[i].color = Color.yellow;
+                }
+                else
+                {
+                    usernameUI[i].color = Color.white;
+                }
+            }
+        }
+    }
 
     public void GameOver()
 	{
@@ -270,6 +289,11 @@ public class StackBattleManager : NetworkBehaviour
 	public void GameOverServerRpc(ulong id)
 	{
 		isRetire[playerIds.IndexOf(id)] = true;
+
+        // 강제로 NetworkList의 OnListChanged를 호출하기 위함
+        isRetire.Add(false);
+        isRetire.RemoveAt(playerIds.Count);
+
 		failed = true;
 
 		GameOverClientRpc(id);
@@ -284,7 +308,7 @@ public class StackBattleManager : NetworkBehaviour
 		{
 			loseMessageUI.SetActive(true);
 		}
-	}
+    }
 	
 	[ClientRpc]
 	public void GameFinishedClientRpc(ulong winClientId)
