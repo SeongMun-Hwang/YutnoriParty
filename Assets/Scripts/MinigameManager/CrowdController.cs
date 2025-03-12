@@ -11,13 +11,10 @@ public class CrowdController : MonoBehaviour
     {
         int type = Random.Range(0, 9);
         GetComponent<Animator>().SetInteger("type", type);
-        manager.turnButton.onClick.AddListener(() =>
-        {
-            Jump();
-        });
+        manager.currentTurnPlayerId.OnValueChanged += Jump;
     }
 
-    public void Jump()
+    public void Jump(ulong oldId, ulong newId)
     {
         StartCoroutine(JumpCoroutine());
     }
