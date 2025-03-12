@@ -118,6 +118,7 @@ public class BlackHoleNode : EventNode
     IEnumerator WaitForMoveEnd(NetworkObject triggeredCharacter, List<ulong> playerIds ,List<NetworkObjectReference> characters)
     {
         int timeOut = 10;
+        MainGameProgress.Instance.isMinigamePlaying = true;
 
         while (characterCount.Value > 0)
         {
