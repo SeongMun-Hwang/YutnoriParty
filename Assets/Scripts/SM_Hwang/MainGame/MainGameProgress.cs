@@ -270,7 +270,7 @@ public class MainGameProgress : NetworkBehaviour
     void CheckTurnChangeClientRpc(ClientRpcParams rpcParams)
     {
         Debug.Log("블랙홀 밟은 놈이 턴 종료 체크");
-        CheckTurnChange();
+        StartCoroutine(WaitUntilPartygameEnd());
     }
 
     //플레이어 매니저가 모두 달라 특정 클라이언트만 지정
