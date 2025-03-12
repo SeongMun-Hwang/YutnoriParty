@@ -71,7 +71,7 @@ public class BlackHoleNode : EventNode
         Vector3 targetPos;
 
         Debug.Log("이동 시작");
-        PlayerManager.Instance.isMoving = true;
+        //PlayerManager.Instance.isMoving = true;
 
         //밟은애도 사라져야하니까 목록에 추가
         playerIds.Add(triggeredCharacter.OwnerClientId);
@@ -115,6 +115,7 @@ public class BlackHoleNode : EventNode
         StartCoroutine(WaitForMoveEnd(triggeredCharacter, playerIds, characterGameobjects));
     }
 
+    //서버에서 실행
     IEnumerator WaitForMoveEnd(NetworkObject triggeredCharacter, List<ulong> playerIds ,List<NetworkObjectReference> characters)
     {
         int timeOut = 10;
@@ -132,7 +133,7 @@ public class BlackHoleNode : EventNode
             timeOut--;
         }
 
-        PlayerManager.Instance.isMoving = false;
+        //PlayerManager.Instance.isMoving = false;
 
         if (characterCount.Value <= 0)
         {
