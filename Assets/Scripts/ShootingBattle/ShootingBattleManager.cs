@@ -77,22 +77,17 @@ public class ShootingBattleManager : NetworkBehaviour
         }
     }
 
-    Vector4 ColorToVector4(Color color)
-    {
-        return new Vector4(color.r, color.g, color.b, color.a);
-    }
-
     private IEnumerator StartGameTimer(int timer = 3)
     {
         while (timer > 0)
         {
             yield return new WaitForSecondsRealtime(1f);
             timer--;
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f, ColorToVector4(Color.white));
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f, Color.white);
             yield return null;
         }
 
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f, ColorToVector4(Color.white));
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f, Color.white);
 
         isPlaying.Value = true;
     }

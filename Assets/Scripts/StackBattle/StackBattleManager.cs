@@ -227,7 +227,7 @@ public class StackBattleManager : NetworkBehaviour
 
                 if (!timeover && !failed)
                 {
-                    spawner.CreateBlock();
+                    //spawner.CreateBlock();
                 }
 
                 currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김

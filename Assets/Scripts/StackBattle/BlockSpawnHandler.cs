@@ -12,6 +12,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 	[SerializeField] private GameObject bottomFrame;
 	[SerializeField] private List<GameObject> stack;
     [SerializeField] private float blockSpeed = 6f;
+    private bool isSpawned = false;
     Scene stackScene;
 
     public override void OnNetworkSpawn()
@@ -33,9 +34,23 @@ public class BlockSpawnHandler : NetworkBehaviour
         }
 	}
 
+    private void Update()
+    {
+        if (stack.Count > 0 && !isSpawned)
+        {
+            StackableBlock previousTile = stack[stack.Count - 1].GetComponent<StackableBlock>();
+            if (IsServer && manager.isPlaying.Value && !previousTile.isMoving)
+            {
+                isSpawned = true;
+                CreateBlock();
+            }
+        }
+            
+    }
+
     public void CreateBlock()
 	{
-		if (!IsServer)
+		if (!IsServer || !manager.isPlaying.Value)
 			return; // 서버에서만 블록 생성
 
 		GameObject previousTile;
@@ -44,6 +59,11 @@ public class BlockSpawnHandler : NetworkBehaviour
 		if (stack.Count > 0)
 		{
 			previousTile = stack[stack.Count - 1];
+
+            if (previousTile.GetComponent<StackableBlock>().isMoving)
+            {
+                return;
+            }
 		}
 		else
 		{
@@ -72,6 +92,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 	public void DropBlock()
 	{
 		if (!IsServer) return; // 서버에서만 블록 배치
+        isSpawned = false;
 		stack[stack.Count - 1].GetComponent<StackableBlock>().ScaleBlock();
 	}
 }
