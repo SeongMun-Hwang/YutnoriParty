@@ -102,6 +102,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 if (data.clientId == playerIds[i])
                 {
                     usernameUI[i].text = data.userName.ToString();
+                    usernameUI[i].color = crosshairColors[i];
                 }
             }
             
