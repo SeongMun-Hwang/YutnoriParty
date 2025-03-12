@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -67,11 +65,17 @@ public class BlackHoleNode : EventNode
         //캐릭터들 이동
         //MoveCharactersRpc();
         List<CharacterBoardMovement> list = new List<CharacterBoardMovement>();
+        List<ulong> playerIds = new List<ulong>();
+        List<NetworkObjectReference> characterGameobjects = new List<NetworkObjectReference>();
         CharacterBoardMovement character;
         Vector3 targetPos;
 
         Debug.Log("이동 시작");
         PlayerManager.Instance.isMoving = true;
+
+        //밟은애도 사라져야하니까 목록에 추가
+        playerIds.Add(triggeredCharacter.OwnerClientId);
+        characterGameobjects.Add(triggeredCharacter);
 
         for (int i = 0; i < targetNodes.Count; i++)
         {
@@ -83,12 +87,20 @@ public class BlackHoleNode : EventNode
         for (int i = 0; i < list.Count; i++)
         {
             character = list[i];
+            characterGameobjects.Add(character.gameObject);
+
             var characterNetObj = character.GetComponent<NetworkObject>();
 
             //무인도에 갇힌 놈이면 탈출시켜줌
             if (character.GetComponent<CharacterInfo>().inIsland.Value)
             {
                 EventNodeManager.Instance.EscapeIslandCallRpc(characterNetObj);
+            }
+
+            //플레이어 아이디 리스트에 없으면 추가
+            if (!playerIds.Contains(characterNetObj.OwnerClientId))
+            {
+                playerIds.Add(characterNetObj.OwnerClientId);
             }
 
             //노드 목적지로 설정
@@ -100,10 +112,10 @@ public class BlackHoleNode : EventNode
         }
 
         //모든 말 이동이 끝날때까지 대기
-        StartCoroutine(WaitForMoveEnd(triggeredCharacter));
+        StartCoroutine(WaitForMoveEnd(playerIds, characterGameobjects));
     }
 
-    IEnumerator WaitForMoveEnd(NetworkObject triggeredCharacter)
+    IEnumerator WaitForMoveEnd(List<ulong> playerIds ,List<NetworkObjectReference> characters)
     {
         int timeOut = 10;
 
@@ -119,15 +131,19 @@ public class BlackHoleNode : EventNode
             timeOut--;
         }
 
+        PlayerManager.Instance.isMoving = false;
+
         if (characterCount.Value <= 0)
         {
             //이동 종료 후 처리
-            PlayerManager.Instance.isMoving = false;
             //Debug.Log("블랙홀 쉴텐데? " + isPaused.Value);
             //블랙홀 밟은 애가 엔드 무브 실행
-            BlackHoleMoveEndRpc(RpcTarget.Single(triggeredCharacter.OwnerClientId, RpcTargetUse.Temp));
-            Debug.Log("전체 이동 끝");
+            //BlackHoleMoveEndRpc(RpcTarget.Single(triggeredCharacter.OwnerClientId, RpcTargetUse.Temp));
+            GameManager.Instance.mainGameProgress.StartMiniGameTogetherServerRpc(playerIds.ToArray(), characters.ToArray());
         }
+
+        Debug.Log("전체 이동 끝");
+
         yield return null;
     }
 
