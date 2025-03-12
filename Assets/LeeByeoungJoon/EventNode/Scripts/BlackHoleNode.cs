@@ -139,7 +139,7 @@ public class BlackHoleNode : EventNode
             //Debug.Log("블랙홀 쉴텐데? " + isPaused.Value);
             //블랙홀 밟은 애가 엔드 무브 실행
             //BlackHoleMoveEndRpc(RpcTarget.Single(triggeredCharacter.OwnerClientId, RpcTargetUse.Temp));
-            GameManager.Instance.mainGameProgress.StartMiniGameTogetherServerRpc(playerIds.ToArray(), characters.ToArray());
+            GameManager.Instance.mainGameProgress.StartMiniGameTogetherServerRpc(triggeredCharacter, playerIds.ToArray(), characters.ToArray());
         }
 
         Debug.Log("전체 이동 끝");
