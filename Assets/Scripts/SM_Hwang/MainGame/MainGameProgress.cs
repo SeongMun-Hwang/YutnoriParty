@@ -206,7 +206,7 @@ public class MainGameProgress : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void StartMiniGameTogetherServerRpc(ulong[] playerIds, NetworkObjectReference[] characterList)
+    public void StartMiniGameTogetherServerRpc(NetworkObjectReference triggeredCharacter, ulong[] playerIds, NetworkObjectReference[] characterList)
     {
         Debug.Log("여러명 미니게임 시작");
         isMinigamePlaying = true;
@@ -248,11 +248,26 @@ public class MainGameProgress : NetworkBehaviour
                 });
             }
 
-            CheckAllPlayerTurnPassed();
+            triggeredCharacter.TryGet(out NetworkObject triggered);
+
+            CheckTurnChangeClientRpc(new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new List<ulong> { triggered.OwnerClientId }
+                }
+            });
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
         //StartMiniGameClientRpc();
+    }
+
+    [ClientRpc]
+    void CheckTurnChangeClientRpc(ClientRpcParams rpcParams)
+    {
+        Debug.Log("블랙홀 밟은 놈이 턴 종료 체크");
+        CheckTurnChange();
     }
 
     //플레이어 매니저가 모두 달라 특정 클라이언트만 지정
