@@ -180,19 +180,6 @@ public class EventNode : NetworkBehaviour
         }
     }
 
-    //이벤트를 시작하면 개별적인 처리를 끝내고
-    void EventExecute()
-    {
-
-    }
-
-    //모든 클라이언트에서 동일하게 효과를 보여줌
-    [ClientRpc]
-    void PlayEventClientRpc()
-    {
-
-    }
-
     [Rpc(SendTo.Everyone)]
     protected virtual void ActiveNodeRpc(Vector3 pos)
     {

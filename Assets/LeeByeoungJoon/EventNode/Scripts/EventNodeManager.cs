@@ -37,6 +37,8 @@ public class EventNodeManager : NetworkBehaviour
     //각 이벤트 노드별로 몇개 있는지 세는 딕셔너리
     Dictionary<EventNodeType, int> eventNodeTypeNum;
 
+    int itemNodeInitialSpawnNum = 2;
+
     //싱글톤 아님
     static EventNodeManager instance;
     public static EventNodeManager Instance {  get { return instance; } }
@@ -77,9 +79,10 @@ public class EventNodeManager : NetworkBehaviour
             eventNodeTypeNum[type] = 0;
         }
 
-        //이벤트 노드 생성
+        //이벤트 노드 생성 -> 이벤트 노드 더 많이 만들거면 여기 리팩토링 해야함
         SpawnEventNode(GetRandomNode(blackHoleNodes), EventNodeType.BlackHole);
         SpawnEventNode(GetRandomNode(islandNodes), EventNodeType.Island);
+        SpawnItemNodeRpc(itemNodeInitialSpawnNum);
     }
 
     //모든 플레이어 한바퀴 돌면 이거 실행
@@ -95,6 +98,9 @@ public class EventNodeManager : NetworkBehaviour
         {
             node.TurnIncreaseRpc();
         }
+
+        //한바퀴에 아이템노드 하나씩 생성
+        SpawnItemNodeRpc(1);
     } 
 
     //EndMove에서 얘 실행
@@ -259,6 +265,22 @@ public class EventNodeManager : NetworkBehaviour
             {
                 island.EscapeIslandRpc(character);
             }
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SpawnItemNodeRpc(int spawnNum)
+    {
+        int spawned = eventNodeTypeNum[EventNodeType.Item];
+        int max = itemNodePrefab.GetComponent<ItemNode>().MaxNode;
+        
+        //스폰할 노드 수가 최대 생성개수를 넘어서지 못하게 제한
+        int toSpawn = (spawnNum + spawned > max) ? max - spawned : spawnNum;
+
+        //스폰할 노드 수만큼 스폰
+        for(int i = 0; i < toSpawn; i++)
+        {
+            SpawnEventNode(GetRandomNode(itemNodes), EventNodeType.Item);
         }
     }
 }

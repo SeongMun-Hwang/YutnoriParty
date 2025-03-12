@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3814936234
+  GlobalObjectIdHash: 2076334260
   InScenePlacedSourceGlobalObjectIdHash: 2076334260
   DeferredDespawnTick: 0
   Ownership: 1
@@ -73,42 +73,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   islandNodePrefab: {fileID: 5521834557609116767, guid: 5920d8ff385e2d44db743a19db84d640, type: 3}
   blackHoleNodePrefab: {fileID: 1132235250467705152, guid: 062d35da264f4bf499945f4adebd9d55, type: 3}
-  itemNodePrefab: {fileID: 0}
-  allNodes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  islandNodes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  blackHoleNodes:
-  - {fileID: 0}
+  itemNodePrefab: {fileID: 9074918833992485940, guid: 5361ca269d3b4754f9b2a3d56b8f7ec8, type: 3}
+  allNodes: []
+  islandNodes: []
+  blackHoleNodes: []
+  blackHoleTargets: []
   itemNodes: []
