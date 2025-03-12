@@ -59,16 +59,24 @@ public class RunGameManager : NetworkBehaviour
         if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
         {
             playerIds.Add(clientId);
-            canMoveList.Add(true); // 새로운 플레이어는 처음에 이동 가능 상태
+            canMoveList.Add(false);
+            int spawnIndex = playerIds.IndexOf(clientId);
+            if (spawnIndex >= spawnPos.Count) return;
+            Vector3 spawnPosition = spawnPos[spawnIndex].position;
 
-            // RunPrefab 인스턴스화
-            GameObject rp = Instantiate(runPrefab[(int)clientId]);
+            // RunPrefab 인스턴스화 및 위치 설정
+            GameObject rp = Instantiate(runPrefab[spawnIndex], spawnPosition, Quaternion.identity);
             RunGameController rc = rp.GetComponent<RunGameController>();
 
             // NetworkObject 설정
             NetworkObject runNetObj = rp.GetComponent<NetworkObject>();
             runNetObj.SpawnWithOwnership(clientId, true); // 클라이언트에게 소유권 부여
 
+            RunGameController runController = rp.GetComponent<RunGameController>();
+            if (runController != null)
+            {
+                runController.EnableControl(false); // 게임 시작 전에는 움직일 수 없도록 설정
+            }
             // Run 오브젝트 리스트에 추가
             runObjects.Add(rp);
 
@@ -186,9 +194,20 @@ public class RunGameManager : NetworkBehaviour
             MainGameProgress.Instance.winnerId = winnerClientId;
             GameFinishedClientRpc(winnerClientId);
             StartCoroutine(PassTheScene());
+            ClearRunObjects();
         }
     }
-
+    private void ClearRunObjects()
+    {
+        foreach (var obj in runObjects)
+        {
+            if (obj != null)
+            {
+                Destroy(obj); // 생성된 오브젝트 삭제
+            }
+        }
+        runObjects.Clear(); // 리스트 초기화
+    }
     public void CheckRemainingPlayers()
     {
         if (gameEnd) return;

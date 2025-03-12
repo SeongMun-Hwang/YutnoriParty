@@ -8,7 +8,7 @@ public class RunGameController : NetworkBehaviour
 
     private Vector3 targetPosition;
     private Animator animator;
-    public NetworkVariable<bool> canMove = new NetworkVariable<bool>(true);
+    public NetworkVariable<bool> canMove = new NetworkVariable<bool>(false);
 
     public override void OnNetworkSpawn()
     {
@@ -21,21 +21,25 @@ public class RunGameController : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner && canMove.Value)
+        if (!IsOwner) return;
         {
-            if (Camera.main != null)
+            if (RunGameManager.Instance.runGameCamera != null)
             {
-                Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
-                Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+                Camera cam = RunGameManager.Instance.runGameCamera;
+                cam.transform.position = transform.position + new Vector3(0, 4, 7);
+                cam.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
             }
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!canMove.Value) return;
             {
-                MoveForwardServerRpc(OwnerClientId);
-            }
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    MoveForwardServerRpc(OwnerClientId);
+                }
 
-            transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
-            GetComponent<Animator>().SetFloat("MoveSpeed", moveSpeedValue);
+                transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+                float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
+                GetComponent<Animator>().SetFloat("MoveSpeed", moveSpeedValue);
+            }
         }
     }
 
