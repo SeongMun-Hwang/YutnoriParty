@@ -12,11 +12,15 @@ public class MinigameManager : NetworkBehaviour
     public static MinigameManager Instance { get { return instance; } }
 
     public NetworkVariable<int> maxPlayers;
+
+    // 추후 미니게임이 추가될 때, Define 클래스의 MinigameType 열거형과 씬의 이름을 추가할 것
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
+        { Define.MinigameType.BasketGame, "BasketGame" },
+        { Define.MinigameType.Randomize, "??" },
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
@@ -48,27 +52,6 @@ public class MinigameManager : NetworkBehaviour
         else if (instance != this)
         {
             Destroy(gameObject);
-        }
-    }
-
-    // 미니게임을 시작하기 위해 씬을 이동
-    public void StartMinigame(Define.MinigameType type)
-    {
-        if (NetworkManager.Singleton.IsServer)
-        {
-            MinigameButtonUI.SetActive(false);
-            if (MinigameScenes.TryGetValue(type, out string sceneName))
-            {
-                NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-            }
-            else
-            {
-                Debug.LogError($"씬 {type}이 없습니다");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("씬 변경은 서버에서 수행해야합니다");
         }
     }
 
