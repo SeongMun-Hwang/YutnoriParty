@@ -121,25 +121,24 @@ public class MainGameProgress : NetworkBehaviour
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
-        if (!(YutManager.Instance.YutResultCount() == 0 && !PlayerManager.Instance.isMoving
-    && YutManager.Instance.throwChance == 0))
+        if (YutManager.Instance.YutResultCount() == 0 && !PlayerManager.Instance.isMoving
+    && YutManager.Instance.throwChance == 0)
         {
-            return;
-        }
             Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
-        //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
-        if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
-        {
-            Debug.Log("Party game start");
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Party time");
-            StartMiniGame();
-            StartCoroutine(WaitUntilPartygameEnd()); //파티게임 끝나기 대기(미니게임과 동일)
-        }
-        //파티할 시간이 아니면 턴 변경할 지 확인
-        else
-        {
-            CheckTurnChange();
-        }
+            //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
+            if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
+            {
+                Debug.Log("Party game start");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Party time");
+                StartMiniGame();
+                StartCoroutine(WaitUntilPartygameEnd()); //파티게임 끝나기 대기(미니게임과 동일)
+            }
+            //파티할 시간이 아니면 턴 변경할 지 확인
+            else
+            {
+                CheckTurnChange();
+            }
+        }         
     }
     /*파티 게임 끝날 때까지 대기 후 턴 변경 체크*/
     private IEnumerator WaitUntilPartygameEnd()
