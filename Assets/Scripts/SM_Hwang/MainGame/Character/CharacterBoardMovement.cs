@@ -88,7 +88,7 @@ public class CharacterBoardMovement : MonoBehaviour
             if (tmpNode == null)
             {
                 PlayerManager.Instance.CharacterGoalIn(gameObject);
-                GameManager.Instance.mainGameProgress.EndMove();
+                StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
                 yield break;
             }
 
@@ -128,7 +128,7 @@ public class CharacterBoardMovement : MonoBehaviour
         PlayerManager.Instance.isMoving = false;
         animator.SetFloat("isMoving", 0f);
         ItemManager.Instance.DespawnItemEffectServerRpc(gameObject);
-        GameManager.Instance.mainGameProgress.EndMove();
+        StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
     }
     /*이동 가능 목적지에 캐릭터 복제, 마우스로 클릭*/
     private IEnumerator SpawnAndSelectNode(List<Node> possibleNodes)

@@ -65,15 +65,45 @@ public class MainGameProgress : NetworkBehaviour
     /*이동 종료 함수*/
     //말이 윷 결과에 따른 이동을 마쳤을 때마다 호출
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
-    public void EndMove()
+    public IEnumerator EndMove()
     {
         EventNodeManager.Instance.CheckStepOnServerRpc(); //이동 끝나고 노드 밟았는지 체크
 
-        if (CheckOtherPlayer()) //이동이 끝나고 주변 체크
+        bool isEventChecking = true;
+
+        //여기인듯? 위에거 실행 끝날때까지 안기다려버림
+        //밟았는지 체킹 중에는 대기
+        int timeOut = 10;
+        while (isEventChecking)
+        {
+            isEventChecking = EventNodeManager.Instance.checkingStepOn.Value;
+
+            yield return new WaitForSecondsRealtime(1);
+
+            timeOut--;
+            Debug.Log("EndMove : 이벤트 노드 실행 기다리는 중 : " + timeOut);
+
+            if (timeOut == 0)
+            {
+                Debug.Log("EndMove 타임아웃");
+                break;
+            }
+        }
+
+        Debug.Log("EndMove 이벤트 노드 실행 대기 끝");
+
+        if (EventNodeManager.Instance.checkingStepOn.Value)
+        {
+            Debug.Log("이벤트 노드 실행중이지만 타임아웃으로 빠져나옴");
+        }
+
+        if (!isMinigamePlaying && CheckOtherPlayer()) //이동이 끝나고 주변 체크
         {
             StartMiniGame(encounteredEnemy);
         }
         StartCoroutine(WaitUntilMinigameEnd()); //미니게임 끝날 때까지 대기
+
+        yield return null;
     }
     /*이동 종료 후 같은 위치의 적 탐색*/
     private bool CheckOtherPlayer()
@@ -253,13 +283,13 @@ public class MainGameProgress : NetworkBehaviour
                 Debug.Log("네트워크 오브젝트 못찾음");
             }
 
-            CheckTurnChangeClientRpc(new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new List<ulong> { triggered.OwnerClientId }
-                }
-            });
+            //CheckTurnChangeClientRpc(new ClientRpcParams
+            //{
+            //    Send = new ClientRpcSendParams
+            //    {
+            //        TargetClientIds = new List<ulong> { triggered.OwnerClientId }
+            //    }
+            //});
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();

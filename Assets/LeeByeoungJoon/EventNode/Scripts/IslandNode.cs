@@ -10,10 +10,12 @@ public class IslandNode : EventNode
     [Rpc(SendTo.Server)]
     public override void EventStartRpc()
     {
+        EventExcuteRpc();
         //아무도 안밟고 있으면 일 없음
         if (enteredPlayers.Count == 0)
         {
             Debug.Log("무인도 노드 아무도 안밟음");
+            EventEndRpc();
             return;
         }
 
@@ -56,6 +58,8 @@ public class IslandNode : EventNode
 
             Debug.Log("남은 턴 : " + trappedPlayers[player]);
         }
+
+        EventEndRpc();
     }
 
     [Rpc(SendTo.Server)]

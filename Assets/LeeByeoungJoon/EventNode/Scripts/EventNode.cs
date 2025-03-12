@@ -8,6 +8,7 @@ public class EventNode : NetworkBehaviour
     [HideInInspector] public Node node;
     public EventNodeData data;
     public bool isCheckingTrigger = false;
+    public NetworkVariable<bool> isEventRunning = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
     //참조만 할 정보들 => 스크립터블 오브젝트에 저장 가능
     protected int minNode = 1;
     protected int maxNode = 1;
@@ -178,6 +179,19 @@ public class EventNode : NetworkBehaviour
                 break;
             }
         }
+    }
+    //이벤트 시작할때 처리
+    [Rpc(SendTo.Server)]
+    protected void EventExcuteRpc()
+    {
+        isEventRunning.Value = true;
+    }
+
+    //이벤트 끝날때 처리
+    [Rpc(SendTo.Server)]
+    protected void EventEndRpc()
+    {
+        isEventRunning.Value = false;
     }
 
     [Rpc(SendTo.Everyone)]

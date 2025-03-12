@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -42,6 +43,9 @@ public class EventNodeManager : NetworkBehaviour
     //싱글톤 아님
     static EventNodeManager instance;
     public static EventNodeManager Instance {  get { return instance; } }
+
+    public NetworkVariable<bool> checkingStepOn = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+
     private void Awake()
     {
         instance = this;
@@ -110,6 +114,7 @@ public class EventNodeManager : NetworkBehaviour
         //서버에서만 실행
         if (!IsServer) return;
 
+        checkingStepOn.Value = true; //노드 검사 시작
         Debug.Log("밟은 노드에 이벤트 있는지 체크");
 
         //모든 노드에서 이벤트 실행
@@ -118,6 +123,60 @@ public class EventNodeManager : NetworkBehaviour
             node.EventStartRpc();
         }
 
+        StartCoroutine(WaitForEventExcute());
+    }
+
+    IEnumerator WaitForEventExcute()
+    {
+        int timeOut = 10;
+        bool eventRunning = true;
+
+        while (eventRunning)
+        {
+            //모든 노드들의 이벤트 실행중 여부를 검사
+            foreach (var node in spawnedNodes)
+            {
+                //하나라도 실행중이면 eventRunning은 true
+                if (node.isEventRunning.Value)
+                {
+                    eventRunning = true;
+                    break;
+                }
+
+                //모두 통과하면 다 실행 종료인걸로 보고 eventRunning은 false
+                eventRunning = false;
+            }
+
+            if (!eventRunning)
+            {
+                Debug.Log("이벤트 실행 완료");
+                break;
+            }
+
+            yield return new WaitForSeconds(1);
+            timeOut--;
+            Debug.Log("이벤트 기다리는 중..");
+            if(timeOut == 0)
+            {
+                Debug.Log("이벤트 대기 타임아웃");
+                break;
+            }
+        }
+
+        if (eventRunning)
+        {
+            Debug.Log("이벤트 실행중이지만 타임아웃");
+            yield return null;
+        }
+
+        DespawnEventNodeExcute();
+        checkingStepOn.Value = false; //노드 검사 끝
+
+        yield return null;
+    }
+
+    void DespawnEventNodeExcute()
+    {
         //예약 걸린 노드들 삭제
         foreach (var node in despawnSchedule)
         {

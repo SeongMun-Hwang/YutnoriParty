@@ -39,15 +39,19 @@ public class BlackHoleNode : EventNode
     [Rpc(SendTo.Server)]
     public override void EventStartRpc()
     {
+        EventExcuteRpc();
+
         if(isPaused.Value)
         {
             Debug.Log("블랙홀 휴식중");
+            EventEndRpc();
             return;
         }
         //아무도 안밟고 있으면 일 없음
         if (enteredPlayers.Count == 0)
         {
             Debug.Log("블랙홀 노드 아무도 안밟음");
+            EventEndRpc();
             return;
         }
         
@@ -146,6 +150,7 @@ public class BlackHoleNode : EventNode
 
         Debug.Log("전체 이동 끝");
 
+        EventEndRpc();
         yield return null;
     }
 
@@ -153,7 +158,7 @@ public class BlackHoleNode : EventNode
     void BlackHoleMoveEndRpc(RpcParams rpcParams)
     {
         Debug.Log("엔드 무브 실행할거임 : " +  NetworkManager.Singleton.LocalClientId);
-        GameManager.Instance.mainGameProgress.EndMove();
+        StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
     }
 
     [Rpc(SendTo.SpecifiedInParams)]

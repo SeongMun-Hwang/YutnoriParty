@@ -467,7 +467,7 @@ public class YutManager : NetworkBehaviour
             ThrowChanceChangeClientRpc(-999, senderId);
 
             //이동 끝 실행해서 턴 넘김
-            GameManager.Instance.mainGameProgress.EndMove();
+            StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
 
             isCalulating = false;
             yield break;
