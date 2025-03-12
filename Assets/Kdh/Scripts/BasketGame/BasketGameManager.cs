@@ -21,7 +21,7 @@ public class BasketGameManager : NetworkBehaviour
     int currentId = -1;
     private Dictionary<ulong, NetworkVariable<int>> playerScores = new Dictionary<ulong, NetworkVariable<int>>(); // 개별 플레이어 점수 관리
     [SerializeField] public NetworkVariable<bool> isPlaying;
-    private bool gameStart = false;
+    public bool gameStart = false;
     private bool gameEnd = false;
 
     private float remainingTime;
