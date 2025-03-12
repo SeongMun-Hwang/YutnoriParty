@@ -11,11 +11,6 @@ public class NetworkCrosshair : NetworkBehaviour
     );
     public SpriteRenderer spriteRenderer;
 
-    private void Start()
-    {
-        SetCamera();
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -39,17 +34,19 @@ public class NetworkCrosshair : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner || mainCamera == null)
+        if (IsOwner)
         {
-            SetCamera();
-            return;
+            if (mainCamera == null || !mainCamera.gameObject.activeSelf)
+            {
+                SetCamera();
+                return;
+            }
+
+            Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mousePos.z = 0;
+            transform.position = mousePos;
+            // Debug.Log($"{NetworkManager.Singleton.LocalClientId} 위치 업뎃 {transform.position}");
         }
-
-        Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 0;
-        transform.position = mousePos;
-
-        Debug.Log($"{NetworkManager.Singleton.LocalClientId} 위치 업뎃 {transform.position}");
     }
 
     [ServerRpc]

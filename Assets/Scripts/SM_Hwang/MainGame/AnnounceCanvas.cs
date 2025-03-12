@@ -24,6 +24,7 @@ public class AnnounceCanvas : NetworkBehaviour
         go.GetComponent<TextMeshProUGUI>().text = str;
 
         Color textColor = go.GetComponent<TextMeshProUGUI>().color;
+        textColor = color;
         textColor.a = 1f;
         go.GetComponent<TextMeshProUGUI>().color = textColor;
 

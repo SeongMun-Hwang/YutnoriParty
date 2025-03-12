@@ -15,6 +15,7 @@ public class StackableBlock : NetworkBehaviour
 	private float stepLength; // 이동 거리
 	private bool moveForward; // 정면으로 이동중인가?
 	public bool moveX; // X방향으로 이동중인가?
+    public bool isMoving = true;
 
 	private NetworkVariable<Vector3> position = new NetworkVariable<Vector3>(
 		Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
@@ -27,6 +28,8 @@ public class StackableBlock : NetworkBehaviour
 	{
 		distance = maxDistance;
 		moveForward = false;
+
+        isMoving = true;
 
 		if (IsServer) // 서버(Host)에서 초기 위치 설정
 		{
@@ -165,6 +168,7 @@ public class StackableBlock : NetworkBehaviour
 		transform.position = pos;
 		transform.localScale = scale;
 		FixBlockClientRpc(transform.position, scale);
+        isMoving = false;
 		MoveCamera();
 	}
 
