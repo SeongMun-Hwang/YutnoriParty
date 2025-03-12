@@ -246,7 +246,7 @@ public class MainGameProgress : NetworkBehaviour
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
+        //StartMiniGameClientRpc();
     }
 
     //플레이어 매니저가 모두 달라 특정 클라이언트만 지정
