@@ -168,7 +168,7 @@ public class CharacterBoardMovement : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Obstacle"))
+        if (other.CompareTag("Obstacle") && PlayerManager.Instance.isMoving)
         {
             meetObstacle = true;
             MainGameProgress.Instance.DespawnNetworkObjectServerRpc(other.gameObject);
