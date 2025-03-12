@@ -8,74 +8,46 @@ public class RunGameController : NetworkBehaviour
 
     private Vector3 targetPosition;
     private Animator animator;
-    private bool canMove = false;
-    private string currentSceneName;
-    Rigidbody rb;
-    public bool IsEliminated { get; private set; } = false;
-    private void Start()
+    public NetworkVariable<bool> canMove = new NetworkVariable<bool>(false);
+
+    public override void OnNetworkSpawn()
     {
-        rb = GetComponent<Rigidbody>();
-        currentSceneName = SceneManager.GetActiveScene().name;
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
-        animator = GetComponent<Animator>();
-        
+        if (IsServer)
+        {
+            Transform spawnTransform = RunGameManager.Instance.spawnPos[(int)OwnerClientId];
+            targetPosition = spawnTransform.position;
+        }
     }
-
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded; 
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded; 
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // 씬이 바뀌면 새로운 씬 이름을 가져와서 업데이트
-        currentSceneName = SceneManager.GetActiveScene().name;
-        // 새로운 씬에 맞는 스폰 포인트로 위치 업데이트
-        Transform spawnTransform = FindFirstObjectByType<SpawnManager>().GetSpawnPosition(OwnerClientId);
-        targetPosition = spawnTransform.position;
-        transform.position = targetPosition;
-
-    }
-
-  
 
     private void Update()
     {
-        string sceneName = SceneManager.GetActiveScene().name;
+        if (!IsOwner) return;
+        {
+            if (RunGameManager.Instance.runGameCamera != null)
+            {
+                Camera cam = RunGameManager.Instance.runGameCamera;
+                cam.transform.position = transform.position + new Vector3(0, 4, 7);
+                cam.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+            }
+            if (!canMove.Value) return;
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    MoveForwardServerRpc(OwnerClientId);
+                }
 
-        if (sceneName == "RunGame")
-        {
-            rb.isKinematic = true;
+                transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+                float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
+                GetComponent<Animator>().SetFloat("MoveSpeed", moveSpeedValue);
+            }
         }
-        else if (sceneName == "MainGame")  
-        {
-            rb.isKinematic = false;
-        }
-        if (!IsOwner || !canMove || IsEliminated || SceneManager.GetActiveScene().name != "RunGame") return;
-        
-        Camera.main.transform.position = transform.position + new Vector3(0, 4, 7);
-        Camera.main.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            MoveForwardServerRpc(OwnerClientId);  
-        }
-
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        float moveSpeedValue = Vector3.Distance(transform.position, targetPosition) > 0.01f ? 1f : 0f;
-        animator.SetFloat("MoveSpeed", moveSpeedValue);
     }
 
     [ServerRpc]
     private void MoveForwardServerRpc(ulong clientId)
     {
 
-        if (OwnerClientId != clientId || IsEliminated) return;
+        if (OwnerClientId != clientId) return;
 
         targetPosition += transform.forward * moveDistance;
         MoveClientRpc(targetPosition);
@@ -88,11 +60,8 @@ public class RunGameController : NetworkBehaviour
     }
     public void EnableControl(bool enable)
     {
-        canMove = enable;
+        canMove.Value = enable;
     }
-    public void SetEliminated(bool isEliminated)
-    {
-        IsEliminated = isEliminated;
-        EnableControl(!isEliminated); // 탈락하면 false, 초기화되면 true
-    }
+
+
 }
