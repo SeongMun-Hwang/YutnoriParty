@@ -60,12 +60,23 @@ public class PlayerBoard : NetworkBehaviour
     }
     private void HandlePlayerSpawned(PlayerManager player)
     {
-        playerProfileDatas.Add(new PlayerProfileData
+        int i = 0;
+        for (; i < playerProfileDatas.Count; i++)
         {
-            clientId = player.OwnerClientId,
-            userName = ServerSingleton.Instance.clientIdToUserData[player.OwnerClientId].userName,
-            score = 0
-        });
+            if (playerProfileDatas[i].clientId == player.OwnerClientId)
+            {
+                break;
+            }
+        }
+        if (i >= playerProfileDatas.Count)
+        {
+            playerProfileDatas.Add(new PlayerProfileData
+            {
+                clientId = player.OwnerClientId,
+                userName = ServerSingleton.Instance.clientIdToUserData[player.OwnerClientId].userName,
+                score = 0
+            });
+        }
     }
     private void HandlePlayerDespawned(PlayerManager player)
     {
@@ -74,7 +85,7 @@ public class PlayerBoard : NetworkBehaviour
             if (data.clientId == player.OwnerClientId)
             {
                 playerProfileDatas.Remove(data);
-                break;
+                //break;
             }
         }
     }
@@ -86,11 +97,8 @@ public class PlayerBoard : NetworkBehaviour
                 {
                     if (!playerProfiles.Any(x => x.clientId == changeEvent.Value.clientId))
                     {
-                        int index = playerProfileDatas.IndexOf(changeEvent.Value);
-
-                        Debug.Log("Player index : " + index);
                         PlayerProfile item = Instantiate(playerProfilePrefab, playerBoardParent);
-                        item.GetComponent<RectTransform>().anchoredPosition = corners[index];
+                        item.GetComponent<RectTransform>().anchoredPosition = corners[changeEvent.Value.clientId];
                         item.SetData(changeEvent.Value.clientId, changeEvent.Value.userName, changeEvent.Value.score);
                         playerProfiles.Add(item);
                     }
