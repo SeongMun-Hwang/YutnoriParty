@@ -248,7 +248,10 @@ public class MainGameProgress : NetworkBehaviour
                 });
             }
 
-            triggeredCharacter.TryGet(out NetworkObject triggered);
+            if(!triggeredCharacter.TryGet(out NetworkObject triggered))
+            {
+                Debug.Log("네트워크 오브젝트 못찾음");
+            }
 
             CheckTurnChangeClientRpc(new ClientRpcParams
             {
