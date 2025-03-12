@@ -121,7 +121,12 @@ public class MainGameProgress : NetworkBehaviour
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
-        Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
+        if (!(YutManager.Instance.YutResultCount() == 0 && !PlayerManager.Instance.isMoving
+    && YutManager.Instance.throwChance == 0))
+        {
+            return;
+        }
+            Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
         //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
         if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
         {
@@ -244,7 +249,7 @@ public class MainGameProgress : NetworkBehaviour
                 });
             }
 
-            EndMove();
+            CheckAllPlayerTurnPassed();
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
