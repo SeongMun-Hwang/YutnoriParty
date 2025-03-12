@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -21,9 +22,11 @@ public class MinigameManager : NetworkBehaviour
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
     public Define.MGPlayerType playerType;
 
+    public Camera maingameCamera;
+
     [SerializeField] private GameObject spectatorUI;
     [SerializeField] private GameObject MinigameButtonUI;
-    [SerializeField] private GameObject FadeUI;
+    [SerializeField] private Animator FadeUIAnimator;
 
     public override void OnNetworkSpawn()
     {
@@ -74,7 +77,7 @@ public class MinigameManager : NetworkBehaviour
         if (NetworkManager.Singleton.IsServer)
         {
             MinigameButtonUI.SetActive(false);
-            NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[gameType], LoadSceneMode.Additive);
+            StartMiniGameClientRpc();
         }
         else
         {
@@ -93,7 +96,7 @@ public class MinigameManager : NetworkBehaviour
     public void EndMinigame()
     {
         MinigameButtonUI.SetActive(true);
-        MainGameProgress.Instance.endMinigameActions.Invoke();
+        EndMiniGameClientRpc();
         CloseSpectatorUIClientRpc();
     }
 
@@ -147,5 +150,68 @@ public class MinigameManager : NetworkBehaviour
     public bool IsPlayer(ulong id)
     {
         return playerTypes[id] == Define.MGPlayerType.Player;
+    }
+
+    [ClientRpc]
+    void StartMiniGameClientRpc()
+    {
+        // 미니게임을 위해 특정 오브젝트 비활성화
+        StartCoroutine(LoadSceneWithFade(1f, false));
+    }
+
+    [ClientRpc]
+    void EndMiniGameClientRpc()
+    {
+        StartCoroutine(LoadSceneWithFade(1f, true));
+    }
+
+    private IEnumerator LoadSceneWithFade(float duration, bool isUnloading)
+    {
+        FadeUIAnimator.SetTrigger("FadeOut");
+        yield return new WaitForSecondsRealtime(duration);
+        if (IsServer)
+        {
+            if (!isUnloading)
+            {
+                NetworkManager.Singleton.SceneManager.LoadScene(MinigameScenes[gameType], LoadSceneMode.Additive);
+
+                bool sceneLoaded = false;
+                NetworkManager.Singleton.SceneManager.OnLoadComplete += (ulong clientId, string sceneName, LoadSceneMode mode) =>
+                {
+                    if (sceneName == MinigameScenes[gameType])
+                    {
+                        sceneLoaded = true;
+                    }
+                };
+
+                yield return new WaitUntil(() => sceneLoaded);
+            }
+            else
+            {
+                Debug.Log("언로드 시작");
+                NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName(MinigameScenes[gameType]));
+
+                bool sceneUnloaded = false;
+                NetworkManager.Singleton.SceneManager.OnUnloadComplete += (ulong clientId, string sceneName) =>
+                {
+                    if (sceneName == MinigameScenes[gameType])
+                    {
+                        sceneUnloaded = true;
+                    }
+                };
+
+                yield return new WaitUntil(() => sceneUnloaded);
+            }
+        }
+        maingameCamera.gameObject.SetActive(isUnloading); // 윷놀이 판 전용카메라
+        YutManager.Instance.gameObject.SetActive(isUnloading); // 윷놀이 관련 활성화
+        GameManager.Instance.playerBoard.gameObject.SetActive(isUnloading); // 메인게임 플레이어 프로필 활성화
+        yield return new WaitForSecondsRealtime(duration);
+        FadeUIAnimator.SetTrigger("FadeIn");
+        yield return new WaitForSecondsRealtime(0.5f);
+        if (IsServer && isUnloading && MainGameProgress.Instance.endMinigameActions != null)
+        {
+            MainGameProgress.Instance.endMinigameActions.Invoke();
+        }
     }
 }

@@ -246,7 +246,7 @@ public class MainGameProgress : NetworkBehaviour
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
+        //StartMiniGameClientRpc();
     }
 
     //플레이어 매니저가 모두 달라 특정 클라이언트만 지정
@@ -371,7 +371,6 @@ public class MainGameProgress : NetworkBehaviour
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
         MinigameManager.Instance.SetPlayers(players);
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
     }
     [ServerRpc(RequireOwnership =false)]
     void StartPartyGameServerRpc()
@@ -396,7 +395,6 @@ public class MainGameProgress : NetworkBehaviour
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
     }
     [ClientRpc]
     void AddThrowChanceClientRpc(ulong targetId)
@@ -408,19 +406,11 @@ public class MainGameProgress : NetworkBehaviour
         }
     }
     [ClientRpc]
-    void StartMiniGameClientRpc()
-    {
-        // 미니게임을 위해 특정 오브젝트 비활성화
-        maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(false); // 윷놀이 관련 비활성화
-    }
-    [ClientRpc]
     void EndMiniGameClientRpc()
     {
         // 미니게임 종료이므로 특정 오브젝트 활성화 및 상태 변경
+        Debug.Log("이즈미니게임플레잉False");
         isMinigamePlaying = false;
-        maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(true); // 윷놀이 관련 활성화
     }
     public int GetCurrentTurn()
     {

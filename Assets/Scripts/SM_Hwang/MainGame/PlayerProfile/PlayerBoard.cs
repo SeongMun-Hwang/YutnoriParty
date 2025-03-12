@@ -16,7 +16,7 @@ public class PlayerBoard : NetworkBehaviour
                             new Vector2( 1708 ,  -114),  // 우상단
                             new Vector2(208 ,  -114)   // 좌상단
 };
-    NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
+    public NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
     List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
     public override void OnNetworkSpawn()
     {

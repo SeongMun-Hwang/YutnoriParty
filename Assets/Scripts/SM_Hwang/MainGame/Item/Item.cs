@@ -100,7 +100,7 @@ public class Item : MonoBehaviour
                     if (hit.collider.TryGetComponent<Node>(out Node no))
                     {
                         Debug.Log("Find Node");
-                        ItemManager.Instance.SetObstacleServerRpc(no.transform.position+new Vector3(0,1,0));
+                        ItemManager.Instance.SetObstacleServerRpc(no.transform.position);
                         ItemManager.Instance.RemoveItem();
                     }
                 }
