@@ -78,8 +78,9 @@ public class PlayerBoard : NetworkBehaviour
         {
             if (data.clientId == player.OwnerClientId)
             {
+                Debug.Log("Despawn profile");
                 playerProfileDatas.Remove(data);
-                //break;
+                break;
             }
         }
     }
@@ -103,12 +104,14 @@ public class PlayerBoard : NetworkBehaviour
         {
             case NetworkListEvent<PlayerProfileData>.EventType.Add:
                 {
+                    Debug.Log("profile add");
                     if (!playerProfiles.Any(x => x.clientId == changeEvent.Value.clientId))
                     {
+                        int index = playerProfileDatas.IndexOf(changeEvent.Value);
                         PlayerProfile item = Instantiate(playerProfilePrefab, playerBoardParent);
                         Vector2[] dynamicCorners = GetCornerPositions();
                         RectTransform rectTransform = item.GetComponent<RectTransform>();
-                        item.GetComponent<RectTransform>().anchoredPosition = dynamicCorners[changeEvent.Value.clientId];
+                        item.GetComponent<RectTransform>().anchoredPosition = dynamicCorners[index];
                         item.SetData(changeEvent.Value.clientId, changeEvent.Value.userName, changeEvent.Value.score);
                         playerProfiles.Add(item);
                     }
@@ -116,6 +119,7 @@ public class PlayerBoard : NetworkBehaviour
                 break;
             case NetworkListEvent<PlayerProfileData>.EventType.Remove:
                 {
+                    Debug.Log("profile remove");
                     PlayerProfile item = playerProfiles.FirstOrDefault(x => x.clientId == changeEvent.Value.clientId);
                     if (item != null)
                     {
@@ -126,6 +130,7 @@ public class PlayerBoard : NetworkBehaviour
                 break;
             case NetworkListEvent<PlayerProfileData>.EventType.Value:
                 {
+                    Debug.Log("profile changed");
                     PlayerProfile item = playerProfiles.FirstOrDefault(x => x.clientId == changeEvent.Value.clientId);
                     if (item != null)
                     {
