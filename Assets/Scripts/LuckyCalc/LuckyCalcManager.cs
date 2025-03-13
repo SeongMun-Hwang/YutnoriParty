@@ -15,6 +15,8 @@ public class LuckyCalcManager : NetworkBehaviour
     private NetworkVariable<FixedString128Bytes> currentTurnPlayerName = new NetworkVariable<FixedString128Bytes>(".");
 
     [SerializeField] public NetworkVariable<bool> isPlaying;
+    private int timer = 10; // 턴 제한시간
+    private Coroutine turnTimerCoroutine; // 턴 제한시간 타이머 코루틴
 
     // UI 관련
     public TMP_Text answerText;
@@ -23,6 +25,11 @@ public class LuckyCalcManager : NetworkBehaviour
     public TMP_Text rightOperandText;
     [SerializeField] private GameObject cardPrefabs;
     [SerializeField] private Transform cardParent;
+    [SerializeField] private List<TMP_Text> usernameUI;
+    [SerializeField] private TMP_Text turnText;
+    [SerializeField] private TMP_Text timerUI;
+    [SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject loseMessageUI;
 
     // 게임 관련 변수
     public NetworkVariable<int> leftOperand = new NetworkVariable<int>(0);
@@ -47,7 +54,9 @@ public class LuckyCalcManager : NetworkBehaviour
             cards[i].Id = i;
         }
 
+        isPlaying.OnValueChanged += InitScoreBoardUI;
         currentTurnPlayerId.OnValueChanged += UpdateTurnUI;
+        currentTurnPlayerName.OnValueChanged += UpdateTurnPlayerNameUI;
         leftOperand.OnValueChanged += UpdateLeftOperand;
         rightOperand.OnValueChanged += UpdateRightOperand;
 
@@ -74,6 +83,26 @@ public class LuckyCalcManager : NetworkBehaviour
         }
     }
 
+    public void InitScoreBoardUI(bool previousValue, bool newValue)
+    {
+        for (int i = 0; i < playerIds.Count; i++)
+        {
+            usernameUI[i].transform.parent.gameObject.SetActive(true);
+            foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
+            {
+                if (data.clientId == playerIds[i])
+                {
+                    usernameUI[i].text = data.userName.ToString();
+                }
+            }
+        }
+    }
+
+    private void UpdateTurnPlayerNameUI(FixedString128Bytes previousValue, FixedString128Bytes newValue)
+    {
+        turnText.text = $"{newValue}";
+    }
+
     private IEnumerator StartGameTimer(int timer = 3)
     {
         while (timer > 0)
@@ -91,7 +120,81 @@ public class LuckyCalcManager : NetworkBehaviour
         currentTurnPlayerName.Value = ServerSingleton.Instance.clientIdToUserData[playerIds[i]].userName;
         Debug.Log(currentTurnPlayerName.Value.ToString() + "에게 첫 턴");
         isPlaying.Value = true;
+        StartTurnTimer();
         InitGame();
+    }
+
+    private void OnTurnChanged(ulong previousValue, ulong newValue)
+    {
+        Debug.Log("턴 변경");
+        if (IsServer)
+        {
+            if (turnTimerCoroutine != null)
+            {
+                StopCoroutine(turnTimerCoroutine);
+                turnTimerCoroutine = null;
+            }
+
+            StartTurnTimer();
+        }
+    }
+
+    private void StartTurnTimer()
+    {
+        if (turnTimerCoroutine != null)
+        {
+            StopCoroutine(turnTimerCoroutine);
+            turnTimerCoroutine = null;
+        }
+
+        turnTimerCoroutine = StartCoroutine(TurnTimerCoroutine());
+    }
+
+    private IEnumerator TurnTimerCoroutine()
+    {
+        int remainTime = timer;
+        while (remainTime > 0)
+        {
+            // 클라이언트의 UI 업데이트를 위한 ClientRpc 호출
+            UpdateTimerUIClientRpc(remainTime);
+            yield return new WaitForSeconds(1f);
+            remainTime -= 1;
+        }
+        // 제한 시간이 지나면 현재 턴을 자동 종료
+        if (IsServer)
+        {
+            NextTurn();
+        }
+    }
+
+    [ClientRpc]
+    private void UpdateTimerUIClientRpc(int time)
+    {
+        timerUI.text = time.ToString();
+    }
+
+    public void NextTurn()
+    {
+        // 턴 종료 요청 시 타이머 코루틴 정지
+        if (turnTimerCoroutine != null)
+        {
+            StopCoroutine(turnTimerCoroutine);
+            turnTimerCoroutine = null;
+        }
+
+        int nextIndex = (playerIds.IndexOf(currentTurnPlayerId.Value) + 1) % playerIds.Count;
+
+        currentTurnPlayerId.Value = playerIds[nextIndex]; // 턴 넘김
+        currentTurnPlayerName.Value = ServerSingleton.Instance.clientIdToUserData[playerIds[nextIndex]].userName;
+
+        leftOperand.Value = 0;
+        rightOperand.Value = 0;
+        CloseCardClientRpc(flippedCardId);
+        currentFlipCount = 0;
+        flippedCardId = new int[2];
+
+        // 새 턴 시작 시 타이머를 다시 시작
+        StartTurnTimer();
     }
 
     private void InitGame()
@@ -163,17 +266,41 @@ public class LuckyCalcManager : NetworkBehaviour
 
     private void UpdateLeftOperand(int previousValue, int newValue)
     {
-        leftOperandText.text = newValue.ToString();
+        if (newValue == 0)
+        {
+            leftOperandText.text = "?";
+        }
+        else
+        {
+            leftOperandText.text = newValue.ToString();
+        }
     }
 
     private void UpdateRightOperand(int previousValue, int newValue)
     {
-        rightOperandText.text = newValue.ToString();
+        if (newValue == 0)
+        {
+            rightOperandText.text = "?";
+        }
+        else
+        {
+            rightOperandText.text = newValue.ToString();
+        }
     }
 
     private void UpdateTurnUI(ulong previousValue, ulong newValue)
     {
-        
+        for (int i = 0; i < playerIds.Count; i++)
+        {
+            if (GetCurrentTurnPlayerId() == playerIds[i])
+            {
+                usernameUI[i].color = Color.yellow;
+            }
+            else
+            {
+                usernameUI[i].color = Color.white;
+            }
+        }
     }
 
     public void TryToFlip(int cardId)
@@ -190,21 +317,42 @@ public class LuckyCalcManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void OpenCardServerRpc(int cardId)
     {
+        if (currentFlipCount >= 2) return;
+
         flippedCardId[currentFlipCount] = cardId;
         currentFlipCount++;
 
         if (currentFlipCount == 1)
         {
             leftOperand.Value = cards[cardId].Number;
+            OpenCardClientRpc(cardId);
         }
         else if (currentFlipCount == 2)
         {
             rightOperand.Value = cards[cardId].Number;
+            OpenCardClientRpc(cardId);
 
-            // TODO : 조금 기다렸다가 결과 출력하고 턴 넘기기, 다시 카드 되돌리기
+            StartCoroutine(CheckResult());
         }
+    }
 
-        OpenCardClientRpc(cardId);
+    private IEnumerator CheckResult()
+    {
+        
+        yield return new WaitForSecondsRealtime(1f);
+
+        if (operatorStrategy.Calc(leftOperand.Value, rightOperand.Value, resultNumber.Value))
+        {
+            Debug.Log("정답!");
+            MainGameProgress.Instance.winnerId = currentTurnPlayerId.Value;
+            GameFinishedClientRpc(currentTurnPlayerId.Value);
+            StartCoroutine(PassTheScene());
+        }
+        else
+        {
+            Debug.Log("오답...");
+            NextTurn();
+        }
     }
 
     [ClientRpc]
@@ -213,8 +361,40 @@ public class LuckyCalcManager : NetworkBehaviour
         cards[cardId].OpenCard();
     }
 
+    [ClientRpc]
+    private void CloseCardClientRpc(int[] cardIds)
+    {
+        foreach (int cardId in cardIds)
+        {
+            cards[cardId].CloseCard();
+        }
+    }
+
     public ulong GetCurrentTurnPlayerId()
     {
         return currentTurnPlayerId.Value;
+    }
+
+    [ClientRpc]
+    public void GameFinishedClientRpc(ulong winClientId)
+    {
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
+
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
+        {
+            winMessageUI.SetActive(true);
+        }
+        else
+        {
+            loseMessageUI.SetActive(true);
+        }
+
+        Debug.Log("게임 종료");
+    }
+
+    public IEnumerator PassTheScene()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        MinigameManager.Instance.EndMinigame();
     }
 }
