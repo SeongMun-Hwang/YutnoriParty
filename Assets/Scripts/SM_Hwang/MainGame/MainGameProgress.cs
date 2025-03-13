@@ -270,6 +270,7 @@ public class MainGameProgress : NetworkBehaviour
                 if(character.OwnerClientId != winnerId)
                 {
                     PlayerManager.Instance.DespawnCharacterServerRpc(character, character.OwnerClientId);
+                    Debug.Log("캐릭터 id : " +  character.NetworkObjectId);
                 }
                 else//승자 캐릭터는 리스트로 따로 추출
                 {

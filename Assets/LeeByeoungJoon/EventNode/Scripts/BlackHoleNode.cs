@@ -139,7 +139,8 @@ public class BlackHoleNode : EventNode
 
         //PlayerManager.Instance.isMoving = false;
 
-        if (characterCount.Value <= 0)
+        //캐릭터들 이동이 모두 끝나고, 플레이어가 둘 이상일때만 미니게임 시작
+        if (characterCount.Value <= 0 && playerIds.Count >= 2)
         {
             //이동 종료 후 처리
             //Debug.Log("블랙홀 쉴텐데? " + isPaused.Value);
@@ -148,6 +149,10 @@ public class BlackHoleNode : EventNode
 
             //미니게임 다 했다는 콜 받기 위해 블랙홀 노드 전달
             GameManager.Instance.mainGameProgress.StartBlackHoleMiniGameServerRpc(gameObject, triggeredCharacter, playerIds.ToArray(), characters.ToArray());
+        }
+        else
+        {
+            EventEndRpc();
         }
 
         Debug.Log("전체 이동 끝");
