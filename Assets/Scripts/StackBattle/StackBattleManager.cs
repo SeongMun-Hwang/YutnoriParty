@@ -117,6 +117,7 @@ public class StackBattleManager : NetworkBehaviour
         {
             yield return new WaitForSecondsRealtime(1f);
             timer--;
+            if (timer == 0) break;
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
             yield return null;
         }
