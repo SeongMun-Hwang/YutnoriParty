@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class MainGameProgress : NetworkBehaviour
 {
@@ -198,6 +200,82 @@ public class MainGameProgress : NetworkBehaviour
             StartPartyGameServerRpc();
         }
     }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void StartMiniGameTogetherServerRpc(ulong[] playerIds, NetworkObjectReference[] characterList)
+    {
+        Debug.Log("여러명 미니게임 시작");
+        isMinigamePlaying = true;
+        
+        endMinigameActions = null;
+        endMinigameActions += (() =>
+        {
+            EndMiniGameClientRpc();
+
+            List<NetworkObjectReference> winnerCharacters = new List<NetworkObjectReference>();
+
+            //미니 게임 승자 판별
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
+            //캐릭터 처리
+            foreach (var characterRef in characterList)
+            {
+                if(!characterRef.TryGet(out NetworkObject character)) continue;
+
+                //승자의 캐릭터가 아니면 다 디스폰
+                if(character.OwnerClientId != winnerId)
+                {
+                    PlayerManager.Instance.DespawnCharacterServerRpc(character, character.OwnerClientId);
+                }
+                else//승자 캐릭터는 리스트로 따로 추출
+                {
+                    winnerCharacters.Add(character);
+                }
+            }
+
+            //승자의 캐릭터가 둘 이상일때 쌓기 실행
+            if(winnerCharacters.Count >= 2)
+            {
+                StackCharactersClientRpc(winnerCharacters.ToArray(), new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new List<ulong> { winnerId }
+                    }
+                });
+            }
+        });
+        MinigameManager.Instance.SetPlayers(playerIds);
+        MinigameManager.Instance.StartMinigame();
+        //StartMiniGameClientRpc();
+    }
+
+    //플레이어 매니저가 모두 달라 특정 클라이언트만 지정
+    //캐릭터 목록을 받아 쌓기
+    [ClientRpc]
+    void StackCharactersClientRpc(NetworkObjectReference[] arr, ClientRpcParams rpcParams)
+    {
+        //네트워크 오브젝트 레퍼런스 -> 게임 오브젝트 리스트로 변환
+        List<GameObject> characters = new List<GameObject>();
+        for(int i = 0; i < arr.Length; i++)
+        {
+            arr[i].TryGet(out NetworkObject character);
+            characters.Add(character.gameObject);
+        }
+
+        for(int i=1; i< characters.Count; i++)
+        {
+            PlayerManager.Instance.OverlapCharacter(characters[i], characters[i-1]); //겹치고
+            characters[i - 1].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
+            
+            //마지막 캐릭터만 실행
+            if(i == characters.Count)
+            {
+                currentCharacter = characters[i].GetComponent<CharacterBoardMovement>(); //현재 캐릭터 제일 밑에 있는애로 바꿔주고
+                characters[i].GetComponent<Outline>().EnableOutline(); //밑에 있는 애 아웃라인 켜고
+            }
+        }
+    }
+
     /*캐릭터 선택*/
     //Ray를 통해 이동할 말 선택
     //내 말이 아니면 메시지 출력
@@ -229,6 +307,7 @@ public class MainGameProgress : NetworkBehaviour
             }
         }
     }
+
     [ServerRpc(RequireOwnership = false)]
     void StartMiniGameServerRpc(NetworkObjectReference playerReference, NetworkObjectReference enemyReference)
     {
@@ -292,7 +371,6 @@ public class MainGameProgress : NetworkBehaviour
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
         MinigameManager.Instance.SetPlayers(players);
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
     }
     [ServerRpc(RequireOwnership =false)]
     void StartPartyGameServerRpc()
@@ -317,7 +395,6 @@ public class MainGameProgress : NetworkBehaviour
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());
         MinigameManager.Instance.StartMinigame();
-        StartMiniGameClientRpc();
     }
     [ClientRpc]
     void AddThrowChanceClientRpc(ulong targetId)
@@ -329,19 +406,11 @@ public class MainGameProgress : NetworkBehaviour
         }
     }
     [ClientRpc]
-    void StartMiniGameClientRpc()
-    {
-        // 미니게임을 위해 특정 오브젝트 비활성화
-        maingameCamera.gameObject.SetActive(false); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(false); // 윷놀이 관련 비활성화
-    }
-    [ClientRpc]
     void EndMiniGameClientRpc()
     {
         // 미니게임 종료이므로 특정 오브젝트 활성화 및 상태 변경
+        Debug.Log("이즈미니게임플레잉False");
         isMinigamePlaying = false;
-        maingameCamera.gameObject.SetActive(true); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(true); // 윷놀이 관련 활성화
     }
     public int GetCurrentTurn()
     {

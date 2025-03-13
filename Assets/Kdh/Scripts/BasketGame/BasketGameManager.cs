@@ -13,37 +13,81 @@ public class BasketGameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI scoreBoardText; // 모든 플레이어 점수 표시
     [SerializeField] private GameObject countdownCanvas;
     [SerializeField] private GameObject winnerTextCanvas;
-    [SerializeField] private TextMeshProUGUI winnerText;
-    [SerializeField] private GameObject basketPrefab;
+    [SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject loseMessageUI;
 
+    private NetworkList<ulong> playerIds = new NetworkList<ulong>(); 
+    private List<GameObject> basketObjects = new List<GameObject>();
+    int currentId = -1;
     private Dictionary<ulong, NetworkVariable<int>> playerScores = new Dictionary<ulong, NetworkVariable<int>>(); // 개별 플레이어 점수 관리
-    public bool gameStarted = false;
-    public bool gameEnded = false;
+    [SerializeField] public NetworkVariable<bool> isPlaying;
+    public bool gameStart = false;
+    private bool gameEnd = false;
+
     private float remainingTime;
-    public static BasketGameManager Instance { get; private set; }
+    [SerializeField] public Camera basketGameCamera;
+    [SerializeField] private List<GameObject> basketPrefab = new List<GameObject>();
+    [SerializeField] public List<Transform> spawnPos = new List<Transform>();
+    private static BasketGameManager instance;
+    public static BasketGameManager Instance
+    {
+        get { return instance; }
+    }
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;  // 인스턴스를 설정
-        }
-        else
-        {
-            Destroy(gameObject);  // 이미 인스턴스가 있으면 자기 자신을 파괴
-        }
+        instance = this;
     }
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            gameEnded = false;
             remainingTime = gameDuration;
             InitializePlayerScores();
-            StartCoroutine(StartCountdown());
-            AssignBasketsToPlayersServerRpc();
+            
+            foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                ulong clientId = clientPair.Key;
+                OnPlayerJoined(clientId);
+            }
         }
+
+        currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
+        Debug.Log($"플레이어 ID : {currentId}");
     }
 
+
+    private void OnPlayerJoined(ulong clientId)
+    {
+        if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
+        {
+            playerIds.Add(clientId);
+            
+            int spawnIndex = playerIds.IndexOf(clientId);
+            if (spawnIndex >= spawnPos.Count) return;
+            Vector3 spawnPosition = spawnPos[spawnIndex].position;
+
+            // RunPrefab 인스턴스화 및 위치 설정
+            GameObject bp = Instantiate(basketPrefab[spawnIndex], spawnPosition, Quaternion.identity);
+            BasketGameController bc = bp.GetComponent<BasketGameController>();
+
+            // NetworkObject 설정
+            NetworkObject runNetObj = bp.GetComponent<NetworkObject>();
+            runNetObj.SpawnWithOwnership(clientId, true); // 클라이언트에게 소유권 부여
+
+            BasketGameController basketController = bp.GetComponent<BasketGameController>();
+            if (basketController != null)
+            {
+                basketController.EnableControl(false); // 게임 시작 전에는 움직일 수 없도록 설정
+            }
+            // Run 오브젝트 리스트에 추가
+            basketObjects.Add(bp);
+
+            if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
+            {
+                StartCoroutine(StartCountdown());
+            }
+        }
+    }
     private void InitializePlayerScores()
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
@@ -54,36 +98,7 @@ public class BasketGameManager : NetworkBehaviour
             playerScores[clientId].OnValueChanged += (oldValue, newValue) => UpdateScoreUI();
         }
     }
-    [ServerRpc(RequireOwnership = false)]
-    private void AssignBasketsToPlayersServerRpc()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            if (client.Value.PlayerObject.TryGetComponent(out BasketGameController player))
-            {
-                // 1. 바구니 인스턴스 생성 (플레이어 위치에 배치)
-                GameObject basketInstance = Instantiate(basketPrefab, player.transform.position + new Vector3(0, 2, 0), Quaternion.identity);
-
-                // 2. 네트워크 오브젝트 활성화
-                NetworkObject basketNetworkObject = basketInstance.GetComponent<NetworkObject>();
-                basketNetworkObject.SpawnWithOwnership(player.OwnerClientId);
-
-                // 3. 부모 변경은 클라이언트에서 실행
-                SetParentClientRpc(basketNetworkObject.NetworkObjectId, player.NetworkObjectId);
-            }
-        }
-    }
-
-    [ClientRpc]
-    private void SetParentClientRpc(ulong basketId, ulong playerId)
-    {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(basketId, out NetworkObject basket) &&
-            NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(playerId, out NetworkObject player))
-        {
-            basket.transform.SetParent(player.transform, false);
-            basket.transform.localPosition = new Vector3(0, 2, 0);//플레이어에 0,2,0고정배치
-        }
-    }
+  
     private IEnumerator StartCountdown()
     {
         int countdown = 3;
@@ -123,7 +138,7 @@ public class BasketGameManager : NetworkBehaviour
     [ClientRpc]
     private void StartGameClientRpc()
     {
-        gameStarted = true;
+        gameStart = true;
         if (scoreBoardText != null)
         {
             scoreBoardText.transform.parent.gameObject.SetActive(true);  
@@ -140,14 +155,14 @@ public class BasketGameManager : NetworkBehaviour
 
     private IEnumerator GameTimer()
     {
-        while (remainingTime > 0 && !gameEnded)
+        while (remainingTime > 0 && !gameEnd)
         {
             yield return new WaitForSeconds(1f);
             remainingTime--;
             UpdateRemainingTimeClientRpc((int)remainingTime);
         }
 
-        if (!gameEnded)
+        if (!gameEnd)
         {
             DetermineWinner();
         }
@@ -185,7 +200,7 @@ public class BasketGameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void AddScoreServerRpc(ulong playerId, int points)
     {
-        if (gameEnded) return;
+        if (gameEnd) return;
 
         if (playerScores.ContainsKey(playerId))
         {
@@ -213,8 +228,8 @@ public class BasketGameManager : NetworkBehaviour
 
     private void DetermineWinner()
     {
-        gameEnded = true;
-        gameStarted = false;
+        gameEnd = true;
+        gameStart = false;
         ulong winnerId = ulong.MaxValue; 
         int maxScore = 0;
 
@@ -228,36 +243,12 @@ public class BasketGameManager : NetworkBehaviour
         }
 
        
-        if (winnerId != ulong.MaxValue)
-        {
-            ShowWinnerClientRpc(winnerId);
-        }
-        DestroyBasketsServerRpc();
+
+       
         DestroyFruitsServerRpc();
-        StartCoroutine(EndGame());
+        EndGameServerRpc(winnerId);
     }
-    [ServerRpc(RequireOwnership = false)]
-    private void DestroyBasketsServerRpc()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            if (client.Value.PlayerObject.TryGetComponent(out BasketGameController player))
-            {
-                foreach (Transform child in player.transform)
-                {
-                    if (child.CompareTag("Basket")) // 바구니인지 확인
-                    {
-                        NetworkObject basketNetworkObject = child.GetComponent<NetworkObject>();
-                        if (basketNetworkObject != null && basketNetworkObject.IsSpawned)
-                        {
-                            basketNetworkObject.Despawn(); // 네트워크에서 제거
-                        }
-                        Destroy(child.gameObject); // 게임 오브젝트 삭제
-                    }
-                }
-            }
-        }
-    }
+    
     [ServerRpc(RequireOwnership = false)]
     private void DestroyFruitsServerRpc()
     {
@@ -273,23 +264,55 @@ public class BasketGameManager : NetworkBehaviour
             Destroy(fruit); // 게임 오브젝트 삭제
         }
     }
-    [ClientRpc]
-    private void ShowWinnerClientRpc(ulong winnerId)
+    [ServerRpc(RequireOwnership = false)]
+    private void EndGameServerRpc(ulong winnerClientId)
     {
-        if (winnerTextCanvas != null)
-            winnerTextCanvas.SetActive(true);
-
-        if (winnerText != null)
-            winnerText.text = $"Player {winnerId} Win!";
-    }
-
-    private IEnumerator EndGame()
-    {
-        yield return new WaitForSeconds(3f);
-
+        if (gameEnd) return;
         if (IsServer)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single);
+            isPlaying.Value = false;
+            gameEnd = true;
+            MainGameProgress.Instance.winnerId = winnerClientId;
+            GameFinishedClientRpc(winnerClientId);
+            StartCoroutine(PassTheScene());
+            ClearBasketObjects();
         }
+    }
+
+    private void ClearBasketObjects()
+    {
+        foreach (var obj in basketObjects)
+        {
+            if (obj != null)
+            {
+                Destroy(obj); // 생성된 오브젝트 삭제
+            }
+        }
+        basketObjects.Clear(); // 리스트 초기화
+    }
+
+    // 게임 종료 후 클라이언트에게 승리 메시지 전달
+    [ClientRpc]
+    public void GameFinishedClientRpc(ulong winClientId)
+    {
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) return;
+
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
+        {
+            winMessageUI.SetActive(true);
+        }
+        else
+        {
+            loseMessageUI.SetActive(true);
+        }
+
+        Debug.Log("게임 종료");
+    }
+
+    public IEnumerator PassTheScene()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("BasketGame"));
+        MinigameManager.Instance.EndMinigame();
     }
 }

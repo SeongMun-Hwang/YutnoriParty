@@ -10,27 +10,84 @@ public class RunGameManager : NetworkBehaviour
     [SerializeField] private Collider goalArea;
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private GameObject countdownCanvas;
-    [SerializeField] private GameObject winnerTextCanvas; 
-    [SerializeField] private TextMeshProUGUI winnerText; 
 
-    private bool gameStarted = false;
-    private bool gameEnded = false; 
-    private ulong winnerClientId;
+    private NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
+    private List<bool> canMoveList = new List<bool>(); // 각 플레이어의 이동 상태 추적
+    private List<GameObject> runObjects = new List<GameObject>(); // 각 플레이어의 Run 오브젝트 리스트
 
+    int currentId = -1;
+
+    [SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject loseMessageUI;
+
+    // 게임 상태 및 진행 관련
+    [SerializeField] public NetworkVariable<bool> isPlaying;
+    private bool gameStart = false;
+    private bool gameEnd = false;
+
+    [SerializeField] private List<GameObject> runPrefab =new List<GameObject>();
+    [SerializeField] public List<Transform> spawnPos= new List<Transform>();
+
+    /*추가 부분*/
+    [SerializeField] public Camera runGameCamera;
+    private static RunGameManager instance;
+    public static RunGameManager Instance
+    {
+        get { return instance; }
+    }
+    private void Awake()
+    {
+        instance = this;
+    }
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            gameEnded = false; // 씬에 들어올 때 게임 종료 상태 초기화
-            StartCoroutine(StartCountdown());
+            foreach (var clientPair in NetworkManager.Singleton.ConnectedClients)
+            {
+                ulong clientId = clientPair.Key;
+                OnPlayerJoined(clientId);
+            }
         }
-        if (gameStarted && IsClient)
+
+        currentId = playerIds.IndexOf(NetworkManager.Singleton.LocalClientId);
+        Debug.Log($"플레이어 ID : {currentId}");
+    }
+
+    private void OnPlayerJoined(ulong clientId)
+    {
+        if (!playerIds.Contains(clientId) && MinigameManager.Instance.IsPlayer(clientId))
         {
-            EnablePlayerControl();
+            playerIds.Add(clientId);
+            canMoveList.Add(false);
+            int spawnIndex = playerIds.IndexOf(clientId);
+            if (spawnIndex >= spawnPos.Count) return;
+            Vector3 spawnPosition = spawnPos[spawnIndex].position;
+
+            // RunPrefab 인스턴스화 및 위치 설정
+            GameObject rp = Instantiate(runPrefab[spawnIndex], spawnPosition, Quaternion.identity);
+            RunGameController rc = rp.GetComponent<RunGameController>();
+
+            // NetworkObject 설정
+            NetworkObject runNetObj = rp.GetComponent<NetworkObject>();
+            runNetObj.SpawnWithOwnership(clientId, true); // 클라이언트에게 소유권 부여
+
+            RunGameController runController = rp.GetComponent<RunGameController>();
+            if (runController != null)
+            {
+                runController.EnableControl(false); // 게임 시작 전에는 움직일 수 없도록 설정
+            }
+            // Run 오브젝트 리스트에 추가
+            runObjects.Add(rp);
+
+            if (playerIds.Count == MinigameManager.Instance.maxPlayers.Value)
+            {
+                StartCoroutine(StartGameCountdown());
+            }
         }
     }
 
-    private IEnumerator StartCountdown()
+    private IEnumerator StartGameCountdown()
     {
         int countdown = 3;
         UpdateCountdownUIClientRpc(countdown, true);
@@ -47,7 +104,7 @@ public class RunGameManager : NetworkBehaviour
 
         UpdateCountdownUIClientRpc(-1, false);
 
-        StartGameClientRpc();
+        StartGame();
     }
 
     [ClientRpc]
@@ -66,36 +123,34 @@ public class RunGameManager : NetworkBehaviour
             countdownText.gameObject.SetActive(false);
     }
 
-    [ClientRpc]
-    private void StartGameClientRpc()
+    private void StartGame()
     {
-        gameStarted = true;
-
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        // 모든 플레이어에게 달리기 권한 부여
+        foreach (var clientId in playerIds)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
+            int clientIndex = playerIds.IndexOf(clientId);
+            if (runObjects[clientIndex] != null)
             {
-                player.EnableControl(true);
+                RunGameController runController = runObjects[clientIndex].GetComponent<RunGameController>();
+                if (runController != null)
+                {
+                    runController.EnableControl(true); // 달리기 시작
+                }
             }
         }
 
         FindAnyObjectByType<Chase>().EnableChase();
-    }
-    private void EnablePlayerControl()
-    {
-        // 미니게임 씬에 들어갔을 때 플레이어 컨트롤 활성화
-        if (TryGetComponent(out RunGameController playerController))
-        {
-            playerController.EnableControl(true);
-        }
+        isPlaying.Value = true; // 게임 진행 상태로 설정
     }
 
     private void Update()
     {
-        if (!gameStarted || !IsServer || gameEnded) return;
-
-        if (NetworkManager.Singleton.ConnectedClients.Count >= 2)
+        if (isPlaying.Value)
         {
+            if (!gameStart)
+            {
+                gameStart = true;
+            }
             CheckForWinner();
             CheckRemainingPlayers();
         }
@@ -103,34 +158,73 @@ public class RunGameManager : NetworkBehaviour
 
     private void CheckForWinner()
     {
-        if (gameEnded) return;
+        if (gameEnd) return;
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var clientId in playerIds)
         {
-            var playerObject = client.Value.PlayerObject;
+            int clientIndex = playerIds.IndexOf(clientId);
 
-            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
+            GameObject playerObject=null;
+            if (runObjects.Count > clientIndex)
             {
+                playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+            }
+
+            if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController) && playerController.canMove.Value)
+            {
+                // 골인 지점에 도달했을 때 승리 처리
                 if (goalArea.bounds.Contains(playerController.transform.position))
                 {
-                    EndGame(playerController.OwnerClientId);
+                    EndGameServerRpc(playerController.OwnerClientId);
                     return;
                 }
             }
         }
     }
 
+    // 게임 종료 처리 - 골인 지점에 도달한 플레이어를 처리
+    [ServerRpc(RequireOwnership = false)]
+    private void EndGameServerRpc(ulong winnerClientId)
+    {
+        if (gameEnd) return;
+        if (IsServer)
+        {
+            isPlaying.Value = false;
+            gameEnd = true;
+            MainGameProgress.Instance.winnerId = winnerClientId;
+            GameFinishedClientRpc(winnerClientId);
+            StartCoroutine(PassTheScene());
+            ClearRunObjects();
+        }
+    }
+    private void ClearRunObjects()
+    {
+        foreach (var obj in runObjects)
+        {
+            if (obj != null)
+            {
+                Destroy(obj); // 생성된 오브젝트 삭제
+            }
+        }
+        runObjects.Clear(); // 리스트 초기화
+    }
     public void CheckRemainingPlayers()
     {
-        if (gameEnded) return;
+        if (gameEnd) return;
 
         List<RunGameController> alivePlayers = new List<RunGameController>();
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        // 살아있는 플레이어들 찾기
+        foreach (var clientId in playerIds)
         {
-            var playerObject = client.Value.PlayerObject;
+            int clientIndex = playerIds.IndexOf(clientId);
+            GameObject playerObject = null;
+            if (runObjects.Count > clientIndex)
+            {
+                playerObject = runObjects[clientIndex];  // 각 클라이언트에 해당하는 RunGameObject를 가져옵니다.
+            }
 
-            if (playerObject.TryGetComponent(out RunGameController playerController) && !playerController.IsEliminated)
+            if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController) && playerController.canMove.Value)
             {
                 alivePlayers.Add(playerController);
             }
@@ -138,77 +232,32 @@ public class RunGameManager : NetworkBehaviour
 
         if (alivePlayers.Count == 1)
         {
-            EndGame(alivePlayers[0].OwnerClientId);
+            EndGameServerRpc(alivePlayers[0].OwnerClientId);
         }
     }
 
-    private void EndGame(ulong winnerId)
-    {
-        gameEnded = true;
-        winnerClientId = winnerId;
-
-        Debug.Log($"Player {winnerId} 이 승리했습니다!");
-        StopAllPlayersClientRpc();
-        ShowWinnerClientRpc(winnerId);
-
-        Debug.Log("미니게임이 종료되었습니다.");
-        StartCoroutine(LoadNextScene());
-    }
-
+    // 게임 종료 후 클라이언트에게 승리 메시지 전달
     [ClientRpc]
-    private void ShowWinnerClientRpc(ulong winnerId)
+    public void GameFinishedClientRpc(ulong winClientId)
     {
-        if (winnerTextCanvas != null)
-            winnerTextCanvas.SetActive(true);
+        if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) return;
 
-        if (winnerText != null)
-            winnerText.text = $"Player {winnerId} Win!";
-    }
-    [ClientRpc]
-    private void StopAllPlayersClientRpc()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        if (NetworkManager.Singleton.LocalClientId == winClientId)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
-            {
-                player.EnableControl(false); // 조작 비활성화
-            }
+            winMessageUI.SetActive(true);
         }
-    }
-
-    [ClientRpc]
-    private void EndGame_ClientRpc(ulong networkObjectId)
-    {
-        var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[networkObjectId];
-
-        if (playerObject != null && playerObject.TryGetComponent(out RunGameController playerController))
+        else
         {
-            playerController.EnableControl(false);
+            loseMessageUI.SetActive(true);
         }
+
+        Debug.Log("게임 종료");
     }
 
-    private IEnumerator LoadNextScene()
+    public IEnumerator PassTheScene()
     {
-        yield return new WaitForSeconds(3f);
-
-        if (IsServer)
-        {
-            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single); // 모든 클라이언트가 이동
-            EnableAllPlayersControlClientRpc(); // 씬 이동 후 즉시 실행
-        }
+        yield return new WaitForSecondsRealtime(2f);
+        //NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("RunGame"));
+        MinigameManager.Instance.EndMinigame();
     }
-
-    [ClientRpc]
-    private void EnableAllPlayersControlClientRpc()
-    {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
-        {
-            if (client.Value.PlayerObject.TryGetComponent(out RunGameController player))
-            {
-                player.SetEliminated(false);
-                player.EnableControl(true);
-            }
-        }
-    }
-
 }

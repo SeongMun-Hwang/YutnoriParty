@@ -213,7 +213,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  node: {fileID: 0}
   data: {fileID: 11400000, guid: 257980fefe79f1e429c20658727b2db9, type: 2}
+  spawnInterval: 0
+  nodes: []
+  targetNodePrefab: {fileID: 6335003002857245594, guid: fda40be697d753a4d8078295cfe3daf3, type: 3}
 --- !u!54 &5683779139776893250
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -169,11 +168,16 @@ public class CharacterBoardMovement : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Obstacle"))
+        if (other.CompareTag("Obstacle") && PlayerManager.Instance.isMoving)
         {
             meetObstacle = true;
             MainGameProgress.Instance.DespawnNetworkObjectServerRpc(other.gameObject);
             Debug.Log("Obstacle!");
         }
+    }
+
+    public void ChangeCurrentNode(Node node)
+    {
+        currentNode = node;
     }
 }

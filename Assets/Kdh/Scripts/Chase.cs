@@ -77,17 +77,14 @@ public class Chase : NetworkBehaviour
         
         if (other.TryGetComponent<RunGameController>(out RunGameController player))
         {
-            PlayerEliminated(player);            
+            player.EnableControl(false);
+            Debug.Log(player.name + "이 탈락했습니다!");
             animator.SetTrigger("hit");
+            FindAnyObjectByType<RunGameManager>().CheckRemainingPlayers();
         }
     }
 
-    private void PlayerEliminated(RunGameController player)
-    {
-        Debug.Log(player.name + "이 탈락했습니다!");
-        player.SetEliminated(true);
-        FindAnyObjectByType<RunGameManager>().CheckRemainingPlayers();
-    }
+   
     public void EnableChase()
     {
         canChase = true;

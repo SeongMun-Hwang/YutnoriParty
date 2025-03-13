@@ -1,14 +1,16 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class EventNode : NetworkBehaviour
 {
+    [HideInInspector] public Node node;
     public EventNodeData data;
+    public bool isCheckingTrigger = false;
     //참조만 할 정보들 => 스크립터블 오브젝트에 저장 가능
-    int minNode = 1;
-    int maxNode = 1;
+    protected int minNode = 1;
+    protected int maxNode = 1;
     protected int lifeTime = 0;
     public int MinNode { get { return minNode; } }
     public int MaxNode { get {return maxNode; } }
@@ -17,10 +19,13 @@ public class EventNode : NetworkBehaviour
     protected NetworkVariable<int> turnAfterSpawned = new NetworkVariable<int>(0);
     protected NetworkObject enteredPlayer;
     protected NetworkObject exitPlayer;
-    protected List<NetworkObject> enteredPlayers = new List<NetworkObject>();
+    //protected List<NetworkObject> enteredPlayers = new List<NetworkObject>();
+    protected NetworkList<NetworkObjectReference> enteredPlayers = new NetworkList<NetworkObjectReference>(
+        null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     //가끔 바뀌는 정보?
     [SerializeField] int spawnInterval = 0;
+    float triggerTimeOut = 10f;
 
     //네트워크 스폰시 변수들 초기화
     public override void OnNetworkSpawn()
@@ -32,33 +37,63 @@ public class EventNode : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        //플레이어가 밟으면 걔 저장
+        //밟음 판정 서버에서만
+        //if (!IsServer) return;
+
+        //캐릭터가 밟으면 목록에서 찾아보고, 있으면 저장 없으면 패스
         if (other.TryGetComponent(out enteredPlayer))
         {
-            bool contains = false;
-            foreach (var character in PlayerManager.Instance.currentCharacters)
+            if (!enteredPlayer.IsSpawned)
             {
-                //Debug.Log("목록에 있는 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + " 트리거 들어온놈 id + " + enteredPlayer.NetworkObjectId);
-
-                if (character.GetComponent<NetworkObject>().NetworkObjectId == enteredPlayer.NetworkObjectId)
-                {
-                    contains = true;
-                }
+                //Debug.Log("스폰 안된놈임");
+                return;
             }
-            Debug.Log("들어있음? : " + contains);
+            isCheckingTrigger = true;
 
-            //소환된 플레이어 캐릭터 목록에 없으면 리턴
-            if (!contains) return;
-
-            AddPlayerRpc(enteredPlayer);
+            //플레이어 매니저가 각 클라이언트마다 따로라서 밟은 캐릭터의 오너가 실행
+            if (NetworkManager.Singleton.LocalClientId == enteredPlayer.OwnerClientId)
+            {
+                FindCurrentCharacters();
+            }
+            isCheckingTrigger = false;
+            //FindCurrentCharactersRpc(enteredPlayer, RpcTarget.Single(enteredPlayer.OwnerClientId, RpcTargetUse.Temp));
         }
     }
+
+    void FindCurrentCharacters()
+    {
+        foreach (var character in PlayerManager.Instance.currentCharacters)
+        {
+            //Debug.Log("목록에 있는 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + " 트리거 들어온놈 id + " + enteredCharacter.NetworkObjectId);
+
+            if (character.GetComponent<NetworkObject>().NetworkObjectId == enteredPlayer.NetworkObjectId)
+            {
+                //찾음
+                //Debug.Log("목록에서 찾음");
+                AddPlayerRpc(enteredPlayer);
+                return;
+            }
+        }
+
+        //소환된 플레이어 캐릭터 목록에 없으면 리턴
+        //Debug.Log("목록에 없는 캐릭터입니다");
+        isCheckingTrigger = false;
+        return;
+    }
+
     protected virtual void OnTriggerExit(Collider other)
     {
+        //나감 판정 서버에서만
+        //if (!IsServer) return;
+
         //나가는놈이 트리거 들어와있는거 리스트에 없으면 탈출
         if (other.TryGetComponent(out exitPlayer))
         {
-            RemovePlayerRpc(exitPlayer);
+            //주인만 실행
+            if (NetworkManager.Singleton.LocalClientId == exitPlayer.OwnerClientId)
+            {
+                RemovePlayerRpc(exitPlayer);
+            }
         }
     }
 
@@ -66,19 +101,36 @@ public class EventNode : NetworkBehaviour
     [Rpc(SendTo.Server)]
     void AddPlayerRpc(NetworkObjectReference player)
     {
+        NetworkObject playerObject;
+        if(!player.TryGet(out playerObject))
+        {
+            Debug.Log("AddPlayerRpc : 네트워크 오브젝트 찾을 수 없음");
+            return;
+        }
         enteredPlayers.Add(player);
-        Debug.Log(player.NetworkObjectId + " 들어옴, " + "리스트 수 : " + enteredPlayers.Count);
+        //Debug.Log(playerObject.NetworkObjectId + " 들어옴, " + "리스트 수 : " + enteredPlayers.Count);
+
+        isCheckingTrigger = false;
     }
 
     [Rpc(SendTo.Server)]
     void RemovePlayerRpc(NetworkObjectReference player)
     {
-        //이미 들어와 있으면 리턴
-        if (enteredPlayers.Contains(player)) return;
-        if (!enteredPlayers.Contains(player)) return;
+        NetworkObject playerObject;
+        if (!player.TryGet(out playerObject))
+        {
+            Debug.Log("RemovePlayerRpc : 네트워크 오브젝트 찾을 수 없음");
+            return;
+        }
+        //리스트에 없으면 리턴
+        if (!enteredPlayers.Contains(player))
+        {
+            Debug.Log("RemovePlayerRpc : 리스트에 없음");
+            return;
+        }
 
         //있으면 리스트에서 삭제
-        Debug.Log(player.NetworkObjectId + "나감");
+        //Debug.Log(playerObject.NetworkObjectId + "나감");
         enteredPlayers.Remove(player);
     }
 
@@ -111,17 +163,21 @@ public class EventNode : NetworkBehaviour
         }
     }
 
-    //이벤트를 시작하면 개별적인 처리를 끝내고
-    void EventExecute()
+    IEnumerator WaitForTrigger()
     {
+        float time = Time.time;
 
-    }
+        while (Time.time - time < triggerTimeOut)
+        {
+            //1초마다 트리거 체크 변수 체크
+            yield return new WaitForSecondsRealtime(1);
 
-    //모든 클라이언트에서 동일하게 효과를 보여줌
-    [ClientRpc]
-    void PlayEventClientRpc()
-    {
-
+            //체크 됐으면 탈출
+            if (!isCheckingTrigger)
+            {
+                break;
+            }
+        }
     }
 
     [Rpc(SendTo.Everyone)]

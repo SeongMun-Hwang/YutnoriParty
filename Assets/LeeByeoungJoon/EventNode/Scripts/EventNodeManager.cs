@@ -24,17 +24,20 @@ public class EventNodeManager : NetworkBehaviour
     [SerializeField] EventNode itemNodePrefab;
 
     //모든 노드들
-    [SerializeField] List<Transform> allNodes;
-    //스폰될 위치들(스크립터블 오브젝트로 바꾸려면 vec3와 transform 간 변환 과정이 필요)
-    [SerializeField] List<Transform> islandNodeTransforms;
-    [SerializeField] List<Transform> blackHoleNodeTransforms;
-    [SerializeField] List<Transform> itemNodeTransforms;
+    [SerializeField] List<Node> allNodes;
+
+    [SerializeField] List<Node> islandNodes;
+    [SerializeField] List<Node> blackHoleNodes;
+    [SerializeField] List<Node> blackHoleTargets;
+    [SerializeField] List<Node> itemNodes;
 
     //노드에 이벤트 노드가 없는지 체크하는 리스트, 여기에 있으면 방 나간거
     List<int> isFulledNode;
     List<EventNode> despawnSchedule; //디스폰 예약용 리스트
     //각 이벤트 노드별로 몇개 있는지 세는 딕셔너리
     Dictionary<EventNodeType, int> eventNodeTypeNum;
+
+    int itemNodeInitialSpawnNum = 2;
 
     //싱글톤 아님
     static EventNodeManager instance;
@@ -76,9 +79,10 @@ public class EventNodeManager : NetworkBehaviour
             eventNodeTypeNum[type] = 0;
         }
 
-        //이벤트 노드 생성
-        SpawnEventNode(GetRandomPosition(blackHoleNodeTransforms), EventNodeType.BlackHole);
-        SpawnEventNode(GetRandomPosition(islandNodeTransforms), EventNodeType.Island);
+        //이벤트 노드 생성 -> 이벤트 노드 더 많이 만들거면 여기 리팩토링 해야함
+        SpawnEventNode(GetRandomNode(blackHoleNodes), EventNodeType.BlackHole);
+        SpawnEventNode(GetRandomNode(islandNodes), EventNodeType.Island);
+        SpawnItemNodeRpc(itemNodeInitialSpawnNum);
     }
 
     //모든 플레이어 한바퀴 돌면 이거 실행
@@ -94,6 +98,9 @@ public class EventNodeManager : NetworkBehaviour
         {
             node.TurnIncreaseRpc();
         }
+
+        //한바퀴에 아이템노드 하나씩 생성
+        SpawnItemNodeRpc(1);
     } 
 
     //EndMove에서 얘 실행
@@ -121,14 +128,14 @@ public class EventNodeManager : NetworkBehaviour
     }
 
     //노드 리스트를 받아 그 중 랜덤한 노드 위치를 골라주는 함수
-    Transform GetRandomPosition(List<Transform> transforms)
+    Node GetRandomNode(List<Node> nodes)
     {
-        List<Transform> tmp = transforms;
+        List<Node> tmp = nodes;
 
         //랜덤으로 노드 하나 뽑고
-        Transform nodeTransform = tmp[UnityEngine.Random.Range(0, tmp.Count)];
+        Node node = tmp[UnityEngine.Random.Range(0, tmp.Count)];
         //전체 노드에서 얘 인덱스가 몇번인지 찾고
-        int idx = allNodes.IndexOf(nodeTransform);
+        int idx = allNodes.IndexOf(node);
         Debug.Log("인덱스 : " + idx);
 
         //방 찼으면 다시 찾으셈
@@ -142,22 +149,21 @@ public class EventNodeManager : NetworkBehaviour
             }
             Debug.Log("방 찼네요");
             //방 다찼으면 tmp에서 제거해 다시 안뽑히게 하고 
-            tmp.Remove(nodeTransform);
+            tmp.Remove(node);
             //다시 뽑고
-            nodeTransform = tmp[UnityEngine.Random.Range(0, tmp.Count)];
+            node = tmp[UnityEngine.Random.Range(0, tmp.Count)];
             //인덱스 다시 뽑아서 검사
-            idx = allNodes.IndexOf(nodeTransform);
+            idx = allNodes.IndexOf(node);
             Debug.Log("다시 뽑은 인덱스 : " + idx);
         }
 
-        //최종적으로 트랜스폼으로 리턴
-
+        //최종적으로 노드 리턴
         return allNodes[idx];
     }
 
-    void SpawnEventNode(Transform nodeTransform, EventNodeType type)
+    void SpawnEventNode(Node node, EventNodeType type)
     {
-        if(nodeTransform == null)
+        if (node == null)
         {
             Debug.Log("빈 노드 없음");
             return;
@@ -165,6 +171,7 @@ public class EventNodeManager : NetworkBehaviour
         Debug.Log("노드 타입 : " +  type);
 
         EventNode nodePrefab;
+        Transform nodeTransform = node.transform;
 
         switch (type)
         {
@@ -187,6 +194,7 @@ public class EventNodeManager : NetworkBehaviour
         //해당 타입 노드가 최대 노드 수 까지 만들어졌다면 더 안만들고 리턴
         if (nodePrefab.MaxNode <= eventNodeTypeNum[type])
         {
+            Debug.Log(type + " 노드 타입 최대");
             return;
         }
 
@@ -194,8 +202,19 @@ public class EventNodeManager : NetworkBehaviour
         spawnedNodes.Add(Instantiate(nodePrefab, nodeTransform.position, Quaternion.identity));
         //Debug.Log(type + " 인스턴스화 성공");
 
+        var spawnedNode = spawnedNodes.Last();
+
+        //노드 할당
+        spawnedNode.node = node;
+
+        //블랙홀 노드면 범위 노드 전달
+        if(type == EventNodeType.BlackHole)
+        {
+            spawnedNode.GetComponent<BlackHoleNode>().nodes = blackHoleTargets;
+        }
+
         //네트워크 스폰
-        spawnedNodes.Last().GetComponent<NetworkObject>().Spawn();
+        spawnedNode.GetComponent<NetworkObject>().Spawn();
         //Debug.Log(type + " 네트워크 스폰 성공");
 
         //모든 처리가 끝나 노드가 생성되었으면 딕셔너리 숫자 증가
@@ -203,7 +222,7 @@ public class EventNodeManager : NetworkBehaviour
         //Debug.Log(type + " 딕셔너리++");
 
         //방 찼다는거 표시
-        isFulledNode.Add(allNodes.IndexOf(nodeTransform));
+        isFulledNode.Add(allNodes.IndexOf(node));
 
         //Debug.Log(type + " 스폰 완료");
     }
@@ -246,6 +265,22 @@ public class EventNodeManager : NetworkBehaviour
             {
                 island.EscapeIslandRpc(character);
             }
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SpawnItemNodeRpc(int spawnNum)
+    {
+        int spawned = eventNodeTypeNum[EventNodeType.Item];
+        int max = itemNodePrefab.GetComponent<ItemNode>().MaxNode;
+        
+        //스폰할 노드 수가 최대 생성개수를 넘어서지 못하게 제한
+        int toSpawn = (spawnNum + spawned > max) ? max - spawned : spawnNum;
+
+        //스폰할 노드 수만큼 스폰
+        for(int i = 0; i < toSpawn; i++)
+        {
+            SpawnEventNode(GetRandomNode(itemNodes), EventNodeType.Item);
         }
     }
 }
