@@ -68,6 +68,7 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public IEnumerator EndMove()
     {
+        Debug.Log("EndMove 호출 : " + NetworkManager.Singleton.LocalClientId);
         EventNodeManager.Instance.CheckStepOnServerRpc(); //이동 끝나고 노드 밟았는지 체크
 
         bool isEventChecking = true;
