@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,12 +22,15 @@ public class StackableBlock : NetworkBehaviour
 	private NetworkVariable<Vector3> position = new NetworkVariable<Vector3>(
 		Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
 	);
+    public NetworkVariable<Vector4> color = new NetworkVariable<Vector4>();
 
 	// 고정관련
 	private bool isFixed;
 
 	public override void OnNetworkSpawn()
 	{
+        GetComponent<Renderer>().material.color = color.Value;
+        color.OnValueChanged += OnColorChanged;
 		distance = maxDistance;
 		moveForward = false;
 
@@ -41,6 +46,12 @@ public class StackableBlock : NetworkBehaviour
 		else
 			transform.Translate(0, 0, distance);
 	}
+
+    private void OnColorChanged(Vector4 previousValue, Vector4 newValue)
+    {
+        Color color = new Color(newValue.x, newValue.y, newValue.z, 1);
+        GetComponent<Renderer>().material.color = newValue;
+    }
 
 	private void Update()
 	{

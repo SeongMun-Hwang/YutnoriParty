@@ -83,6 +83,7 @@ public class ShootingBattleManager : NetworkBehaviour
         {
             yield return new WaitForSecondsRealtime(1f);
             timer--;
+            if (timer == 0) break;
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f, Color.white);
             yield return null;
         }
@@ -102,6 +103,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 if (data.clientId == playerIds[i])
                 {
                     usernameUI[i].text = data.userName.ToString();
+                    usernameUI[i].color = crosshairColors[i];
                 }
             }
             

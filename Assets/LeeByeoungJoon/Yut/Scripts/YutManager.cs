@@ -450,6 +450,10 @@ public class YutManager : NetworkBehaviour
                 {
                     break;
                 }
+                else //faceStable이 false지만 타임아웃으로 루프 탈출했을때 결과가 나와버리는 버그 방지
+                {
+                    isFaceError = true;
+                }
             }
 
             timePassed += waitInterval;

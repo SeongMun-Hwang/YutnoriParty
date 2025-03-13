@@ -87,6 +87,7 @@ public class BlockSpawnHandler : NetworkBehaviour
 
         NetworkObject netObj = activeTile.GetComponent<NetworkObject>();
 		netObj.Spawn(true); // 네트워크에 생성 등록
+        activeTile.GetComponent<StackableBlock>().color.Value = new Vector4(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1);
 	}
 
 	public void DropBlock()

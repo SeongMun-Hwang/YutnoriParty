@@ -12,15 +12,20 @@ public class MinigameManager : NetworkBehaviour
     public static MinigameManager Instance { get { return instance; } }
 
     public NetworkVariable<int> maxPlayers;
+
+    // 추후 미니게임이 추가될 때, Define 클래스의 MinigameType 열거형과 씬의 이름을 추가할 것
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
+        //{ Define.MinigameType.BasketGame, "BasketGame" },
+        { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" }
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
     public Define.MGPlayerType playerType;
+    private bool isRandomGame = false;
 
     public Camera maingameCamera;
 
@@ -51,27 +56,6 @@ public class MinigameManager : NetworkBehaviour
         }
     }
 
-    // 미니게임을 시작하기 위해 씬을 이동
-    public void StartMinigame(Define.MinigameType type)
-    {
-        if (NetworkManager.Singleton.IsServer)
-        {
-            MinigameButtonUI.SetActive(false);
-            if (MinigameScenes.TryGetValue(type, out string sceneName))
-            {
-                NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-            }
-            else
-            {
-                Debug.LogError($"씬 {type}이 없습니다");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("씬 변경은 서버에서 수행해야합니다");
-        }
-    }
-
     public void StartMinigame()
     {
         if (NetworkManager.Singleton.IsServer)
@@ -90,7 +74,14 @@ public class MinigameManager : NetworkBehaviour
     public void SelectMinigame(int i)
     {
         gameType = (Define.MinigameType)i;
+        isRandomGame = false;
         Debug.Log($"{gameType} 미니게임 선택됨");
+    }
+
+    public void OnRandomToggleChanged()
+    {
+        isRandomGame = !isRandomGame;
+        Debug.Log($"미니게임 랜덤 선택 : {isRandomGame}");
     }
 
     public void EndMinigame()
@@ -155,7 +146,11 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     void StartMiniGameClientRpc()
     {
-        // 미니게임을 위해 특정 오브젝트 비활성화
+        if (isRandomGame)
+        {
+            gameType = (Define.MinigameType)Random.Range(0, MinigameScenes.Count);
+            Debug.Log($"랜덤으로 {gameType} 선택");
+        }
         StartCoroutine(LoadSceneWithFade(1f, false));
     }
 

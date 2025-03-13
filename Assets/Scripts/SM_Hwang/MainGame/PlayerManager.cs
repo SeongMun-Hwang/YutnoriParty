@@ -85,29 +85,29 @@ public class PlayerManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = default)]
     public void DespawnCharacterServerRpc(NetworkObjectReference noRef, ulong targetClientId, bool isGoal = false)
     {
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { targetClientId } }
-        };
         noRef.TryGet(out NetworkObject no);
         List<NetworkObject> childObjects = new List<NetworkObject>(no.GetComponentsInChildren<NetworkObject>());
         for (int i = 0; i < childObjects.Count; i++)
         {
-            DespawnCharacterClientRpc(childObjects[i], isGoal, clientRpcParams);
+            DespawnCharacterClientRpc(childObjects[i], isGoal);
             childObjects[i].Despawn();
             Destroy(childObjects[i]);
         }
     }
-    [ClientRpc]
-    private void DespawnCharacterClientRpc(NetworkObjectReference noRef, bool isGoal = false, ClientRpcParams clientRpcParams = default)
+    [ClientRpc(RequireOwnership = default)]
+    private void DespawnCharacterClientRpc(NetworkObjectReference noRef, bool isGoal = false)
     {
         noRef.TryGet(out NetworkObject no);
-        currentCharacters.Remove(noRef);
-        currentCharacters.RemoveAll(item => item == null);
-        if (isGoal) numOfCharacter--;
-        if (numOfCharacter == 0)
+        if (no.OwnerClientId == NetworkManager.LocalClientId)
         {
-            EndGame();
+            Debug.Log("Remove from list");
+            PlayerManager.Instance.currentCharacters.Remove(noRef);
+            PlayerManager.Instance.currentCharacters.RemoveAll(item => item == null);
+            if (isGoal) numOfCharacter--;
+            if (numOfCharacter == 0)
+            {
+                EndGame();
+            }
         }
     }
     public void OverlapCharacter(GameObject parent, GameObject child)
