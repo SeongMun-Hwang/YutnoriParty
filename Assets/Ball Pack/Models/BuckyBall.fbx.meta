@@ -1,20 +1,20 @@
 fileFormatVersion: 2
-guid: 3de1b40f05c2c1a44a6e4fed7a4cadbd
+guid: a97bdcf094fff104d9f67b004b505dd0
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable:
   - first:
       43: 4300000
-    second: Cylinder
+    second: Atoms
   - first:
       43: 4300002
-    second: BombBall
+    second: Lines
   - first:
       43: 4300004
-    second: BombTop
+    second: BuckyBallLines
   - first:
       43: 4300006
-    second: BombWick
+    second: BuckyBallAtoms
   - first:
       1001: 100100000
     second: DataTemplate __Singleton__
@@ -120,3 +120,10 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 446
+  packageName: Ball Pack
+  packageVersion: 1.0
+  assetPath: Assets/Ball Pack/Models/BuckyBall.fbx
+  uploadId: 24549

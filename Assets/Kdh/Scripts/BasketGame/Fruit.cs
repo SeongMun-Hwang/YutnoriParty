@@ -7,11 +7,8 @@ public class Fruit : NetworkBehaviour
     [SerializeField] private int scoreValue; 
     [SerializeField] private GameObject collectParticlePrefab;
     private bool collected = false;
-    private AudioSource audioSource;
-    private void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+    
+
         private void OnTriggerEnter(Collider other)
         {
         if (collected) return;
@@ -63,10 +60,7 @@ public class Fruit : NetworkBehaviour
     [ClientRpc]
     private void PlaySoundClientRpc()
     {
-        if (audioSource != null)
-        {
-            audioSource.Play();
-        }
+        AudioManager.instance.Playsfx(2);
     }
 
     [ServerRpc(RequireOwnership = false)]

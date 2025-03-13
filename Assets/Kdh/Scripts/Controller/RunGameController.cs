@@ -23,11 +23,22 @@ public class RunGameController : NetworkBehaviour
     {
         if (!IsOwner) return;
         {
-            if (RunGameManager.Instance.runGameCamera != null)
+            if (RunGameManager.Instance != null)
             {
-                Camera cam = RunGameManager.Instance.runGameCamera;
-                cam.transform.position = transform.position + new Vector3(0, 4, 7);
-                cam.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+                if (RunGameManager.Instance.runGameCamera != null)
+                {
+                    Camera cam = RunGameManager.Instance.runGameCamera;
+                    cam.transform.position = transform.position + new Vector3(0, 4, 7);
+                    cam.transform.rotation = Quaternion.Euler(6f, -180f, 0f);
+                }
+                else
+                {
+                    
+                }
+            }
+            else
+            {
+                
             }
             if (!canMove.Value) return;
             {

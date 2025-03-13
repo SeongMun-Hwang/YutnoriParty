@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  gameDuration: 10
+  gameDuration: 30
   countdownText: {fileID: 542981318}
   remainingTimeText: {fileID: 1934465021}
   scoreBoardText: {fileID: 1616687525}
@@ -478,7 +478,7 @@ PrefabInstance:
     - target: {fileID: 237591571182729425, guid: ef88645c0ffd7a84596f8cca0ebdcbae, type: 3}
       propertyPath: 'fruitPrefabs.Array.data[0]'
       value: 
-      objectReference: {fileID: 5995667670132570334, guid: 956bf8ee75eb6064999342a782b986e8, type: 3}
+      objectReference: {fileID: 8782256428914420644, guid: b255a1c1eb19e39498fbf7e7f924c16f, type: 3}
     - target: {fileID: 237591571182729425, guid: ef88645c0ffd7a84596f8cca0ebdcbae, type: 3}
       propertyPath: 'fruitPrefabs.Array.data[1]'
       value: 
