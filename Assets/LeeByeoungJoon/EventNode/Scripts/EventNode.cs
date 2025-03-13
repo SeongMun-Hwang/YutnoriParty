@@ -185,6 +185,7 @@ public class EventNode : NetworkBehaviour
     protected void EventExcuteRpc()
     {
         isEventRunning.Value = true;
+        Debug.Log(gameObject.name + " 이벤트 처리 시작");
     }
 
     //이벤트 끝날때 처리
@@ -192,6 +193,7 @@ public class EventNode : NetworkBehaviour
     protected void EventEndRpc()
     {
         isEventRunning.Value = false;
+        Debug.Log(gameObject.name + " 이벤트 처리 끝");
     }
 
     [Rpc(SendTo.Everyone)]

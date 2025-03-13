@@ -115,7 +115,7 @@ public class EventNodeManager : NetworkBehaviour
         if (!IsServer) return;
 
         checkingStepOn.Value = true; //노드 검사 시작
-        Debug.Log("밟은 노드에 이벤트 있는지 체크");
+        Debug.Log("노드 검사 시작");
 
         //모든 노드에서 이벤트 실행
         foreach (var node in spawnedNodes)
@@ -154,13 +154,13 @@ public class EventNodeManager : NetworkBehaviour
             }
 
             yield return new WaitForSeconds(1);
-            timeOut--;
+            //timeOut--;
             Debug.Log("이벤트 기다리는 중..");
-            if(timeOut == 0)
-            {
-                Debug.Log("이벤트 대기 타임아웃");
-                break;
-            }
+            //if(timeOut == 0)
+            //{
+            //    Debug.Log("이벤트 대기 타임아웃");
+            //    break;
+            //}
         }
 
         if (eventRunning)
@@ -171,6 +171,7 @@ public class EventNodeManager : NetworkBehaviour
 
         DespawnEventNodeExcute();
         checkingStepOn.Value = false; //노드 검사 끝
+        Debug.Log("노드 검사 끝");
 
         yield return null;
     }

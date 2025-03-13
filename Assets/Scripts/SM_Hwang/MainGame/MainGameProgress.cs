@@ -19,6 +19,7 @@ public class MainGameProgress : NetworkBehaviour
     public System.Action endMinigameActions;
     public ulong winnerId;
     public bool isMinigamePlaying = false;
+    NetworkVariable<bool> isBlackHoleExcuting = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
 
     private void Update()
     {
@@ -73,31 +74,33 @@ public class MainGameProgress : NetworkBehaviour
 
         //여기인듯? 위에거 실행 끝날때까지 안기다려버림
         //밟았는지 체킹 중에는 대기
-        int timeOut = 10;
+        //int timeOut = 10;
         while (isEventChecking)
         {
+            yield return new WaitForSecondsRealtime(1);
             isEventChecking = EventNodeManager.Instance.checkingStepOn.Value;
 
-            yield return new WaitForSecondsRealtime(1);
+            Debug.Log("EndMove : 이벤트 노드 검사중? : " + EventNodeManager.Instance.checkingStepOn.Value);
 
-            timeOut--;
-            Debug.Log("EndMove : 이벤트 노드 실행 기다리는 중 : " + timeOut);
+            //timeOut--;
+            //Debug.Log("EndMove : 이벤트 노드 실행 기다리는 중 : " + timeOut);
 
-            if (timeOut == 0)
-            {
-                Debug.Log("EndMove 타임아웃");
-                break;
-            }
+            //if (timeOut == 0)
+            //{
+            //    Debug.Log("EndMove 타임아웃");
+            //    break;
+            //}
         }
 
         Debug.Log("EndMove 이벤트 노드 실행 대기 끝");
+        Debug.Log("미니게임 플레이중? : " + isMinigamePlaying);
 
         if (EventNodeManager.Instance.checkingStepOn.Value)
         {
             Debug.Log("이벤트 노드 실행중이지만 타임아웃으로 빠져나옴");
         }
 
-        if (!isMinigamePlaying && CheckOtherPlayer()) //이동이 끝나고 주변 체크
+        if (CheckOtherPlayer()) //이동이 끝나고 주변 체크
         {
             StartMiniGame(encounteredEnemy);
         }
@@ -236,11 +239,18 @@ public class MainGameProgress : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void StartMiniGameTogetherServerRpc(NetworkObjectReference triggeredCharacter, ulong[] playerIds, NetworkObjectReference[] characterList)
+    public void StartBlackHoleMiniGameServerRpc(NetworkObjectReference node, NetworkObjectReference triggeredCharacter, ulong[] playerIds, NetworkObjectReference[] characterList)
     {
         Debug.Log("여러명 미니게임 시작");
         isMinigamePlaying = true;
-        
+
+        if (!node.TryGet(out NetworkObject no))
+        {
+            Debug.Log("네트워크 오브젝트 못찾음");
+        }
+
+        isBlackHoleExcuting.Value = true;
+
         endMinigameActions = null;
         endMinigameActions += (() =>
         {
@@ -290,6 +300,9 @@ public class MainGameProgress : NetworkBehaviour
             //        TargetClientIds = new List<ulong> { triggered.OwnerClientId }
             //    }
             //});
+
+            //미니게임 끝나고서야 이벤트 종료 호출
+            no.GetComponent<BlackHoleNode>().BlackHoleEventEndRpc();
         });
         MinigameManager.Instance.SetPlayers(playerIds);
         MinigameManager.Instance.StartMinigame();
