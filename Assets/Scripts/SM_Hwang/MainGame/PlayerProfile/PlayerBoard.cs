@@ -10,7 +10,7 @@ public class PlayerBoard : NetworkBehaviour
     [SerializeField] Transform playerBoardParent;
     [SerializeField] PlayerProfile playerProfilePrefab;
     [SerializeField] List<RectTransform> profileTransforms;
-    NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
+    public NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
     List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
     public override void OnNetworkSpawn()
     {
