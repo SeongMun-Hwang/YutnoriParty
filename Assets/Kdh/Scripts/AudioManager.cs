@@ -18,20 +18,30 @@ public class AudioManager : MonoBehaviour
     AudioSource[] sfxPlayers;
     int channelIndex;
 
-    
+
 
 
 
     void Awake()
     {
-        instance = this;
-        Init();
-
-        if (!bgmPlayer.isPlaying)
+        if (instance == null)
         {
-            bgmPlayer.Play();
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+            Init();
+
+            if (!bgmPlayer.isPlaying)
+            {
+                bgmPlayer.Play();
+            }
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
+
+
 
     void Init()
     {

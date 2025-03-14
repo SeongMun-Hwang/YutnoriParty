@@ -2971,12 +2971,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2033560869}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000872541, y: -0.95299935, z: 0.3029722, w: 0.00027837767}
-  m_LocalPosition: {x: -0.2845081, y: 18.894325, z: 23.474487}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.24237071, y: -0.0014597445, z: 0.00036718382, w: 0.9701826}
+  m_LocalPosition: {x: -0.009933091, y: 0.49352932, z: 0.683101}
+  m_LocalScale: {x: 0.049999997, y: 0.05, z: 0.05000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 8857613296451916316}
   m_LocalEulerAnglesHint: {x: 44.52, y: 0, z: 0}
 --- !u!114 &2033560873
 MonoBehaviour:
@@ -3671,13 +3671,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tiger
       objectReference: {fileID: 0}
+    - target: {fileID: 3921098486439412464, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
+      propertyPath: chaseSpeed
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 4312754742453869637, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2101137442
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 863317919959514539, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2033560872}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 863317919959736779, guid: 4210ffd01922c5c4db5d401bd5d4b69e, type: 3}
       insertIndex: -1
@@ -3794,7 +3801,6 @@ AudioSource:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 2033560872}
   - {fileID: 815878445}
   - {fileID: 341684777}
   - {fileID: 1080449750}

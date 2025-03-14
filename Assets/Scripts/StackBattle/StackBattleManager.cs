@@ -191,6 +191,12 @@ public class StackBattleManager : NetworkBehaviour
         timerUI.text = time.ToString();
     }
 
+    [ClientRpc]
+    private void SuccessStackClientRpc()
+    {
+        AudioManager.instance.Playsfx(6);
+    }
+
     [ServerRpc(RequireOwnership = false)]
 	public void RequestNextTurnServerRpc(ulong senderClientId)
 	{
@@ -228,6 +234,7 @@ public class StackBattleManager : NetworkBehaviour
 
                 if (!timeover && !failed)
                 {
+                    SuccessStackClientRpc();
                     //spawner.CreateBlock();
                 }
 
@@ -303,6 +310,7 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameOverClientRpc(ulong id)
 	{
+        AudioManager.instance.Playsfx(7);
         if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
 
         if (NetworkManager.Singleton.LocalClientId == id)
