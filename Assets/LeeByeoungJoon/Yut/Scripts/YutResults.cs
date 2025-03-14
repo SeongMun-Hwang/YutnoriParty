@@ -35,6 +35,11 @@ public class YutResults : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Event Excute", 2f);
             return;
         }
+        if (GameManager.Instance.mainGameProgress.isEndMoveExcuting)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait EndMove Excute", 2f);
+            return;
+        }
 
         Debug.Log("이동 가능? : " + MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value);
         //이동 못하는 애 골랐으면 다시 고르라고 안내함

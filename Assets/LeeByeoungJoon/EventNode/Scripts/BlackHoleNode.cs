@@ -19,6 +19,8 @@ public class BlackHoleNode : EventNode
     WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
 
     NetworkVariable<bool> isPaused = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+    NetworkVariable<bool> isProcessing = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+
     NetworkVariable<int> pausedTurn = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone);
     NetworkVariable<int> characterCount =new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone);
 
@@ -40,11 +42,19 @@ public class BlackHoleNode : EventNode
     public override void EventStartRpc()
     {
         EventExcuteRpc();
+        isProcessing.Value = true;
 
+        //휴식중인데 밟으면 바로 리턴
         if(isPaused.Value)
         {
+            //이미 작동중이면 패스
+            if (isProcessing.Value)
+            {
+                return;
+            }
+
             Debug.Log("블랙홀 휴식중");
-            EventEndRpc();
+            EventEndRpc(); //니가 가로챘냐
             return;
         }
         //아무도 안밟고 있으면 일 없음
@@ -127,12 +137,14 @@ public class BlackHoleNode : EventNode
 
         while (characterCount.Value > 0)
         {
-            if(timeOut <= 0)
-            {
-                Debug.Log("블랙홀 이동 타임아웃");
-                break;
-            }
-            Debug.Log("블랙홀 이동처리 기다리는 중... 타임아웃까지 : " +  timeOut);
+            //if(timeOut <= 0)
+            //{
+            //    Debug.Log("블랙홀 이동 타임아웃");
+            //    break;
+            //}
+            //Debug.Log("블랙홀 이동처리 기다리는 중... 타임아웃까지 : " +  timeOut);
+            Debug.Log("블랙홀 이동처리 기다리는 중...");
+
             yield return new WaitForSecondsRealtime(1);
             timeOut--;
         }
@@ -162,6 +174,7 @@ public class BlackHoleNode : EventNode
     [Rpc(SendTo.Server)]
     public void BlackHoleEventEndRpc()
     {
+        isProcessing.Value = false;
         EventEndRpc();
     }
 

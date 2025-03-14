@@ -51,6 +51,11 @@ public class EventNodeManager : NetworkBehaviour
         instance = this;
     }
 
+    void OnCheckingStepOnChanged(bool prev, bool current)
+    {
+        Debug.Log("체킹 스텝온 바뀜 : " + checkingStepOn.Value + " 이전 값 :" + prev + " 현재 값 : " + current);
+    }
+
     void FixedUpdate()
     {
         //if (!IsServer) return;
@@ -67,6 +72,8 @@ public class EventNodeManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        //checkingStepOn.OnValueChanged += OnCheckingStepOnChanged;
+
         //서버에서만 노드 관리
         if (!IsServer) return;
 
@@ -115,6 +122,7 @@ public class EventNodeManager : NetworkBehaviour
         if (!IsServer) return;
 
         checkingStepOn.Value = true; //노드 검사 시작
+
         Debug.Log("노드 검사 시작");
 
         //모든 노드에서 이벤트 실행
@@ -170,7 +178,10 @@ public class EventNodeManager : NetworkBehaviour
         }
 
         DespawnEventNodeExcute();
+
         checkingStepOn.Value = false; //노드 검사 끝
+        GameManager.Instance.mainGameProgress.ChangeEventCheckingClientRpc(false);
+
         Debug.Log("노드 검사 끝");
 
         yield return null;

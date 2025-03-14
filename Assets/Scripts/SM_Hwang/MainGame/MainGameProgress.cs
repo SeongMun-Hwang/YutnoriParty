@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -20,6 +21,10 @@ public class MainGameProgress : NetworkBehaviour
     public ulong winnerId;
     public bool isMinigamePlaying = false;
     NetworkVariable<bool> isBlackHoleExcuting = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+    public bool isEndMoveExcuting = false;
+
+    [SerializeField] bool isWaitMinigameEnd = false;
+    bool isEventChecking = false;
 
     private void Update()
     {
@@ -29,6 +34,12 @@ public class MainGameProgress : NetworkBehaviour
     {
         instance = this;
     }
+
+    public override void OnNetworkDespawn()
+    {
+
+    }
+
     /*게임 시작*/
     //시작 시 입장한 플레이어 수 저장 및 랜덤으로 시작턴 지정
     public void StartGame()
@@ -61,20 +72,27 @@ public class MainGameProgress : NetworkBehaviour
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
     public IEnumerator EndMove()
     {
+        isEndMoveExcuting = true;
+
         Debug.Log("EndMove 호출 : " + NetworkManager.Singleton.LocalClientId);
-        EventNodeManager.Instance.CheckStepOnServerRpc(); //이동 끝나고 노드 밟았는지 체크
-
-        bool isEventChecking = true;
-
+        
+        isEventChecking = true;
+        bool subscribed = false;
         //여기인듯? 위에거 실행 끝날때까지 안기다려버림
         //밟았는지 체킹 중에는 대기
         //int timeOut = 10;
         while (isEventChecking)
         {
-            yield return new WaitForSecondsRealtime(1);
-            isEventChecking = EventNodeManager.Instance.checkingStepOn.Value;
+            if (!subscribed)
+            {
+                //EventNodeManager.Instance.checkingStepOn.OnValueChanged += OnCheckingStepOnChangedServerRpc;
+                EventNodeManager.Instance.CheckStepOnServerRpc(); //이동 끝나고 노드 밟았는지 체크
+                subscribed = true;
+            }
 
-            Debug.Log("EndMove : 이벤트 노드 검사중? : " + EventNodeManager.Instance.checkingStepOn.Value);
+            yield return new WaitForSecondsRealtime(1);
+            //isEventChecking = EventNodeManager.Instance.checkingStepOn.Value;
+            Debug.Log("EndMove : 이벤트 노드 검사중? : " + isEventChecking);
 
             //timeOut--;
             //Debug.Log("EndMove : 이벤트 노드 실행 기다리는 중 : " + timeOut);
@@ -85,6 +103,7 @@ public class MainGameProgress : NetworkBehaviour
             //    break;
             //}
         }
+        //EventNodeManager.Instance.checkingStepOn.OnValueChanged -= OnCheckingStepOnChangedServerRpc;
 
         Debug.Log("EndMove 이벤트 노드 실행 대기 끝");
         Debug.Log("미니게임 플레이중? : " + isMinigamePlaying);
@@ -102,9 +121,33 @@ public class MainGameProgress : NetworkBehaviour
 
         yield return null;
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    void OnCheckingStepOnChangedServerRpc(bool previous, bool current)
+    {
+        Debug.Log("노드 밟았는지? 이전 값 : " + previous + " 현재 값 : " + current);
+
+        //isEventChecking = current;
+        ChangeEventCheckingStateClientRpc();
+    }
+
+    [ClientRpc]
+    void ChangeEventCheckingStateClientRpc()
+    {
+        isEventChecking = EventNodeManager.Instance.checkingStepOn.Value;
+        Debug.Log("클라이언트 이벤트 체킹 변경\n이벤트 노드 매니저 값 : " + EventNodeManager.Instance.checkingStepOn.Value + "\nisEventChecking 값 : " + isEventChecking);
+    }
+    [ClientRpc]
+    public void ChangeEventCheckingClientRpc(bool value)
+    {
+        isEventChecking = value;
+        Debug.Log("클라이언트 이벤트 체킹 변경\nisEventChecking 값 : " + isEventChecking);
+    }
     /*이동 종료 후 같은 위치의 적 탐색*/
     private bool CheckOtherPlayer()
     {
+        Debug.Log("다른 캐릭터 겹치는지 체크");
+
         if (currentCharacter == null) return false;
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 1f);
         foreach (Collider collider in hitColliders)
@@ -133,6 +176,9 @@ public class MainGameProgress : NetworkBehaviour
     /*미니게임 진행 중, isMinigamePlaying==true일 동안 대기*/
     private IEnumerator WaitUntilMinigameEnd()
     {
+        isWaitMinigameEnd = true;
+        Debug.Log("미니게임 끝날때까지 대기");
+
         while (isMinigamePlaying)
         {
             yield return null;
@@ -143,11 +189,19 @@ public class MainGameProgress : NetworkBehaviour
         {
             CheckAllPlayerTurnPassed();
         }
+        else
+        {
+            isEndMoveExcuting = false;
+            Debug.Log("할거 남음");
+        }
+
+        isWaitMinigameEnd = false;
     }
     /*모든 유저 턴이 한 번 씩 진행됐는지 확인*/
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
+        Debug.Log("모든 플레이어 턴 했는지 체크");
         //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
         if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
         {
@@ -175,6 +229,8 @@ public class MainGameProgress : NetworkBehaviour
     /*턴 변경 체크*/
     private void CheckTurnChange()
     {
+        Debug.Log("턴 변경 체크");
+
         if (YutManager.Instance.YutResultCount() == 0 && YutManager.Instance.throwChance == 0
             && !YutManager.Instance.isCalulating)
         {
@@ -182,6 +238,9 @@ public class MainGameProgress : NetworkBehaviour
             GameManager.Instance.inGameCanvas.SetActive(false);
             EndTurnServerRpc();
         }
+
+        //IsEndMoveExcuteChangeServerRpc(false);
+        isEndMoveExcuting = false;
     }
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
@@ -202,6 +261,8 @@ public class MainGameProgress : NetworkBehaviour
     // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy = null)
     {
+        Debug.Log("미니게임 시작");
+
         isMinigamePlaying = true;
         if (enemy != null)
         {
