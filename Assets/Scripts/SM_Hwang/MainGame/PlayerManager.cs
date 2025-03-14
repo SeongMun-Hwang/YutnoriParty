@@ -8,6 +8,7 @@ using System;
 using Unity.Services.Authentication;
 using System.Threading.Tasks;
 using TMPro;
+using System.Linq;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -51,15 +52,21 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled", 2f);
             return;
         }
-        SpawnCharacterServerRpc();
+        SpawnCharacterServerRpc(GetClientIndex());
     }
-
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Keypad5))
+        {
+            Debug.Log(GetClientIndex());
+        }
+    }
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnCharacterServerRpc(ServerRpcParams rpcParams = default)
+    public void SpawnCharacterServerRpc(int index, ServerRpcParams rpcParams = default)
     {
         ulong senderId = rpcParams.Receive.SenderClientId;
-
-        GameObject go = Instantiate(GameManager.Instance.playerCharacters[(int)senderId], Vector3.zero, Quaternion.identity);
+        
+        GameObject go = Instantiate(GameManager.Instance.playerCharacters[index], Vector3.zero, Quaternion.identity);
         go.GetComponent<NetworkObject>().Spawn();
         go.GetComponent<NetworkObject>().ChangeOwnership(senderId);
 
@@ -163,5 +170,13 @@ public class PlayerManager : NetworkBehaviour
     private void EndGame()
     {
         Debug.Log("Game End");
+    }
+    
+    public int GetClientIndex()
+    {
+        ulong localClientId = NetworkManager.Singleton.LocalClientId;
+        var clientList = NetworkManager.Singleton.ConnectedClientsList.Select(c => c.ClientId).ToList();
+
+        return clientList.IndexOf(localClientId);
     }
 }

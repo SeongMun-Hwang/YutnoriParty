@@ -35,7 +35,6 @@ public class MainGameProgress : NetworkBehaviour
         numOfPlayer = NetworkManager.ConnectedClients.Count;
         currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
-        Debug.Log("count : " + NetworkManager.ConnectedClientsIds.Count);
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
     /*턴 시작*/
@@ -115,7 +114,6 @@ public class MainGameProgress : NetworkBehaviour
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
-        Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
         //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
         if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
         {
@@ -165,7 +163,7 @@ public class MainGameProgress : NetworkBehaviour
         {
             currentPlayerNumber.Value = 0;
         }
-        StartTurn(currentPlayerNumber.Value);
+        StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
     // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy = null)
