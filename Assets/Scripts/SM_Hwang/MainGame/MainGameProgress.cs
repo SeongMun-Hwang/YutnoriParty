@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using System;
 
 public class MainGameProgress : NetworkBehaviour
 {
@@ -33,7 +34,7 @@ public class MainGameProgress : NetworkBehaviour
     public void StartGame()
     {
         numOfPlayer = NetworkManager.ConnectedClients.Count;
-        currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
+        currentPlayerNumber.Value = UnityEngine.Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
@@ -42,6 +43,7 @@ public class MainGameProgress : NetworkBehaviour
     void StartTurn(int n)
     {
         Debug.Log("Start Turn");
+        GameManager.Instance.playerBoard.SetProfileOutlineClientRpc(NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
         GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(currentPlayerNumber.Value + "'s Turn!", 2f);
         SpawnInGameCanvasClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)n } } });
     }
