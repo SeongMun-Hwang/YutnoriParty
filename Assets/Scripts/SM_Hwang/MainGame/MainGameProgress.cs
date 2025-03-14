@@ -24,7 +24,16 @@ public class MainGameProgress : NetworkBehaviour
     public bool isEndMoveExcuting = false;
 
     [SerializeField] bool isWaitMinigameEnd = false;
-    bool isEventChecking = false;
+    bool _isEventChecking;
+    public bool isEventChecking
+    {
+        get => _isEventChecking;
+        set
+        {
+            Debug.Log($"isEventChecking 값 변경 : {_isEventChecking} -> {value}");
+            _isEventChecking = value;
+        }
+    }
 
     private void Update()
     {
@@ -70,7 +79,12 @@ public class MainGameProgress : NetworkBehaviour
     /*이동 종료 함수*/
     //말이 윷 결과에 따른 이동을 마쳤을 때마다 호출
     //더 이상 던질 기회와 이동 가능한 결과가 없으면 턴 종료
-    public IEnumerator EndMove()
+    public void EndMove()
+    {
+        StartCoroutine(EndMoveCoroutine());
+    }
+
+    public IEnumerator EndMoveCoroutine()
     {
         isEndMoveExcuting = true;
 
@@ -102,6 +116,11 @@ public class MainGameProgress : NetworkBehaviour
             //    Debug.Log("EndMove 타임아웃");
             //    break;
             //}
+
+            if (!isEventChecking)
+            {
+                break;
+            }
         }
         //EventNodeManager.Instance.checkingStepOn.OnValueChanged -= OnCheckingStepOnChangedServerRpc;
 

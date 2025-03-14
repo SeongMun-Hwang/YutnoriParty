@@ -182,7 +182,8 @@ public class BlackHoleNode : EventNode
     void BlackHoleMoveEndRpc(RpcParams rpcParams)
     {
         Debug.Log("엔드 무브 실행할거임 : " +  NetworkManager.Singleton.LocalClientId);
-        StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
+        //StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
+        GameManager.Instance.mainGameProgress.EndMove();
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
