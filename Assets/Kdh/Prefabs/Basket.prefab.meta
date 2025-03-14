@@ -1,7 +1,13 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Kdh/Prefabs/Basket.prefab.meta
 guid: 770cbcb51b8e59b43bdda71fe08806a8
 PrefabImporter:
+========
+guid: 7f27962442031c94da1e898ac192a09e
+NativeFormatImporter:
+>>>>>>>> 88b451a (이벤트 노드 프로토타입2):Assets/LeeByeoungJoon/EventNode/Materials/Island.mat.meta
   externalObjects: {}
+  mainObjectFileID: 2100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,18 +17,24 @@ public class StackableBlock : NetworkBehaviour
 	private float stepLength; // 이동 거리
 	private bool moveForward; // 정면으로 이동중인가?
 	public bool moveX; // X방향으로 이동중인가?
+    public bool isMoving = true;
 
 	private NetworkVariable<Vector3> position = new NetworkVariable<Vector3>(
 		Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
 	);
+    public NetworkVariable<Vector4> color = new NetworkVariable<Vector4>();
 
 	// 고정관련
 	private bool isFixed;
 
 	public override void OnNetworkSpawn()
 	{
+        GetComponent<Renderer>().material.color = color.Value;
+        color.OnValueChanged += OnColorChanged;
 		distance = maxDistance;
 		moveForward = false;
+
+        isMoving = true;
 
 		if (IsServer) // 서버(Host)에서 초기 위치 설정
 		{
@@ -38,6 +46,12 @@ public class StackableBlock : NetworkBehaviour
 		else
 			transform.Translate(0, 0, distance);
 	}
+
+    private void OnColorChanged(Vector4 previousValue, Vector4 newValue)
+    {
+        Color color = new Color(newValue.x, newValue.y, newValue.z, 1);
+        GetComponent<Renderer>().material.color = newValue;
+    }
 
 	private void Update()
 	{
@@ -165,6 +179,7 @@ public class StackableBlock : NetworkBehaviour
 		transform.position = pos;
 		transform.localScale = scale;
 		FixBlockClientRpc(transform.position, scale);
+        isMoving = false;
 		MoveCamera();
 	}
 

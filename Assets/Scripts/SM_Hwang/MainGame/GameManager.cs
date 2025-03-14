@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -22,7 +23,13 @@ public class GameManager : NetworkBehaviour
     public AnnounceCanvas announceCanvas;
     public GameObject inGameCanvas;
     public MainGameProgress mainGameProgress;
+    public PlayerBoard playerBoard;
     public Node startNode;
     public List<GameObject> playerCharacters;
     public List<Transform> profilePositions;
+    public NetworkVariable<FixedString128Bytes> lobbyId = new NetworkVariable<FixedString128Bytes>();
+    public override void OnNetworkSpawn()
+    {
+        if(IsServer) lobbyId.Value = HostSingleton.Instance.ReturnJoinCode();
+    }
 }

@@ -34,6 +34,22 @@ public class DevModeMover : MonoBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
             return;
         }
+        if (YutManager.Instance.isCalulating)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Yut Result", 2f);
+            return;
+        }
+
+        Debug.Log("이동 가능? : " + MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value);
+        //이동 못하는 애 골랐으면 다시 고르라고 안내함
+        if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
+            return;
+        }
+
+        //버튼 누르면 윷 사라지게 함
+        YutManager.Instance.HideYutRpc();
 
         GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(n);
     }

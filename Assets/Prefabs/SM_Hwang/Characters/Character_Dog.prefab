@@ -63,10 +63,10 @@ PrefabInstance:
       addedObject: {fileID: -5789683784504321204}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -2864590278399593435}
+      addedObject: {fileID: 318697466270937128}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 318697466270937128}
+      addedObject: {fileID: -606979119771863364}
   m_SourcePrefab: {fileID: 100100000, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
 --- !u!1 &3171602940925265327 stripped
 GameObject:
@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6ffa0f4f679c4a8e2f52f0fb438be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterOnDes: {fileID: 3171602940925265327}
+  characterInfo: {fileID: 0}
 --- !u!54 &-2529744278826332895
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -236,20 +236,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &-2864590278399593435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3171602940925265327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3bfb369affbf5342b338b29eb7582ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  overlappedCount: 0
 --- !u!114 &318697466270937128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,3 +254,23 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &-606979119771863364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3171602940925265327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3bfb369affbf5342b338b29eb7582ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
+  overlappedCount: 0
+  isReverse:
+    m_InternalValue: 0

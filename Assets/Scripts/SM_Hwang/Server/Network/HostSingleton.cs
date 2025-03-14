@@ -14,6 +14,7 @@ using System.Text;
 using Unity.Services.Authentication;
 using System;
 using WebSocketSharp;
+using Unity.Collections;
 public class HostSingleton : MonoBehaviour
 {
     static HostSingleton instance;
@@ -129,5 +130,25 @@ public class HostSingleton : MonoBehaviour
             lobbyId = null;
         }
         ServerSingleton.Instance.OnClientLeft-= HandleClientLeft;
+    }
+    public async void BlockLobbyJoin()
+    {
+        if (lobbyId.IsNullOrEmpty()) return;
+        try
+        {
+            await LobbyService.Instance.UpdateLobbyAsync(lobbyId, new UpdateLobbyOptions
+            {
+                IsPrivate = true
+            });
+            Debug.Log("Block lobby join");
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogException(e);
+        }
+    }
+    public FixedString128Bytes ReturnJoinCode()
+    {
+        return joinCode;
     }
 }

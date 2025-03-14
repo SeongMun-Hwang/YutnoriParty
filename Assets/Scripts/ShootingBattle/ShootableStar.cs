@@ -115,7 +115,7 @@ public class ShootableStar : NetworkBehaviour
             {
                 DrawEffectClientRpc(color);
             }
-            Debug.Log($"[Netcode] DestroyStarServerRpc 실행: {gameObject.name} (NetworkObjectId: {NetworkObjectId})");
+            // Debug.Log($"[Netcode] DestroyStarServerRpc 실행: {gameObject.name} (NetworkObjectId: {NetworkObjectId})");
             destroyCoroutine = StartCoroutine(ResetCoroutine(duration));
         }
     }

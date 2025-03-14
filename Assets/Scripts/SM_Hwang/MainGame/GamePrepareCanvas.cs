@@ -1,26 +1,35 @@
 using Newtonsoft.Json;
+using System.Linq;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GamePrepareCanvas : NetworkBehaviour
 {
     [SerializeField] Button gameStartBtn;
-
-    public override void OnNetworkSpawn()
+    [SerializeField] TextMeshProUGUI roomCodeTmp;
+    public override async void OnNetworkSpawn()
     {
         if (IsServer)
         {
             gameStartBtn.gameObject.SetActive(true);
         }
+        var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
+        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyIds[0]);
+        roomCodeTmp.text = GameManager.Instance.lobbyId.Value.ToString();
     }
     public void GameStart()
     {
-        if(NetworkManager.ConnectedClients.Count > 1)
+        if (NetworkManager.ConnectedClients.Count > 1)
         {
             GameManager.Instance.mainGameProgress.StartGame();
+            HostSingleton.Instance.BlockLobbyJoin();
             gameObject.GetComponent<NetworkObject>().Despawn();
         }
         else

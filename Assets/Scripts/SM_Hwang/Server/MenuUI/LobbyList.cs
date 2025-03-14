@@ -52,8 +52,8 @@ public class LobbyList : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.LogException(e);
-            return;
         }
+        isRefreshing = false;
     }
     public async void JoinAsync(Lobby lobby)
     {

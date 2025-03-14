@@ -9,7 +9,7 @@ PhysicsMaterial:
   m_Name: YutPhysicsMaterial
   serializedVersion: 2
   m_DynamicFriction: 30
-  m_StaticFriction: 0
+  m_StaticFriction: 30
   m_Bounciness: 0
   m_FrictionCombine: 0
   m_BounceCombine: 0
