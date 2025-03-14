@@ -26,16 +26,7 @@ public class MainGameProgress : NetworkBehaviour
     }
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn();
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
     }
     /*게임 시작*/
     //시작 시 입장한 플레이어 수 저장 및 랜덤으로 시작턴 지정
@@ -44,12 +35,13 @@ public class MainGameProgress : NetworkBehaviour
         numOfPlayer = NetworkManager.ConnectedClients.Count;
         currentPlayerNumber.Value = Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
-        StartTurn(currentPlayerNumber.Value);
+        StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
     /*턴 시작*/
     //누구의 턴인지 공지
     void StartTurn(int n)
     {
+        Debug.Log("Start Turn");
         GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(currentPlayerNumber.Value + "'s Turn!", 2f);
         SpawnInGameCanvasClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)n } } });
     }
@@ -58,6 +50,7 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     public void SpawnInGameCanvasClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        Debug.Log("Spawn canvas client rpc");
         GameManager.Instance.inGameCanvas.SetActive(true);
         YutManager.Instance.throwChance++;
         //StartCoroutine(WaitForCanvasAndActivate());
@@ -85,7 +78,7 @@ public class MainGameProgress : NetworkBehaviour
             if (collider.gameObject == currentCharacter.gameObject) continue;
             if (collider.TryGetComponent<CharacterBoardMovement>(out var character))
             {
-                Debug.Log("compare id : " + character.GetComponent<NetworkObject>().OwnerClientId+" | "+ NetworkManager.Singleton.LocalClientId);
+                Debug.Log("compare id : " + character.GetComponent<NetworkObject>().OwnerClientId + " | " + NetworkManager.Singleton.LocalClientId);
                 if (character.GetComponent<NetworkObject>().OwnerClientId != NetworkManager.Singleton.LocalClientId) //적이면
                 {
                     encounteredEnemy = character.gameObject;
@@ -121,7 +114,6 @@ public class MainGameProgress : NetworkBehaviour
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
-        Debug.Log((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count);
         //gameTurn은 0부터 시작, gameTurn+1이 전체 참여자 수의 배수일 때 파티게임 진행
         if ((gameTurn.Value + 1) % NetworkManager.ConnectedClients.Count == 0)
         {
@@ -171,7 +163,7 @@ public class MainGameProgress : NetworkBehaviour
         {
             currentPlayerNumber.Value = 0;
         }
-        StartTurn(currentPlayerNumber.Value);
+        StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
     // 미니게임 시작하기 위해 움직이는 말이 감지한 적과 함께 호출
     private void StartMiniGame(GameObject enemy = null)
@@ -351,8 +343,6 @@ public class MainGameProgress : NetworkBehaviour
                     return;
                 }
                 AddThrowChanceClientRpc(winnerId);
-                //YutManager.Instance.throwChance++;
-                //enemy.GetComponent<CharacterInfo>().DespawnServerRpc();
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
             }
             else
@@ -364,7 +354,6 @@ public class MainGameProgress : NetworkBehaviour
                     EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
                     return;
                 }
-                //currentCharacter.GetComponent<CharacterInfo>().DespawnServerRpc();
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
             }
         });
@@ -372,14 +361,14 @@ public class MainGameProgress : NetworkBehaviour
         MinigameManager.Instance.SetPlayers(players);
         MinigameManager.Instance.StartMinigame();
     }
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     void StartPartyGameServerRpc()
     {
         Debug.Log("PartyGame Start!");
         isMinigamePlaying = true;
-        List<ulong> playerIds=new List<ulong>();
+        List<ulong> playerIds = new List<ulong>();
 
-        foreach(var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
             ulong clientId = client.Key;
             playerIds.Add(clientId);
@@ -390,8 +379,8 @@ public class MainGameProgress : NetworkBehaviour
             EndMiniGameClientRpc();
 
             //미니 게임 승자 판별과 패배한 말 처리
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);            
-            ItemManager.Instance.GetItemClientRpc(ItemName.ResultUp,winnerId);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Player" + winnerId + "Win!", 2f);
+            ItemManager.Instance.GetItemClientRpc(ItemName.ResultUp, winnerId);
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());
         MinigameManager.Instance.StartMinigame();
