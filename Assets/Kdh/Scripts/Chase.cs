@@ -9,14 +9,13 @@ public class Chase : NetworkBehaviour
     private bool canChase = false;
     private Vector3 chaserPosition; 
     private Animator animator;
-    private AudioSource audioSource;
-    [SerializeField] private AudioClip moveSound;
-    [SerializeField] private AudioClip catchSound;
+    
+
 
     private void Start()
     {
         animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
+
     }
     public override void OnNetworkSpawn()
     {
@@ -53,13 +52,13 @@ public class Chase : NetworkBehaviour
     }
     [ClientRpc]
     private void PlayMoveSoundClientRpc()
-    {       
-     audioSource.PlayOneShot(moveSound);        
+    {
+        AudioManager.instance.Playsfx(0);
     }
     [ClientRpc]
     private void PlayCatchSoundClientRpc()
-    {       
-     audioSource.PlayOneShot(catchSound);        
+    {
+        AudioManager.instance.Playsfx(1);
     }
     [ClientRpc]
     private void UpdatePositionClientRpc(Vector3 newPosition, float speedValue)

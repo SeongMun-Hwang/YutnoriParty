@@ -273,6 +273,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  currentTurnPlayerId:
+    m_InternalValue: 100
   isPlaying:
     m_InternalValue: 0
   spawner: {fileID: 1022981537}
@@ -7356,7 +7358,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1425728253}
-  m_Enabled: 0
+  m_Enabled: 1
 --- !u!20 &1425728255
 Camera:
   m_ObjectHideFlags: 0

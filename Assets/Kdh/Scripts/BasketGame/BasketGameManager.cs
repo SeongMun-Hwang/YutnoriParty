@@ -21,7 +21,7 @@ public class BasketGameManager : NetworkBehaviour
     int currentId = -1;
     private Dictionary<ulong, NetworkVariable<int>> playerScores = new Dictionary<ulong, NetworkVariable<int>>(); // 개별 플레이어 점수 관리
     [SerializeField] public NetworkVariable<bool> isPlaying;
-    public bool gameStart = false;
+    private bool gameStart = false;
     private bool gameEnd = false;
 
     private float remainingTime;
@@ -138,22 +138,38 @@ public class BasketGameManager : NetworkBehaviour
     [ClientRpc]
     private void StartGameClientRpc()
     {
-        gameStart = true;
+
         if (scoreBoardText != null)
         {
-            scoreBoardText.transform.parent.gameObject.SetActive(true);  
+            scoreBoardText.transform.parent.gameObject.SetActive(true);
         }
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        foreach (var clientId in playerIds)
         {
-            if (client.Value.PlayerObject.TryGetComponent(out BasketGameController player))
+            int clientIndex = playerIds.IndexOf(clientId);
+            if (basketObjects[clientIndex] != null)
             {
-                player.EnableControl(true);
+                BasketGameController runController = basketObjects[clientIndex].GetComponent<BasketGameController>();
+                if (runController != null)
+                {
+                    runController.EnableControl(true);
+                }
+            }
+        }
+        isPlaying.Value = true;
+    }
+    private void Update()
+    {
+        if (isPlaying.Value)
+        {
+            if (!gameStart)
+            {
+                gameStart = true;
             }
         }
     }
 
-    private IEnumerator GameTimer()
+            private IEnumerator GameTimer()
     {
         while (remainingTime > 0 && !gameEnd)
         {
@@ -228,8 +244,7 @@ public class BasketGameManager : NetworkBehaviour
 
     private void DetermineWinner()
     {
-        gameEnd = true;
-        gameStart = false;
+
         ulong winnerId = ulong.MaxValue; 
         int maxScore = 0;
 
@@ -312,7 +327,7 @@ public class BasketGameManager : NetworkBehaviour
     public IEnumerator PassTheScene()
     {
         yield return new WaitForSecondsRealtime(2f);
-        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("BasketGame"));
+        //NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("BasketGame"));
         MinigameManager.Instance.EndMinigame();
     }
 }

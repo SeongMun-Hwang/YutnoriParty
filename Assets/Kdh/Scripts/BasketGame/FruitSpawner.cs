@@ -13,7 +13,7 @@ public class FruitSpawner : NetworkBehaviour
 
     private void Update()
     {
-        if (IsServer && BasketGameManager.Instance.gameStart && !isSpawning)
+        if (IsServer && BasketGameManager.Instance.isPlaying.Value && !isSpawning)
         {
             isSpawning = true;
             StartCoroutine(SpawnFruits());

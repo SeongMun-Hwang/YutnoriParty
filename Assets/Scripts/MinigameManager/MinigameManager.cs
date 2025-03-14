@@ -19,7 +19,7 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
-        //{ Define.MinigameType.BasketGame, "BasketGame" },
+        { Define.MinigameType.BasketGame, "BasketGame" },
         { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" }
     };
     private Define.MinigameType gameType;
@@ -48,7 +48,7 @@ public class MinigameManager : NetworkBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+           // DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)
         {
