@@ -26,6 +26,7 @@ public class BasketGameController : NetworkBehaviour
         {
             Transform spawnTransform = BasketGameManager.Instance.spawnPos[(int)OwnerClientId];
             targetPosition = spawnTransform.position;
+            transform.position = targetPosition;
         }
     }
 

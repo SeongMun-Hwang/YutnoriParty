@@ -16,6 +16,7 @@ public class RunGameController : NetworkBehaviour
         {
             Transform spawnTransform = RunGameManager.Instance.spawnPos[(int)OwnerClientId];
             targetPosition = spawnTransform.position;
+            transform.position = targetPosition;
         }
     }
 
