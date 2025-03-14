@@ -13,60 +13,70 @@ public class VolumeUIManager : MonoBehaviour
     public TextMeshProUGUI sfxText;
     public GameObject volumeUI;
 
-    void Start()
+    private void Start()
     {
-        // 기존 볼륨값 불러오기
-        masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1.0f);
-        bgmSlider.value = PlayerPrefs.GetFloat("BgmVolume", 1.0f);
-        sfxSlider.value = PlayerPrefs.GetFloat("SfxVolume", 1.0f);
+        volumeUI.SetActive(false);
+        // 기존 볼륨값 불러오기 및 UI 초기화
+        LoadVolumeSettings();
+        UpdateVolumeUI();
 
-        // 슬라이더 값 변경 시 이벤트 추가
+        // 슬라이더 이벤트 리스너 등록
         masterVolumeSlider.onValueChanged.AddListener(SetMasterVolume);
         bgmSlider.onValueChanged.AddListener(SetBgmVolume);
         sfxSlider.onValueChanged.AddListener(SetSfxVolume);
-
-        // 초기 볼륨 적용
-        UpdateVolumeUI();
     }
-    void SetMasterVolume(float volume)
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            volumeUI.SetActive(false);
+        }
+    }
+    private void LoadVolumeSettings()
+    {
+        masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1.0f);
+        bgmSlider.value = PlayerPrefs.GetFloat("BgmVolume", masterVolumeSlider.value);
+        sfxSlider.value = PlayerPrefs.GetFloat("SfxVolume", masterVolumeSlider.value);
+    }
+
+    private void SetMasterVolume(float volume)
     {
         AudioManager.instance.SetMasterVolume(volume);
-        PlayerPrefs.SetFloat("MasterVolume", volume);
-        PlayerPrefs.SetFloat("BgmVolume", volume);
-        PlayerPrefs.SetFloat("SfxVolume", volume);
-        PlayerPrefs.Save();
-
-        // 개별 슬라이더도 동기화
         bgmSlider.value = volume;
         sfxSlider.value = volume;
-
-        UpdateVolumeUI();
+        SaveVolume("MasterVolume", volume);
+        SaveVolume("BgmVolume", volume);
+        SaveVolume("SfxVolume", volume);
     }
-    void SetBgmVolume(float volume)
+
+    private void SetBgmVolume(float volume)
     {
         AudioManager.instance.SetBgmVolume(volume);
-        PlayerPrefs.SetFloat("MasterVolume", volume);
-        PlayerPrefs.SetFloat("BgmVolume", volume); // 저장
-        PlayerPrefs.Save();
-        UpdateVolumeUI();
+        SaveVolume("BgmVolume", volume);
     }
 
-    void SetSfxVolume(float volume)
+    private void SetSfxVolume(float volume)
     {
         AudioManager.instance.SetSfxVolume(volume);
-        PlayerPrefs.SetFloat("SfxVolume", volume); // 저장
+        SaveVolume("SfxVolume", volume);
+    }
+
+    private void SaveVolume(string key, float value)
+    {
+        PlayerPrefs.SetFloat(key, value);
         PlayerPrefs.Save();
         UpdateVolumeUI();
     }
 
-    void UpdateVolumeUI()
+    private void UpdateVolumeUI()
     {
-        masterVolumeText.text = $"{Mathf.Round(masterVolumeSlider.value * 100)}";
-        bgmText.text = $"{Mathf.Round(bgmSlider.value * 100)}";
-        sfxText.text = $"{Mathf.Round(sfxSlider.value * 100)}";
+        masterVolumeText.text = Mathf.Round(masterVolumeSlider.value * 100).ToString();
+        bgmText.text = Mathf.Round(bgmSlider.value * 100).ToString();
+        sfxText.text = Mathf.Round(sfxSlider.value * 100).ToString();
     }
+
     public void ToggleUI()
     {
-        volumeUI.SetActive(!volumeUI.activeSelf); 
+        volumeUI.SetActive(!volumeUI.activeSelf);
     }
 }

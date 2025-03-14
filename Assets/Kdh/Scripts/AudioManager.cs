@@ -6,12 +6,12 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
 
-    [Header("#BGM")]
+    [Header("BGM")]
     public AudioClip bgmClip;
     public float bgmVolume;
     AudioSource bgmPlayer;
 
-    [Header("#SFX")]
+    [Header("SFX")]
     public AudioClip[] sfxClips;
     public float sfxVolume;
     public int channels;
