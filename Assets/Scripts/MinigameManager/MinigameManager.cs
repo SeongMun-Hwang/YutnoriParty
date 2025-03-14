@@ -18,7 +18,7 @@ public class MinigameManager : NetworkBehaviour
     {
         { Define.MinigameType.StackGame, "StackScene" },
         { Define.MinigameType.ShootingGame, "ShootingScene" },
-        { Define.MinigameType.RunningGame, "BasketGame" },
+        { Define.MinigameType.RunningGame, "RunGame" },
         //{ Define.MinigameType.BasketGame, "BasketGame" },
         { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" }
     };
