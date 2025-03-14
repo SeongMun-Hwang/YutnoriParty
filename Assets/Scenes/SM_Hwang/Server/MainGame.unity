@@ -5429,14 +5429,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
-      propertyPath: sfxClips.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
-      propertyPath: 'sfxClips.Array.data[4]'
-      value: 
-      objectReference: {fileID: 8300000, guid: fa4bdd254da1adb4cbdcd106c57a61cd, type: 3}
     - target: {fileID: 3333844486308260652, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
       propertyPath: m_Name
       value: AudioManager
