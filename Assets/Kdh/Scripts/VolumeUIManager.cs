@@ -16,6 +16,7 @@ public class VolumeUIManager : MonoBehaviour
     private void Start()
     {
         volumeUI.SetActive(false);
+        AudioManager.instance.LoadVolumeSettings();
         // 기존 볼륨값 불러오기 및 UI 초기화
         LoadVolumeSettings();
         UpdateVolumeUI();

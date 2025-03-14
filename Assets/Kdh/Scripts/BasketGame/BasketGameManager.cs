@@ -327,7 +327,7 @@ public class BasketGameManager : NetworkBehaviour
     public IEnumerator PassTheScene()
     {
         yield return new WaitForSecondsRealtime(2f);
-        NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("BasketGame"));
+        //NetworkManager.Singleton.SceneManager.UnloadScene(SceneManager.GetSceneByName("BasketGame"));
         MinigameManager.Instance.EndMinigame();
     }
 }
