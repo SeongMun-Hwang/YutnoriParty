@@ -5429,6 +5429,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: sfxClips.Array.size
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[5]'
+      value: 
+      objectReference: {fileID: 8300000, guid: fb6e2a0bad8eb1343a6999a6609715ee, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[6]'
+      value: 
+      objectReference: {fileID: 8300000, guid: caf04226ed2404e4bb71bdbcb2687954, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[7]'
+      value: 
+      objectReference: {fileID: 8300000, guid: bf07a2762d07afd47a0842f8a0e15fa0, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[8]'
+      value: 
+      objectReference: {fileID: 8300000, guid: df64102d4c6ddf54f917edf5c99d7668, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[9]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 78e196b8dbdf2044badec030a806956a, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[10]'
+      value: 
+      objectReference: {fileID: 8300000, guid: a63b53df5bdb41f409ea6b4b0465cdce, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[11]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 878edb6550a240a4f803b1792eef192d, type: 3}
     - target: {fileID: 3333844486308260652, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
       propertyPath: m_Name
       value: AudioManager
