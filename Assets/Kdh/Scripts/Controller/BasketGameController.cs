@@ -42,7 +42,7 @@ public class BasketGameController : NetworkBehaviour
 
         if (moveDirection != Vector3.zero)
         {
-            MoveServerRpc(OwnerClientId, moveDirection);
+            MoveServerRpc(OwnerClientId, moveDirection);           
         }
 
         if (rb != null)
@@ -102,5 +102,6 @@ public class BasketGameController : NetworkBehaviour
         // 점수를 서버로 요청
         AddScoreServerRpc(OwnerClientId, scoreValue);
     }
+
 
 }

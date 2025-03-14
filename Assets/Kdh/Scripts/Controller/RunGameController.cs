@@ -45,6 +45,7 @@ public class RunGameController : NetworkBehaviour
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     MoveForwardServerRpc(OwnerClientId);
+                    AudioManager.instance.Playsfx(4);
                 }
 
                 transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
