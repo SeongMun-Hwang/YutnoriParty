@@ -30,6 +30,7 @@ public class YutManager : NetworkBehaviour
     [SerializeField] GameObject yutResultContent;
     [SerializeField] YutResults yutResultPrefab;
     [SerializeField] YutOut outCollision;
+    //[SerializeField] YutOutTrigger outTrigger;
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
     [SerializeField] Image powerGauge;
@@ -45,8 +46,8 @@ public class YutManager : NetworkBehaviour
     float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float torque = 10; //토크
-    public float Torque { get { return torque; } }
+    float minTorque = 10; //최소 토크
+    float maxTorque = 15; //최대 토크
     float yutSpacing = 2;
     float waitTime = 10;
     float waitInterval = 0.5f;
@@ -54,7 +55,19 @@ public class YutManager : NetworkBehaviour
     bool backDo = false;
     bool isThrowButtonDown = false;
     bool isFaceError = false;
-    bool isYutFalled = false;
+    bool _isYutFalled = false;
+    public bool isYutFalled
+    {
+        get { return _isYutFalled; }
+        set
+        {
+            if( _isYutFalled != value)
+            {
+                Debug.Log($"isYutFalled 변경 : {_isYutFalled} -> {value}");
+                _isYutFalled = value;
+            }
+        }
+    }
     bool faceStable = false;
 
     public int yutNum = 4;
@@ -202,21 +215,10 @@ public class YutManager : NetworkBehaviour
         outCollision.OnYutCollided -= YutFalled;
     }
 
-    void YutFalled(int num)
-    {
-        //4개 다 떨어지면 좋은 아이템 지급??
-        
-        if(num > 0)
-        {
-            isYutFalled = true;
-        }
-    }
-
     private void FixedUpdate()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            //MyTurn();
             throwChance++;
             Debug.Log(throwChance);
             //YutResultCount();
@@ -340,13 +342,16 @@ public class YutManager : NetworkBehaviour
 
             //던질때는 캐릭터랑 안부딫히게 잠깐 콜라이더 껐다 켜고
             yut.AllColliderDeactivate();
-            StartCoroutine(YutCollisionOn(yut, 0.5f));
+            StartCoroutine(YutCollisionOn(yut, 0.1f));
 
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
-            float randomTorque = Random.Range(-torque, torque);
+            float randomSign = Mathf.Sign(Random.Range(-1, 1));
+            float randomTorque = Random.Range(minTorque, maxTorque); //최소한 한바퀴 이상 돌 수 있게 토크 조절
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
-            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque, ForceMode.Impulse);
-            yut.torqueSign = Mathf.Sign(randomTorque); //토크 부호 저장
+            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+            //yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+
+            yut.torqueSign = randomSign; //토크 부호 저장
             //yut.Rigidbody.excludeLayers = LayerMask.GetMask("Player");
         }
         
@@ -366,6 +371,7 @@ public class YutManager : NetworkBehaviour
 
         bool yutStable = false;
         bool yutStabledPrev = false;
+        isYutFalled = false;
         YutFace[] faces = new YutFace[yutNums];
 
         //일정 시간동안 반복
@@ -374,6 +380,12 @@ public class YutManager : NetworkBehaviour
         {
             //waitInterval 마다 윷 상태를 확인
             yield return new WaitForSecondsRealtime(waitInterval);
+            
+            if (isYutFalled)
+            {
+                Debug.Log("낙으로 루프 탈출");
+                break;
+            }
 
             for (int i = 0; i < yutNums; i++)
             {
@@ -503,14 +515,12 @@ public class YutManager : NetworkBehaviour
             //낙 판정하는 부울 초기화
             //던지는 횟수 초기화
             ClearYutResuliClientRpc();
-            isYutFalled = false;
+            //YutFalledRpc(false);
             ThrowChanceChangeClientRpc(-999, senderId);
+            EndYutCalculating();
 
             //이동 끝 실행해서 턴 넘김
-            //StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
-            GameManager.Instance.mainGameProgress.EndMove();
-
-            isCalulating = false;
+            YutFallTurnEndRpc(RpcTarget.Single(senderId, RpcTargetUse.Temp));
             yield break;
         }
 
@@ -522,7 +532,7 @@ public class YutManager : NetworkBehaviour
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
             ThrowChanceChangeClientRpc(1, senderId);
 
-            isCalulating = false;
+            EndYutCalculating();
             yield break;
         }
 
@@ -532,7 +542,7 @@ public class YutManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
             ThrowChanceChangeClientRpc(1, senderId);
 
-            isCalulating = false;
+            EndYutCalculating();
             yield break;
         }
 
@@ -570,10 +580,22 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
-        isCalulating = false;
+        EndYutCalculating();
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
         yield break;
+    }
+
+    void EndYutCalculating()
+    {
+        isCalulating = false;
+        isYutFalled = false;
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    void YutFallTurnEndRpc(RpcParams rpcParams)
+    {
+        GameManager.Instance.mainGameProgress.EndMove(); //해당 클라이언트에서 실행해야함
     }
 
     YutFace CalcYutResult(Yut yut)
@@ -720,4 +742,26 @@ public class YutManager : NetworkBehaviour
     {
         throwChanceTmp.text = "기회:"+throwChance.ToString();
     }
+
+    //낙 판정 관련
+    void YutFalled(int num)
+    {
+        //4개 다 떨어지면 좋은 아이템 지급??
+
+        if (num > 0)
+        {
+            isYutFalled = true;
+        }
+        else
+        {
+            isYutFalled = false;
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void YutFalledRpc(bool value)
+    {
+        isYutFalled = value;
+    }
+
 }

@@ -136,7 +136,7 @@ public class EventNodeManager : NetworkBehaviour
 
     IEnumerator WaitForEventExcute()
     {
-        int timeOut = 10;
+        //int timeOut = 10;
         bool eventRunning = true;
 
         while (eventRunning)
