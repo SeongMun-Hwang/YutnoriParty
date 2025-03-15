@@ -9,6 +9,7 @@ using Unity.Services.Authentication;
 using System.Threading.Tasks;
 using TMPro;
 using System.Linq;
+using Unity.Collections;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -170,8 +171,28 @@ public class PlayerManager : NetworkBehaviour
     private void EndGame()
     {
         Debug.Log("Game End");
+        EndGameServerRpc(OwnerClientId);
     }
-    
+    [ServerRpc(RequireOwnership = default)]
+    private void EndGameServerRpc(ulong id)
+    {
+        GameManager.Instance.winnerName.OnValueChanged += GoToAwardSceneClientRpc;
+        GameManager.Instance.winnerName.Value = ServerSingleton.Instance.clientIdToUserData[id].userName;
+        
+    }
+    [ClientRpc]
+    private void GoToAwardSceneClientRpc(FixedString128Bytes oldValue, FixedString128Bytes newValue)
+    {
+        foreach (var hideable in GameManager.Instance.hideableWhenOtherScene)
+        {
+            hideable.SetActive(false);
+        }
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene("AwardScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        }
+    }
     public int GetClientIndex()
     {
         ulong localClientId = NetworkManager.Singleton.LocalClientId;

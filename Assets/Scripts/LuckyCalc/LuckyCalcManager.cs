@@ -43,7 +43,7 @@ public class LuckyCalcManager : NetworkBehaviour
 
     private IOperatorStrategy operatorStrategy;
 
-    private bool isWaitForResult = false;
+    //private bool isWaitForResult = false;
     public override void OnNetworkSpawn()
     {
         // 카드를 생성해서 로컬에서 관리

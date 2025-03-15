@@ -50,6 +50,25 @@ public class ClientSingleton : MonoBehaviour
         {
             return;
         }
+
+        bool isAwardScene = false;
+        if (NetworkManager.Singleton.SceneManager != null)
+        {
+            foreach (var s in NetworkManager.Singleton.SceneManager.GetSynchronizedScenes())
+            {
+                if (s.name == "AwardScene")
+                {
+                    isAwardScene = true;
+                    break;
+                }
+            }
+        }
+
+        if (isAwardScene)
+        {
+            return;
+        }
+        
         if (SceneManager.GetActiveScene().name != "MenuScene")
         {
             SceneManager.LoadScene("MenuScene");
