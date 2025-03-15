@@ -45,7 +45,7 @@ public class YutManager : NetworkBehaviour
     float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float torque = 20; //토크
+    float torque = 10; //토크
     public float Torque { get { return torque; } }
     float yutSpacing = 2;
     float waitTime = 10;
@@ -339,13 +339,14 @@ public class YutManager : NetworkBehaviour
             yut.Rigidbody.angularVelocity = Vector3.zero;
 
             //던질때는 캐릭터랑 안부딫히게 잠깐 콜라이더 껐다 켜고
-            yut.Collider.isTrigger = true;
-            StartCoroutine(YutCollisionOn(yut, 0.1f));
+            yut.AllColliderDeactivate();
+            StartCoroutine(YutCollisionOn(yut, 0.5f));
 
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
+            float randomTorque = Random.Range(-torque, torque);
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
-            yut.Rigidbody.AddTorque(yut.transform.forward * Random.Range(-torque, torque), ForceMode.Impulse);
-
+            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque, ForceMode.Impulse);
+            yut.torqueSign = Mathf.Sign(randomTorque); //토크 부호 저장
             //yut.Rigidbody.excludeLayers = LayerMask.GetMask("Player");
         }
         
@@ -356,7 +357,7 @@ public class YutManager : NetworkBehaviour
     {
         yield return new WaitForSecondsRealtime(second);
 
-        yut.Collider.isTrigger = false;
+        yut.AllColliderActivate(); 
     }
 
     IEnumerator YutResultCheck(float timePassed, int yutNums, ServerRpcParams rpcParams)
@@ -392,7 +393,7 @@ public class YutManager : NetworkBehaviour
                     //yut.Rigidbody.isKinematic = true;
                     //yut.Rigidbody.isKinematic = false;
 
-                    //Debug.Log("멈춤");
+                    //Debug.Log("윷 멈춤");
                     //Debug.Log(i + "번 윷 앞뒷면 : " + faces[i]);
                     //Debug.Log("윷 서있음? " + yut.IsVertical);
                 }

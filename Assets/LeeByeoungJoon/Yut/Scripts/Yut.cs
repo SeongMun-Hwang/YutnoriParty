@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,21 +6,26 @@ public class Yut : NetworkBehaviour
 {
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
-    
-    [SerializeField] new Collider collider;
+    float torque = 5f;
+    public float torqueSign = 0;
+
+    //[SerializeField] new Collider collider;
+    [SerializeField] List<Collider> colliders;
+    //public Collider Collider { get { return collider; } }
+
     [SerializeField] PhysicsMaterial yutPhysicsMaterial;
     [SerializeField] PhysicsMaterial noFrictionMetarial;
 
     new Rigidbody rigidbody;
-    float torque;
+    public Rigidbody Rigidbody { get { return rigidbody; } }
+
     float gravity = 9.8f;
     float gravityFactor = 1;
     float characterBounce = 1f;
     bool isGrounded = false;
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
-    public Rigidbody Rigidbody { get { return rigidbody; } }
-    public Collider Collider { get { return collider; } }
+    
 
     private void Awake()
     {
@@ -43,7 +49,7 @@ public class Yut : NetworkBehaviour
         {
             foreach(ContactPoint contact in collision.contacts)
             {
-                Debug.DrawRay(contact.point, contact.normal, Color.yellow);
+                //Debug.DrawRay(contact.point, contact.normal, Color.yellow);
                 rigidbody.AddForce(contact.normal * characterBounce, ForceMode.Impulse);
             }
         }
@@ -60,15 +66,14 @@ public class Yut : NetworkBehaviour
     {
         if(other.tag == "Ground")
         {
-            //Debug.Log("섰음!!!!!!!");
+            Debug.Log("섰음!!!!!!!");
             //수직으로 섰으니까 토크 가함
-            //rigidbody.AddTorque(transform.forward * torque);
-
+            rigidbody.AddTorque(transform.forward * torque * torqueSign, ForceMode.Impulse);
             //마찰력 없는 피직스 머티리얼로 교체
-            if(collider.material != noFrictionMetarial)
-            {
-                collider.material = noFrictionMetarial;
-            }
+            //if (collider.material != noFrictionMetarial)
+            //{
+            //    collider.material = noFrictionMetarial;
+            //}
         }
     }
 
@@ -86,7 +91,23 @@ public class Yut : NetworkBehaviour
         {
             isVertical = false;
             //마찰력 있는 기본 피직스 머티리얼로 교체
-            collider.material = yutPhysicsMaterial;
+            //collider.material = yutPhysicsMaterial;
+        }
+    }
+
+    public void AllColliderActivate()
+    {
+        foreach(var col in colliders)
+        {
+            col.isTrigger = false;
+        }
+    }
+
+    public void AllColliderDeactivate()
+    {
+        foreach (var col in colliders)
+        {
+            col.isTrigger = true;
         }
     }
 }
