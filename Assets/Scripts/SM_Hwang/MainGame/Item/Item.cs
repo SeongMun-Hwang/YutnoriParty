@@ -17,7 +17,7 @@ public class Item : MonoBehaviour
         button.onClick.AddListener(ToggleState);
         switch (itemName)
         {
-            case ItemName.ResultUp:
+            case ItemName.ChanceUp:
                 itemTmp.text = "+1";
                 break;
             case ItemName.ReverseMove:
@@ -43,6 +43,11 @@ public class Item : MonoBehaviour
         {
             Debug.Log("Item selected");
             ItemManager.Instance.currentItem = gameObject;
+            if (itemName == ItemName.ChanceUp)
+            {
+                YutManager.Instance.throwChance++;
+                ItemManager.Instance.RemoveItem();
+            }
             if (itemName == ItemName.ReverseMove)
             {
                 GameManager.Instance.announceCanvas.ShowAnnounceText("Choose target!",2f);
