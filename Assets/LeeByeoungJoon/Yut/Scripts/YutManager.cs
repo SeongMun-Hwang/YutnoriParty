@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +33,7 @@ public class YutManager : NetworkBehaviour
     [SerializeField] Transform yutSpawnTransform;
     [SerializeField] LayerMask ground;
     [SerializeField] Image powerGauge;
-
+    [SerializeField] TextMeshProUGUI throwChanceTmp;
     List<Yut> yuts = new List<Yut>();
     List<YutResult> results = new List<YutResult>();
     public List<YutResult> Results { get { return results; } }
@@ -57,8 +58,20 @@ public class YutManager : NetworkBehaviour
     bool faceStable = false;
 
     public int yutNum = 4;
-    public int throwChance = 0;
     public bool isCalulating = false;
+
+    private int _throwChance = 0;
+    public int throwChance{
+        get { return _throwChance; }
+        set
+        {
+            if(_throwChance!=value)
+            {
+                _throwChance = value;
+                OnThrowChangeChanged();
+            }
+        }
+    }
 
     //싱글톤 아님
     static YutManager instance;
@@ -679,5 +692,9 @@ public class YutManager : NetworkBehaviour
     public void SpawnCharacter()
     {
         PlayerManager.Instance.SpawnCharacter();
+    }
+    private void OnThrowChangeChanged()
+    {
+        throwChanceTmp.text = "기회:"+throwChance.ToString();
     }
 }

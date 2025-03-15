@@ -172,11 +172,17 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log("Game End");
     }
     
-    public int GetClientIndex()
+    public int GetClientIndex(ulong? targetId=null)
     {
-        ulong localClientId = NetworkManager.Singleton.LocalClientId;
-        var clientList = NetworkManager.Singleton.ConnectedClientsList.Select(c => c.ClientId).ToList();
-
-        return clientList.IndexOf(localClientId);
+        var clientList = NetworkManager.Singleton.ConnectedClientsList.Select(c => c.ClientId).ToList(); 
+        if (targetId == null)
+        {
+            ulong localClientId = NetworkManager.Singleton.LocalClientId;
+            return clientList.IndexOf(localClientId);
+        }
+        else
+        {
+            return clientList.IndexOf((ulong)targetId);
+        }
     }
 }
