@@ -5,7 +5,6 @@ public class RunGameController : NetworkBehaviour
 {
     [SerializeField] private float moveDistance = 2f;  // 한 번 이동할 거리
     [SerializeField] private float moveSpeed = 5f;     // 이동 속도
-    [SerializeField] private Vector3 spawnPosition;
 
     private Vector3 targetPosition;
     private Animator animator;
@@ -15,13 +14,9 @@ public class RunGameController : NetworkBehaviour
     {
         if (IsServer)
         {
-            targetPosition = spawnPosition;
+            Transform spawnTransform = RunGameManager.Instance.spawnPos[PlayerManager.Instance.GetClientIndex(OwnerClientId)];
+            targetPosition = spawnTransform.position;
             transform.position = targetPosition;
-        }
-        else
-        {
-          
-            targetPosition = spawnPosition;  
         }
     }
 
@@ -50,7 +45,7 @@ public class RunGameController : NetworkBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    MoveForwardServerRpc(OwnerClientId);
+                    MoveForwardServerRpc((ulong)PlayerManager.Instance.GetClientIndex(OwnerClientId));
                     AudioManager.instance.Playsfx(4);
                 }
 

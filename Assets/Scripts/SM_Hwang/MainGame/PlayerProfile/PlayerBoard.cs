@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerBoard : NetworkBehaviour
 {
     [SerializeField] Transform playerBoardParent;
     [SerializeField] PlayerProfile playerProfilePrefab;
-    [SerializeField] List<RectTransform> profileTransforms;
     public NetworkList<PlayerProfileData> playerProfileDatas = new NetworkList<PlayerProfileData>();
     List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
     public override void OnNetworkSpawn()
@@ -110,8 +110,6 @@ public class PlayerBoard : NetworkBehaviour
                         int index = playerProfileDatas.IndexOf(changeEvent.Value);
                         PlayerProfile item = Instantiate(playerProfilePrefab, playerBoardParent);
                         Vector2[] dynamicCorners = GetCornerPositions();
-                        RectTransform rectTransform = item.GetComponent<RectTransform>();
-                        item.GetComponent<RectTransform>().anchoredPosition = dynamicCorners[index];
                         item.SetData(changeEvent.Value.clientId, changeEvent.Value.userName, changeEvent.Value.score);
                         playerProfiles.Add(item);
                     }
@@ -155,5 +153,21 @@ public class PlayerBoard : NetworkBehaviour
                 break;
             }
         }
+    }
+    [ClientRpc(RequireOwnership = false)]
+    public void SetProfileOutlineClientRpc(ulong targetId)
+    {
+        Debug.Log("SetProfileOutlineClientRpc");
+        foreach (PlayerProfile profile in playerProfiles)
+        {           
+            if (profile.clientId == targetId)
+            {
+                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color(0,255,0);
+            }
+            else
+            {
+                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color(255, 0, 0);
+            }
+        }   
     }
 }

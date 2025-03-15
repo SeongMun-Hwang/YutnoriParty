@@ -4,9 +4,7 @@ using UnityEngine.SceneManagement;
 public class BasketGameController : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private Vector3 spawnPosition;
-
-
+    
     private Vector3 targetPosition;
     Rigidbody rb;
     private Animator animator;
@@ -17,18 +15,17 @@ public class BasketGameController : NetworkBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();        
-        
+        rb.position = targetPosition;
         animator = GetComponent<Animator>();
-        targetPosition = spawnPosition;
-        transform.position = targetPosition;
-
+        
     }
 
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            targetPosition = spawnPosition;
+            Transform spawnTransform = BasketGameManager.Instance.spawnPos[PlayerManager.Instance.GetClientIndex(OwnerClientId)];
+            targetPosition = spawnTransform.position;
             transform.position = targetPosition;
         }
     }

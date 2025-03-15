@@ -26,7 +26,7 @@ public class RunGameManager : NetworkBehaviour
     private bool gameEnd = false;
 
     [SerializeField] private List<GameObject> runPrefab =new List<GameObject>();
-    
+    [SerializeField] public List<Transform> spawnPos= new List<Transform>();
 
     /*추가 부분*/
     [SerializeField] public Camera runGameCamera;
@@ -60,12 +60,12 @@ public class RunGameManager : NetworkBehaviour
         {
             playerIds.Add(clientId);
             canMoveList.Add(false);
-            int spawnIndex = playerIds.IndexOf(clientId);
-            if (spawnIndex >= runPrefab.Count) return;
-          
+            int spawnIndex = PlayerManager.Instance.GetClientIndex(clientId);
+            if (spawnIndex >= spawnPos.Count) return;
+            Vector3 spawnPosition = spawnPos[spawnIndex].position;
 
             // RunPrefab 인스턴스화 및 위치 설정
-            GameObject rp = Instantiate(runPrefab[spawnIndex], Vector3.zero, Quaternion.identity);
+            GameObject rp = Instantiate(runPrefab[spawnIndex], spawnPosition, Quaternion.identity);
             RunGameController rc = rp.GetComponent<RunGameController>();
 
             // NetworkObject 설정

@@ -27,7 +27,7 @@ public class BasketGameManager : NetworkBehaviour
     private float remainingTime;
     [SerializeField] public Camera basketGameCamera;
     [SerializeField] private List<GameObject> basketPrefab = new List<GameObject>();
-   
+    [SerializeField] public List<Transform> spawnPos = new List<Transform>();
     private static BasketGameManager instance;
     public static BasketGameManager Instance
     {
@@ -62,11 +62,12 @@ public class BasketGameManager : NetworkBehaviour
         {
             playerIds.Add(clientId);
             
-            int spawnIndex = playerIds.IndexOf(clientId);
-            if (spawnIndex >= basketPrefab.Count) return;
+            int spawnIndex = PlayerManager.Instance.GetClientIndex(clientId);
+            if (spawnIndex >= spawnPos.Count) return;
+            Vector3 spawnPosition = spawnPos[spawnIndex].position;
 
             // RunPrefab 인스턴스화 및 위치 설정
-            GameObject bp = Instantiate(basketPrefab[spawnIndex], Vector3.zero, Quaternion.identity);
+            GameObject bp = Instantiate(basketPrefab[spawnIndex], spawnPosition, Quaternion.identity);
             BasketGameController bc = bp.GetComponent<BasketGameController>();
 
             // NetworkObject 설정
