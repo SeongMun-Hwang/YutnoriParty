@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
@@ -140,6 +141,7 @@ public class CharacterBoardMovement : MonoBehaviour
         foreach (Node node in possibleNodes)
         {
             GameObject desInstance = Instantiate(gameObject, node.transform.position, Quaternion.identity);
+            Destroy(desInstance.GetComponent<CharacterBoardMovement>());
             spawnedDesObjects.Add(desInstance);
             objectToNodeMap[desInstance] = node;
         }
