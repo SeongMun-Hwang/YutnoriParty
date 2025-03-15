@@ -232,6 +232,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 10
+  spawnPosition: {x: 80, y: 0, z: 65}
   canMove:
     m_InternalValue: 0
   playerScore: 0

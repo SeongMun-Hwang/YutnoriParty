@@ -221,6 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 10
+  spawnPosition: {x: 85, y: 0, z: 60}
   canMove:
     m_InternalValue: 0
   playerScore: 0
@@ -253,6 +254,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 10
+  spawnPosition: {x: 0, y: 0, z: 0}
   canMove:
     m_InternalValue: 0
   playerScore: 0

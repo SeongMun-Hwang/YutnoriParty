@@ -178,7 +178,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  inIsland:
+    m_InternalValue: 0
+  canMove:
+    m_InternalValue: 1
   overlappedCount: 0
+  isReverse:
+    m_InternalValue: 0
+  ItemEffect: {fileID: 0}
 --- !u!136 &5905374286713868406
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -244,6 +251,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveDistance: 2
   moveSpeed: 5
+  spawnPosition: {x: -92.5, y: 20, z: 0}
   canMove:
     m_InternalValue: 0
 --- !u!114 &5011218703766719188

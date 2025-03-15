@@ -211,6 +211,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveDistance: 2
   moveSpeed: 5
+  spawnPosition: {x: -107.5, y: 20, z: 0}
   canMove:
     m_InternalValue: 1
 --- !u!114 &-4700270957629753970
