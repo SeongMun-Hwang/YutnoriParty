@@ -100,6 +100,7 @@ public class IslandNode : EventNode
 
         player.GetComponent<CharacterInfo>().canMove.Value = true;
         player.GetComponent<CharacterInfo>().inIsland.Value = false;
+        Debug.Log(player.name + " 무인도 탈출");
         trappedPlayers.Remove(player); //딕셔너리에서 지워도 인덱스 문제 안나겠지..?
         //Debug.Log(player.NetworkObjectId + " 탈출");
     }

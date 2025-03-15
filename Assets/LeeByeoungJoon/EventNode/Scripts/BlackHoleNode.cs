@@ -42,7 +42,6 @@ public class BlackHoleNode : EventNode
     public override void EventStartRpc()
     {
         EventExcuteRpc();
-        isProcessing.Value = true;
 
         //휴식중인데 밟으면 바로 리턴
         if(isPaused.Value)
@@ -54,17 +53,18 @@ public class BlackHoleNode : EventNode
             }
 
             Debug.Log("블랙홀 휴식중");
-            EventEndRpc(); //니가 가로챘냐
+            BlackHoleEventEndRpc();
             return;
         }
         //아무도 안밟고 있으면 일 없음
         if (enteredPlayers.Count == 0)
         {
             Debug.Log("블랙홀 노드 아무도 안밟음");
-            EventEndRpc();
+            BlackHoleEventEndRpc();
             return;
         }
-        
+
+        isProcessing.Value = true;
         //밟아서 블랙홀 켠 캐릭터 기록해두고
         enteredPlayers[enteredPlayers.Count - 1].TryGet(out NetworkObject triggeredCharacter);
 
