@@ -39,7 +39,6 @@ public class YutResults : NetworkBehaviour
             return;
         }
         int extraMove = 0;
-        if (ItemManager.Instance.CheckItemActive() == ItemName.ResultUp) { extraMove = 1; }
         ItemManager.Instance.RemoveItem();
         //버튼 누르면 윷 사라지게 함
         YutManager.Instance.HideYutRpc();
@@ -48,27 +47,27 @@ public class YutResults : NetworkBehaviour
         switch (yutResult)
         {
             case YutResult.BackDo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(-1+extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(-1);
                 //Debug.Log("-1");
                 break;
             case YutResult.Do:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(1 + extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(1);
                 //Debug.Log("1");
                 break;
             case YutResult.Gae:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(2 + extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(2);
                 //Debug.Log("2");
                 break;
             case YutResult.Gur:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(3 + extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(3);
                 //Debug.Log("3");
                 break;
             case YutResult.Yut:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(4 + extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(4);
                 //Debug.Log("4");
                 break;
             case YutResult.Mo:
-                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(5 + extraMove);
+                GameManager.Instance.mainGameProgress.currentCharacter.MoveToNextNode(5);
                 //Debug.Log("5");
                 break;
         }
