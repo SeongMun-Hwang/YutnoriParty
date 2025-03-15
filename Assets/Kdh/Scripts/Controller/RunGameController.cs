@@ -14,7 +14,7 @@ public class RunGameController : NetworkBehaviour
     {
         if (IsServer)
         {
-            Transform spawnTransform = RunGameManager.Instance.spawnPos[(int)OwnerClientId];
+            Transform spawnTransform = RunGameManager.Instance.spawnPos[PlayerManager.Instance.GetClientIndex(OwnerClientId)];
             targetPosition = spawnTransform.position;
             transform.position = targetPosition;
         }
@@ -45,7 +45,7 @@ public class RunGameController : NetworkBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    MoveForwardServerRpc(OwnerClientId);
+                    MoveForwardServerRpc((ulong)PlayerManager.Instance.GetClientIndex(OwnerClientId));
                     AudioManager.instance.Playsfx(4);
                 }
 

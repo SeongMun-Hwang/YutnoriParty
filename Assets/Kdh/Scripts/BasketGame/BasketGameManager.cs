@@ -62,7 +62,7 @@ public class BasketGameManager : NetworkBehaviour
         {
             playerIds.Add(clientId);
             
-            int spawnIndex = playerIds.IndexOf(clientId);
+            int spawnIndex = PlayerManager.Instance.GetClientIndex(clientId);
             if (spawnIndex >= spawnPos.Count) return;
             Vector3 spawnPosition = spawnPos[spawnIndex].position;
 

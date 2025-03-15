@@ -24,7 +24,7 @@ public class BasketGameController : NetworkBehaviour
     {
         if (IsServer)
         {
-            Transform spawnTransform = BasketGameManager.Instance.spawnPos[(int)OwnerClientId];
+            Transform spawnTransform = BasketGameManager.Instance.spawnPos[PlayerManager.Instance.GetClientIndex(OwnerClientId)];
             targetPosition = spawnTransform.position;
             transform.position = targetPosition;
         }
