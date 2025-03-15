@@ -299,8 +299,20 @@ public class EventNodeManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    void AssignNodeRpc(EventNode eventNode, Node node)
+    void AssignNodeRpc(NetworkObjectReference eventNodeNoRef, NetworkObjectReference nodeNoRef)
     {
+        if (eventNodeNoRef.TryGet(out NetworkObject eventNodeNo))
+        {
+            Debug.Log("네트워크 오브젝트 못찾음");
+        }
+        if(nodeNoRef.TryGet(out NetworkObject nodeNo))
+        {
+            Debug.Log("네트워크 오브젝트 못찾음");
+        }
+
+        EventNode eventNode = eventNodeNo.GetComponent<EventNode>();
+        Node node = eventNodeNo.GetComponent<Node>();
+
         eventNode.node = node;
     }
 
