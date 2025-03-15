@@ -222,14 +222,42 @@ public class YutManager : NetworkBehaviour
             //YutResultCount();
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
-            Debug.Log("--------" + NetworkManager.Singleton.LocalClientId + " 캐릭터 목록-------");
-            foreach(var character in PlayerManager.Instance.currentCharacters)
+            int backdoCnt, doCnt, gaeCnt, gurCnt, yutCnt, moCnt;
+            backdoCnt = doCnt = gaeCnt = gurCnt = yutCnt = moCnt = 0;
+
+            foreach (var result in results)
             {
-                Debug.Log("네트워크 오브젝트 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + 
-                    "게임 오브젝트 id : " + character.GetInstanceID());
+                switch (result)
+                {
+                    case YutResult.BackDo:
+                        backdoCnt++;
+                        break;
+                    case YutResult.Do:
+                        doCnt++;
+                        break;
+                    case YutResult.Gae:
+                        gaeCnt++;
+                        break;
+                    case YutResult.Gur:
+                        gurCnt++;
+                        break;
+                    case YutResult.Yut:
+                        yutCnt++;
+                        break;
+                    case YutResult.Mo:
+                        moCnt++;
+                        break;
+                }
             }
+
+            Debug.Log("백도 : " + backdoCnt);
+            Debug.Log("도 : " + doCnt);
+            Debug.Log("개 : " + gaeCnt);
+            Debug.Log("걸 : " + gurCnt);
+            Debug.Log("윷 : " + yutCnt);
+            Debug.Log("모 : " + moCnt);
         }
 
         if (isThrowButtonDown)
@@ -253,12 +281,6 @@ public class YutManager : NetworkBehaviour
                 ThrowButtonReleased();
             }
         }
-    }
-
-    void MyTurn()
-    {
-        throwChance = 1;
-        Debug.Log("내턴, 던질 기회 +1");
     }
 
     public void ThrowButtonPressed()

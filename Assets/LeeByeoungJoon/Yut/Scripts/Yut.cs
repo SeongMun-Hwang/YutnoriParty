@@ -7,10 +7,14 @@ public class Yut : NetworkBehaviour
     [HideInInspector] public Quaternion originRot;
     
     [SerializeField] new Collider collider;
+    [SerializeField] PhysicsMaterial yutPhysicsMaterial;
+    [SerializeField] PhysicsMaterial noFrictionMetarial;
+
     new Rigidbody rigidbody;
     float torque;
     float gravity = 9.8f;
     float gravityFactor = 1;
+    float characterBounce = 1f;
     bool isGrounded = false;
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
@@ -29,16 +33,21 @@ public class Yut : NetworkBehaviour
         //윷 움직임은 서버에서만 관리
         if(!IsServer) return;
 
-        if (!isGrounded)
-        {
-            //Debug.Log("내려가");
-            //중력 gravityFactor배
-            rigidbody.AddForce(Vector3.down * gravity * gravityFactor, ForceMode.Impulse);
-        }   
+        rigidbody.AddForce(Vector3.down * gravity * gravityFactor, ForceMode.Impulse);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        //플레이어랑 닿으면 반발력 가함
+        if(collision.gameObject.tag == "Player")
+        {
+            foreach(ContactPoint contact in collision.contacts)
+            {
+                Debug.DrawRay(contact.point, contact.normal, Color.yellow);
+                rigidbody.AddForce(contact.normal * characterBounce, ForceMode.Impulse);
+            }
+        }
+
         isGrounded = true;
     }
 
@@ -54,6 +63,12 @@ public class Yut : NetworkBehaviour
             //Debug.Log("섰음!!!!!!!");
             //수직으로 섰으니까 토크 가함
             //rigidbody.AddTorque(transform.forward * torque);
+
+            //마찰력 없는 피직스 머티리얼로 교체
+            if(collider.material != noFrictionMetarial)
+            {
+                collider.material = noFrictionMetarial;
+            }
         }
     }
 
@@ -70,6 +85,8 @@ public class Yut : NetworkBehaviour
         if (other.tag == "Ground")
         {
             isVertical = false;
+            //마찰력 있는 기본 피직스 머티리얼로 교체
+            collider.material = yutPhysicsMaterial;
         }
     }
 }

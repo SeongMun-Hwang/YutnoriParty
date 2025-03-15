@@ -183,7 +183,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6ffa0f4f679c4a8e2f52f0fb438be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterInfo: {fileID: 0}
 --- !u!136 &5905374286713868406
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -191,7 +190,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6720154922840694447}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 189fa2fa100f76a44ba0a4ab8feddd77, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -271,6 +270,7 @@ MonoBehaviour:
   overlappedCount: 0
   isReverse:
     m_InternalValue: 0
+  ItemEffect: {fileID: 0}
 --- !u!114 &1447087924121448639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,3 +309,4 @@ MonoBehaviour:
   overlappedCount: 0
   isReverse:
     m_InternalValue: 0
+  ItemEffect: {fileID: 0}

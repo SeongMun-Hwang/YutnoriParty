@@ -329,6 +329,8 @@ MonoBehaviour:
   originPos: {x: 0, y: 0, z: 0}
   originRot: {x: 0, y: 0, z: 0, w: 0}
   collider: {fileID: 6365819272254785922}
+  yutPhysicsMaterial: {fileID: 13400000, guid: 8ac10b460c067e743b8d8a4d4790d5e7, type: 2}
+  noFrictionMetarial: {fileID: 13400000, guid: c8e34afd9e356824db3336262240b45f, type: 2}
 --- !u!54 &4802452279231007329
 Rigidbody:
   m_ObjectHideFlags: 0
