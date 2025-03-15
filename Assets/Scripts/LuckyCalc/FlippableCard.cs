@@ -35,6 +35,7 @@ public class FlippableCard : MonoBehaviour, IPointerClickHandler
 
     public void OpenCard()
     {
+        Debug.Log($"{Number} 카드 열기");
         BackImage.SetActive(false);
         FrontText.text = Number.ToString();
         image.color = Color.gray;
@@ -43,6 +44,7 @@ public class FlippableCard : MonoBehaviour, IPointerClickHandler
 
     public void CloseCard()
     {
+        Debug.Log($"{Number} 카드 닫기");
         FrontText.gameObject.SetActive(false);
         BackImage.SetActive(true);
         image.color = defaultColor;
