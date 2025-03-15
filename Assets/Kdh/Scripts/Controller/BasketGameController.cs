@@ -9,7 +9,8 @@ public class BasketGameController : NetworkBehaviour
     Rigidbody rb;
     private Animator animator;
     public NetworkVariable<bool> canMove = new NetworkVariable<bool>(false);
-    
+    [SerializeField] private Vector3 spawnPosition;
+
     [SerializeField] private int playerScore = 0;
 
     private void Start()
@@ -24,8 +25,7 @@ public class BasketGameController : NetworkBehaviour
     {
         if (IsServer)
         {
-            Transform spawnTransform = BasketGameManager.Instance.spawnPos[PlayerManager.Instance.GetClientIndex(OwnerClientId)];
-            targetPosition = spawnTransform.position;
+            targetPosition = spawnPosition;
             transform.position = targetPosition;
         }
     }
