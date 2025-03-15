@@ -7091,6 +7091,8 @@ MonoBehaviour:
   maingameCamera: {fileID: 302928133}
   winnerId: 0
   isMinigamePlaying: 0
+  isEndMoveExcuting: 0
+  isWaitMinigameEnd: 0
 --- !u!4 &1365642761
 Transform:
   m_ObjectHideFlags: 0
@@ -8614,6 +8616,7 @@ MonoBehaviour:
   mainGameProgress: {fileID: 1365642760}
   playerBoard: {fileID: 2113713794}
   startNode: {fileID: 1219398259}
+  blackNode: {fileID: 1947997198}
   playerCharacters:
   - {fileID: 6720154922840694447, guid: b68bdab0e5c190f4dace2b55f49dfb5b, type: 3}
   - {fileID: 3171602940925265327, guid: 50ba5231b944f884898492381d4e29fc, type: 3}

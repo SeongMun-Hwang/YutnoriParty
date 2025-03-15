@@ -25,6 +25,7 @@ public class GameManager : NetworkBehaviour
     public MainGameProgress mainGameProgress;
     public PlayerBoard playerBoard;
     public Node startNode;
+    public Node blackNode;
     public List<GameObject> playerCharacters;
     public NetworkVariable<FixedString128Bytes> lobbyId = new NetworkVariable<FixedString128Bytes>();
     public override void OnNetworkSpawn()

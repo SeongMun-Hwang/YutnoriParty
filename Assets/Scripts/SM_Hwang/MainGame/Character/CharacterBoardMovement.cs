@@ -178,9 +178,8 @@ public class CharacterBoardMovement : MonoBehaviour
         }
     }
 
-    public void ChangeCurrentNode(Node node)
+    public void ChangeCurrentNodeToBlackHole()
     {
-        Debug.Log("change current node : "+node.name);
-        currentNode = node;
+        currentNode = GameManager.Instance.blackNode;
     }
 }
