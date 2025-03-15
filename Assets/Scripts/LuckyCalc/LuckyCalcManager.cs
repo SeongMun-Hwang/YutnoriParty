@@ -338,6 +338,12 @@ public class LuckyCalcManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void WrongAnswerClientRpc()
+    {
+        AudioManager.instance.Playsfx(11);
+    }
+
     private IEnumerator CheckResult()
     {
         
@@ -353,6 +359,7 @@ public class LuckyCalcManager : NetworkBehaviour
         else
         {
             Debug.Log("오답...");
+            WrongAnswerClientRpc();
             NextTurn();
         }
     }
@@ -361,6 +368,7 @@ public class LuckyCalcManager : NetworkBehaviour
     private void OpenCardClientRpc(int cardId)
     {
         cards[cardId].OpenCard();
+        AudioManager.instance.Playsfx(9);
     }
 
     [ClientRpc]
@@ -380,6 +388,7 @@ public class LuckyCalcManager : NetworkBehaviour
     [ClientRpc]
     public void GameFinishedClientRpc(ulong winClientId)
     {
+        AudioManager.instance.Playsfx(10);
         if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
 
         if (NetworkManager.Singleton.LocalClientId == winClientId)
