@@ -276,7 +276,7 @@ public class EventNodeManager : NetworkBehaviour
         var spawnedNode = spawnedNodes.Last();
 
         //노드 할당
-        spawnedNode.AssignNode(node.GetComponent<GameObject>());
+        spawnedNode.AssignNodeRpc(node.GetComponent<GameObject>());
 
         //블랙홀 노드면 범위 노드 전달
         if(type == EventNodeType.BlackHole)

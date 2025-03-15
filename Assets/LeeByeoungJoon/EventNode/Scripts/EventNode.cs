@@ -227,7 +227,7 @@ public class EventNode : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    public void AssignNode(NetworkObjectReference node)
+    public void AssignNodeRpc(NetworkObjectReference node)
     {
         if (node.TryGet(out NetworkObject nodeNetObj))
         {
