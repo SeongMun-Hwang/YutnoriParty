@@ -30,6 +30,7 @@ public class GameManager : NetworkBehaviour
     public List<GameObject> hideableWhenOtherScene;
     public NetworkVariable<FixedString128Bytes> lobbyId = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> winnerName = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<int> winnerCharacterIndex = new NetworkVariable<int>();
     public override void OnNetworkSpawn()
     {
         if(IsServer) lobbyId.Value = HostSingleton.Instance.ReturnJoinCode();

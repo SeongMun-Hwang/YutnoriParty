@@ -171,14 +171,15 @@ public class PlayerManager : NetworkBehaviour
     private void EndGame()
     {
         Debug.Log("Game End");
-        EndGameServerRpc(OwnerClientId);
+        int index = GetClientIndex();
+        EndGameServerRpc(OwnerClientId, index);
     }
     [ServerRpc(RequireOwnership = default)]
-    private void EndGameServerRpc(ulong id)
+    private void EndGameServerRpc(ulong id, int index)
     {
-        GameManager.Instance.winnerName.OnValueChanged += GoToAwardSceneClientRpc;
         GameManager.Instance.winnerName.Value = ServerSingleton.Instance.clientIdToUserData[id].userName;
-        
+        GameManager.Instance.winnerCharacterIndex.Value = index;
+        GoToAwardSceneClientRpc("", "");
     }
     [ClientRpc]
     private void GoToAwardSceneClientRpc(FixedString128Bytes oldValue, FixedString128Bytes newValue)
