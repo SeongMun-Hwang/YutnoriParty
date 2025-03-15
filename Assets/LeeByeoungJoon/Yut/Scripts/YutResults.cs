@@ -38,7 +38,6 @@ public class YutResults : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
             return;
         }
-        int extraMove = 0;
         ItemManager.Instance.RemoveItem();
         //버튼 누르면 윷 사라지게 함
         YutManager.Instance.HideYutRpc();
