@@ -276,7 +276,8 @@ public class EventNodeManager : NetworkBehaviour
         var spawnedNode = spawnedNodes.Last();
 
         //노드 할당
-        AssignNodeRpc(spawnedNode.GetComponent<NetworkObject>(), node.GetComponent<NetworkObject>());
+        //AssignNodeRpc(spawnedNode.GetComponent<NetworkObject>(), node.GetComponent<NetworkObject>());
+        spawnedNode.node = node;
 
         //블랙홀 노드면 범위 노드 전달
         if(type == EventNodeType.BlackHole)
@@ -299,19 +300,15 @@ public class EventNodeManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    void AssignNodeRpc(NetworkObjectReference eventNodeNoRef, NetworkObjectReference nodeNoRef)
+    void AssignNodeRpc(NetworkObjectReference eventNodeNoRef, int nodeIdx)
     {
         if (eventNodeNoRef.TryGet(out NetworkObject eventNodeNo))
         {
             Debug.Log("네트워크 오브젝트 못찾음");
         }
-        if(nodeNoRef.TryGet(out NetworkObject nodeNo))
-        {
-            Debug.Log("네트워크 오브젝트 못찾음");
-        }
 
         EventNode eventNode = eventNodeNo.GetComponent<EventNode>();
-        Node node = eventNodeNo.GetComponent<Node>();
+        Node node = allNodes[nodeIdx];
 
         eventNode.node = node;
     }
