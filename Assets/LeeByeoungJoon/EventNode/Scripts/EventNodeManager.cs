@@ -276,7 +276,7 @@ public class EventNodeManager : NetworkBehaviour
         var spawnedNode = spawnedNodes.Last();
 
         //노드 할당
-        spawnedNode.node = node;
+        spawnedNode.AssignNode(node.GetComponent<GameObject>());
 
         //블랙홀 노드면 범위 노드 전달
         if(type == EventNodeType.BlackHole)
@@ -317,7 +317,6 @@ public class EventNodeManager : NetworkBehaviour
     {
         despawnSchedule.Add(node);
     }
-
 
     [Rpc(SendTo.Server)]
     public void EscapeIslandCallRpc(NetworkObjectReference no)

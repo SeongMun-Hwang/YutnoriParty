@@ -180,6 +180,7 @@ public class EventNode : NetworkBehaviour
             }
         }
     }
+
     //이벤트 시작할때 처리
     [Rpc(SendTo.Server)]
     protected void EventExcuteRpc()
@@ -223,5 +224,16 @@ public class EventNode : NetworkBehaviour
         //gameObject.SetActive(false);
         Debug.Log("비활성화 할 노드 전달");
         EventNodeManager.Instance.ScheduleDespawn(this);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void AssignNode(NetworkObjectReference node)
+    {
+        if (node.TryGet(out NetworkObject nodeNetObj))
+        {
+            Debug.Log("네트워크 오브젝트 못찾음");
+        }
+
+        this.node = nodeNetObj.GetComponent<Node>();
     }
 }
