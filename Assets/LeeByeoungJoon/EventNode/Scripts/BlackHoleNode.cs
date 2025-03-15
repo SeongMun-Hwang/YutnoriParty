@@ -216,7 +216,7 @@ public class BlackHoleNode : EventNode
         character.transform.position = targetPos;
 
         //이동 끝나고 노드 변경
-        character.ChangeCurrentNode(node);
+        character.ChangeCurrentNodeToBlackHole();
         animator.SetFloat("isMoving", 0f);
 
         //캐릭터 카운트는 서버에서밖에 못건듬
