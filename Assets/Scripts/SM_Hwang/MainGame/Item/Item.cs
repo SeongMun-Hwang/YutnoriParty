@@ -10,23 +10,11 @@ public class Item : MonoBehaviour
     private bool isToggled = false;
     private ItemName itemName;
     private Coroutine coroutine;
-    [SerializeField] TextMeshProUGUI itemTmp;
+    public Image itemImg;
     void Start()
     {
         button = GetComponent<Button>();
         button.onClick.AddListener(ToggleState);
-        switch (itemName)
-        {
-            case ItemName.ChanceUp:
-                itemTmp.text = "+1";
-                break;
-            case ItemName.ReverseMove:
-                itemTmp.text = "<>";
-                break;
-            case ItemName.Obstacle:
-                itemTmp.text = "ㅁ";
-                break;
-        }
     }
 
     void ToggleState()
@@ -46,6 +34,7 @@ public class Item : MonoBehaviour
             if (itemName == ItemName.ChanceUp)
             {
                 YutManager.Instance.throwChance++;
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("기회 +1", 2f);
                 ItemManager.Instance.RemoveItem();
             }
             if (itemName == ItemName.ReverseMove)

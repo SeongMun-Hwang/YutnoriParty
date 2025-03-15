@@ -2913,7 +2913,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1860156455
+  GlobalObjectIdHash: 2210064958
   InScenePlacedSourceGlobalObjectIdHash: 2210064958
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2970,6 +2970,9 @@ MonoBehaviour:
   itemPrefab: {fileID: 4282492769358396506, guid: 1397cef20d01d694da6001b75295a248, type: 3}
   obstaclePrefab: {fileID: 5961252792949968541, guid: 025f02074795b694bac293df7bf1a60e, type: 3}
   reverseEffectPrefab: {fileID: 5324040731377434238, guid: fa7232501c402304d98fc9fb71e5af6f, type: 3}
+  obstacleImg: {fileID: -1952718243, guid: 3b2a76342bcf0a140ac24f1b3fd887be, type: 3}
+  reverseImg: {fileID: 351713612, guid: a525971d6972c934b8aaa998653b1447, type: 3}
+  chanceUpImg: {fileID: 776452908, guid: d12131273ad80474ab3ae30ab65b1456, type: 3}
   currentItem: {fileID: 0}
 --- !u!1 &4219623502567522067
 GameObject:
