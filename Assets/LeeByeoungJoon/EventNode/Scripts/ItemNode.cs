@@ -25,7 +25,7 @@ public class ItemNode : EventNode
         }
 
         Debug.Log(character.OwnerClientId + "플레이어 아이템 획득");
-        ItemManager.Instance.GetItemClientRpc(ItemName.None, character.OwnerClientId);
+        ItemManager.Instance.GetItemClientRpc(character.OwnerClientId);
         DeactiveNodeRpc();
         EventEndRpc();
     }

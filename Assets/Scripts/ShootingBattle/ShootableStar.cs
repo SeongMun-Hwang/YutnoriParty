@@ -64,6 +64,7 @@ public class ShootableStar : NetworkBehaviour
     [ClientRpc]
     private void DrawEffectClientRpc(Color32 color)
     {
+        AudioManager.instance.Playsfx(7);
         GameObject effect = Instantiate(shotEffect, transform.position, transform.rotation);
         var main = effect.GetComponent<ParticleSystem>().main;
         main.startColor = new ParticleSystem.MinMaxGradient(color);

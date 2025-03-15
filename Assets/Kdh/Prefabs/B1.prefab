@@ -14,15 +14,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 2600952684
-  InScenePlacedSourceGlobalObjectIdHash: 1728957343
+  InScenePlacedSourceGlobalObjectIdHash: 2600952684
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -273,6 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 10
+  spawnPosition: {x: 70, y: 0, z: 65}
   canMove:
     m_InternalValue: 0
   playerScore: 0
@@ -287,6 +288,10 @@ PrefabInstance:
     - target: {fileID: 943280639772234450, guid: 770cbcb51b8e59b43bdda71fe08806a8, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 364583123
+      objectReference: {fileID: 0}
+    - target: {fileID: 943280639772234450, guid: 770cbcb51b8e59b43bdda71fe08806a8, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2600952684
       objectReference: {fileID: 0}
     - target: {fileID: 6079540785776242331, guid: 770cbcb51b8e59b43bdda71fe08806a8, type: 3}
       propertyPath: m_Name

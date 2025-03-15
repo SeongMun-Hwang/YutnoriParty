@@ -194,7 +194,7 @@ public class StackBattleManager : NetworkBehaviour
     [ClientRpc]
     private void SuccessStackClientRpc()
     {
-        AudioManager.instance.Playsfx(6);
+        AudioManager.instance.Playsfx(5);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -310,7 +310,7 @@ public class StackBattleManager : NetworkBehaviour
 	[ClientRpc]
 	public void GameOverClientRpc(ulong id)
 	{
-        AudioManager.instance.Playsfx(7);
+        AudioManager.instance.Playsfx(6);
         if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
 
         if (NetworkManager.Singleton.LocalClientId == id)

@@ -2,10 +2,11 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.UI;
 
 public enum ItemName
 {
-    ResultUp,
+    ChanceUp,
     ReverseMove,
     Obstacle,
     None
@@ -22,6 +23,10 @@ public class ItemManager : NetworkBehaviour
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject obstaclePrefab;
     [SerializeField] GameObject reverseEffectPrefab;
+    [SerializeField] Sprite obstacleImg;
+    [SerializeField] Sprite reverseImg;
+    [SerializeField] Sprite chanceUpImg;
+
     public GameObject currentItem;
     public override void OnNetworkSpawn()
     {
@@ -31,29 +36,32 @@ public class ItemManager : NetworkBehaviour
     {
         if(Input.GetKeyUp(KeyCode.Keypad0))
         {
-            GetItemClientRpc(ItemName.Obstacle, 0);
+            GetItemClientRpc(0);
         }
         if (Input.GetKeyUp(KeyCode.Keypad1))
         {
-            GetItemClientRpc(ItemName.Obstacle, 1);
+            GetItemClientRpc(1);
         }
     }
     [ClientRpc]
-    public void GetItemClientRpc(ItemName item, ulong targetId)
+    public void GetItemClientRpc(ulong targetId)
     {
         Debug.Log("Player" + targetId + "Get Item");
         if (NetworkManager.Singleton.LocalClientId != targetId) return;
         GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
         switch (RandomItem())
         {
-            case ItemName.ResultUp:            
-                go.GetComponent<Item>().SetItemName(ItemName.ResultUp);
+            case ItemName.ChanceUp:            
+                go.GetComponent<Item>().SetItemName(ItemName.ChanceUp);
+                go.GetComponent<Item>().itemImg.sprite = chanceUpImg;
                 break;
             case ItemName.ReverseMove:
                 go.GetComponent<Item>().SetItemName(ItemName.ReverseMove);
+                go.GetComponent<Item>().itemImg.sprite = reverseImg;
                 break;
             case ItemName.Obstacle:
                 go.GetComponent<Item>().SetItemName(ItemName.Obstacle);
+                go.GetComponent<Item>().itemImg.sprite = obstacleImg;
                 break;
         }
         itemLists.Add(go);

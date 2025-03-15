@@ -300,6 +300,7 @@ MonoBehaviour:
   moveSpeed: 10
   canMove:
     m_InternalValue: 0
+  spawnPosition: {x: 80, y: 0, z: 65}
   playerScore: 0
 --- !u!4 &3707901788157396524 stripped
 Transform:
