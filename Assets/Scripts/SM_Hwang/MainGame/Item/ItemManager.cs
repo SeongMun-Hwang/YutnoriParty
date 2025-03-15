@@ -5,7 +5,7 @@ using System;
 
 public enum ItemName
 {
-    ResultUp,
+    ChanceUp,
     ReverseMove,
     Obstacle,
     None
@@ -46,8 +46,8 @@ public class ItemManager : NetworkBehaviour
         GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
         switch (RandomItem())
         {
-            case ItemName.ResultUp:            
-                go.GetComponent<Item>().SetItemName(ItemName.ResultUp);
+            case ItemName.ChanceUp:            
+                go.GetComponent<Item>().SetItemName(ItemName.ChanceUp);
                 break;
             case ItemName.ReverseMove:
                 go.GetComponent<Item>().SetItemName(ItemName.ReverseMove);

@@ -39,7 +39,7 @@ public class YutResults : NetworkBehaviour
             return;
         }
         int extraMove = 0;
-        if (ItemManager.Instance.CheckItemActive() == ItemName.ResultUp) { extraMove = 1; }
+        if (ItemManager.Instance.CheckItemActive() == ItemName.ChanceUp) { extraMove = 1; }
         ItemManager.Instance.RemoveItem();
         //버튼 누르면 윷 사라지게 함
         YutManager.Instance.HideYutRpc();
