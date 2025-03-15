@@ -382,7 +382,7 @@ public class MainGameProgress : NetworkBehaviour
 
             //미니 게임 승자 판별과 패배한 말 처리
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + winnerId + "승리!", 2f);
-            ItemManager.Instance.GetItemClientRpc(ItemName.ChanceUp, winnerId);
+            ItemManager.Instance.GetItemClientRpc(winnerId);
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());
         MinigameManager.Instance.StartMinigame();
