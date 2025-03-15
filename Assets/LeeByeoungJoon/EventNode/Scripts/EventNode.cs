@@ -22,7 +22,7 @@ public class EventNode : NetworkBehaviour
     protected NetworkObject exitPlayer;
     //protected List<NetworkObject> enteredPlayers = new List<NetworkObject>();
     protected NetworkList<NetworkObjectReference> enteredPlayers = new NetworkList<NetworkObjectReference>(
-        null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        null, NetworkVariableReadPermission.Everyone);
 
     //가끔 바뀌는 정보?
     [SerializeField] int spawnInterval = 0;
@@ -36,6 +36,17 @@ public class EventNode : NetworkBehaviour
         lifeTime = data.lifeTime;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            for(int i = 0; i<enteredPlayers.Count; i++)
+            {
+                Debug.Log(enteredPlayers[i].NetworkObjectId);
+            }
+        }
+    }
+
     protected virtual void OnTriggerEnter(Collider other)
     {
         //밟음 판정 서버에서만
@@ -46,6 +57,7 @@ public class EventNode : NetworkBehaviour
         {
             if (!enteredPlayer.IsSpawned)
             {
+                enteredPlayer = null;
                 //Debug.Log("스폰 안된놈임");
                 return;
             }

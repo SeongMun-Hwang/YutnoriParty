@@ -133,7 +133,6 @@ public class BlackHoleNode : EventNode
     IEnumerator WaitForMoveEnd(NetworkObject triggeredCharacter, List<ulong> playerIds ,List<NetworkObjectReference> characters)
     {
         int timeOut = 10;
-        MainGameProgress.Instance.isMinigamePlaying = true;
 
         while (characterCount.Value > 0)
         {
@@ -149,8 +148,6 @@ public class BlackHoleNode : EventNode
             timeOut--;
         }
 
-        //PlayerManager.Instance.isMoving = false;
-
         //캐릭터들 이동이 모두 끝나고, 플레이어가 둘 이상일때만 미니게임 시작
         if (characterCount.Value <= 0 && playerIds.Count >= 2)
         {
@@ -164,7 +161,7 @@ public class BlackHoleNode : EventNode
         }
         else
         {
-            EventEndRpc();
+            BlackHoleEventEndRpc();
         }
 
         Debug.Log("전체 이동 끝");

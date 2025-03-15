@@ -1,12 +1,7 @@
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using System;
 
 public class MainGameProgress : NetworkBehaviour
 {
@@ -20,8 +15,16 @@ public class MainGameProgress : NetworkBehaviour
     public static MainGameProgress Instance { get { return instance; } }
     public System.Action endMinigameActions;
     public ulong winnerId;
-    public bool isMinigamePlaying = false;
-    NetworkVariable<bool> isBlackHoleExcuting = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+    bool _isMinigamePlaying = false;
+    public bool isMinigamePlaying
+    {
+        get => _isMinigamePlaying;
+        set
+        {
+            Debug.Log($"isMinigamePlaying 값 변경 : {isMinigamePlaying} -> {value}");
+            _isMinigamePlaying = value;
+        }
+    }
     public bool isEndMoveExcuting = false;
 
     [SerializeField] bool isWaitMinigameEnd = false;
@@ -309,18 +312,23 @@ public class MainGameProgress : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    void ChangeMinigamePlayingClientRpc(bool value)
+    {
+        isMinigamePlaying = value;
+        Debug.Log("isMinigamePlaying : " + isMinigamePlaying);
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void StartBlackHoleMiniGameServerRpc(NetworkObjectReference node, NetworkObjectReference triggeredCharacter, ulong[] playerIds, NetworkObjectReference[] characterList)
     {
         Debug.Log("여러명 미니게임 시작");
-        isMinigamePlaying = true;
+        ChangeMinigamePlayingClientRpc(true);
 
         if (!node.TryGet(out NetworkObject no))
         {
             Debug.Log("네트워크 오브젝트 못찾음");
         }
-
-        isBlackHoleExcuting.Value = true;
 
         endMinigameActions = null;
         endMinigameActions += (() =>
