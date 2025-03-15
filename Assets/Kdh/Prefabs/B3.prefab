@@ -232,9 +232,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 10
-  spawnPosition: {x: 80, y: 0, z: 65}
   canMove:
     m_InternalValue: 0
+  spawnPosition: {x: 90, y: 0, z: 65}
   playerScore: 0
 --- !u!4 &1428521645519760408 stripped
 Transform:
