@@ -18,6 +18,10 @@ public class RunGameController : NetworkBehaviour
             targetPosition = spawnPosition;
             transform.position = targetPosition;
         }
+        if (IsClient)
+        {
+            targetPosition = spawnPosition;  
+        }
     }
 
     private void Update()
