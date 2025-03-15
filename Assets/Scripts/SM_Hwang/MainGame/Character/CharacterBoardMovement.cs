@@ -180,6 +180,7 @@ public class CharacterBoardMovement : MonoBehaviour
 
     public void ChangeCurrentNode(Node node)
     {
+        Debug.Log("change current node : "+node.name);
         currentNode = node;
     }
 }
