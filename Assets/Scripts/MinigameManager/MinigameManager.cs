@@ -32,6 +32,7 @@ public class MinigameManager : NetworkBehaviour
     [SerializeField] private GameObject spectatorUI;
     [SerializeField] private GameObject MinigameButtonUI;
     [SerializeField] private Animator FadeUIAnimator;
+    [SerializeField] private RouletteController roulette;
 
     public override void OnNetworkSpawn()
     {
@@ -60,8 +61,24 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            if (!isRandomGame)
+            {
+                StartMiniGameClientRpc();
+                return;
+            }
+
             MinigameButtonUI.SetActive(false);
-            StartMiniGameClientRpc();
+            roulette.gameObject.SetActive(true);
+
+            if (!IsServer) { return; }
+            roulette.EndActions = null;
+            roulette.EndActions = () =>
+            {
+                StartMiniGameClientRpc();
+                gameType = (Define.MinigameType)roulette.MinigameIndex.Value;
+                Debug.Log($"랜덤으로 {gameType} 선택");
+            };
+            roulette.StartRoll();
         }
         else
         {
@@ -146,11 +163,6 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     void StartMiniGameClientRpc()
     {
-        if (isRandomGame)
-        {
-            gameType = (Define.MinigameType)Random.Range(0, MinigameScenes.Count);
-            Debug.Log($"랜덤으로 {gameType} 선택");
-        }
         StartCoroutine(LoadSceneWithFade(1f, false));
     }
 
@@ -201,6 +213,7 @@ public class MinigameManager : NetworkBehaviour
         maingameCamera.gameObject.SetActive(isUnloading); // 윷놀이 판 전용카메라
         YutManager.Instance.gameObject.SetActive(isUnloading); // 윷놀이 관련 활성화
         GameManager.Instance.playerBoard.gameObject.SetActive(isUnloading); // 메인게임 플레이어 프로필 활성화
+        roulette.CloseRouletteForce();
         yield return new WaitForSecondsRealtime(duration);
         FadeUIAnimator.SetTrigger("FadeIn");
         yield return new WaitForSecondsRealtime(0.5f);

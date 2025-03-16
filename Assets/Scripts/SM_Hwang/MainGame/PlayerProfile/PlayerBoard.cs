@@ -170,4 +170,17 @@ public class PlayerBoard : NetworkBehaviour
             }
         }   
     }
+    public void ClearAllProfiles()
+    {
+        if (IsServer)
+        {
+            playerProfileDatas.Clear();
+        }
+
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            Destroy(profile.gameObject);
+        }
+        playerProfiles.Clear();
+    }
 }

@@ -88,7 +88,7 @@ public class ShootingBattleManager : NetworkBehaviour
             yield return null;
         }
 
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f, Color.white);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("날아가는 별을 조준하고 잡아라!", 2f, Color.white);
 
         isPlaying.Value = true;
     }
