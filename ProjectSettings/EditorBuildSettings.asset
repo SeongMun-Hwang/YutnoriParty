@@ -35,6 +35,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/WinnerAward/AwardScene.unity
     guid: 46892d73e1099094cb8f7cd8f5053f61
+  - enabled: 1
+    path: Assets/Scenes/HammerGame/HammerGame.unity
+    guid: 3b8fdf1c39058a84683428a849f7a2df
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
