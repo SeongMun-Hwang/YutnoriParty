@@ -287,6 +287,12 @@ public class YutManager : NetworkBehaviour
 
     public void ThrowButtonPressed()
     {
+        if (isCalulating)
+        {
+            //버튼 못누른다고 안내
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Yut Result!", 2f);
+            return;
+        }
         //지금 누구 턴인지
         //if ((ulong)GameManager.Instance.mainGameProgress.currentPlayerNumber != NetworkManager.LocalClientId)
         //{
@@ -318,10 +324,17 @@ public class YutManager : NetworkBehaviour
         //Debug.Log("던짐");
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    void StartYutCalculatingRpc()
+    {
+        isCalulating = true;
+    }
+
     [ServerRpc(RequireOwnership = false)]
     void ThrowYutsServerRpc(int yutNums, float power, ServerRpcParams rpcParams)
     {
-        isCalulating = true;
+        //isCalulating = true;
+        StartYutCalculatingRpc();
         //윷 보이게 하기
         //ShowYutRpc();
 
@@ -517,7 +530,7 @@ public class YutManager : NetworkBehaviour
             ClearYutResuliClientRpc();
             //YutFalledRpc(false);
             ThrowChanceChangeClientRpc(-999, senderId);
-            EndYutCalculating();
+            EndYutCalculatingRpc();
 
             //이동 끝 실행해서 턴 넘김
             YutFallTurnEndRpc(RpcTarget.Single(senderId, RpcTargetUse.Temp));
@@ -532,7 +545,7 @@ public class YutManager : NetworkBehaviour
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
             ThrowChanceChangeClientRpc(1, senderId);
 
-            EndYutCalculating();
+            EndYutCalculatingRpc();
             yield break;
         }
 
@@ -542,7 +555,7 @@ public class YutManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
             ThrowChanceChangeClientRpc(1, senderId);
 
-            EndYutCalculating();
+            EndYutCalculatingRpc();
             yield break;
         }
 
@@ -580,13 +593,14 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
-        EndYutCalculating();
+        EndYutCalculatingRpc();
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
         yield break;
     }
 
-    void EndYutCalculating()
+    [Rpc(SendTo.ClientsAndHost)]
+    void EndYutCalculatingRpc()
     {
         isCalulating = false;
         isYutFalled = false;
