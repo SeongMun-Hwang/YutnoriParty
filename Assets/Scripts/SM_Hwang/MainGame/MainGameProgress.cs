@@ -424,7 +424,6 @@ public class MainGameProgress : NetworkBehaviour
     //내 말이 아니면 메시지 출력
     public void ChooseCharacter()
     {
-        if (NetworkManager.LocalClientId != NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]) return; //내 턴이 아니면 작동 X
         if (isMinigamePlaying) return;
         if (Input.GetMouseButtonDown(0))
         {

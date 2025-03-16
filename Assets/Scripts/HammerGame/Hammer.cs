@@ -1,16 +1,16 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Hammer : MonoBehaviour
+public class Hammer : NetworkBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnCollisionEnter(Collision collision)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (collision.gameObject.CompareTag("Character") 
+            && collision.gameObject!=transform.root.gameObject)
+        {
+            NetworkObjectReference noRef = collision.gameObject.GetComponent<NetworkObject>();
+            Vector3 forceDir = transform.root.transform.forward+transform.root.transform.up*0.05f;
+            HammerGameManager.Instance.AddForceWithHammerServerRpc(noRef,forceDir);
+        }
     }
 }

@@ -4,52 +4,80 @@ using UnityEngine.EventSystems;
 
 public class HammerGameController : NetworkBehaviour
 {
+    [SerializeField] Camera mainCamera;
+    [SerializeField] GameObject cameraParent;
     public float moveSpeed = 5f;
     public float mouseSensitivity = 2f;
     private bool isAttacked = false;
     private Animator animator;
-    private Rigidbody rb;
+    private float rotationX = 0f;
     private float rotationY = 0f;
-
+    private Vector3 moveDirection;
     void Start()
     {
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
-        Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 고정
+        Cursor.lockState = CursorLockMode.Locked;
     }
-
+    public override void OnNetworkSpawn()
+    {
+        if (OwnerClientId == NetworkManager.LocalClientId)
+        {
+            Debug.Log("set camera");
+            mainCamera.gameObject.SetActive(true);
+            mainCamera =Camera.main;
+        }
+    }
     void Update()
     {
+        if (!IsOwner) return;
         RotateWithMouse();
         MoveCharacter();
+        HammerAttack();     
+    }
+    private void FixedUpdate()
+    {
+        if (!IsOwner) return;
+        if (moveDirection != Vector3.zero)
+        {
+            GetComponent<Rigidbody>().linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+        }
+        else
+        {
+            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+        }
+    }
+    private void RotateWithMouse()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mousey = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
+        rotationY += mouseX;
+        transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
+
+        rotationX -= mousey;
+        rotationX = Mathf.Clamp(rotationX, -90f, 90f);
+        cameraParent.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+    }
+
+    private void MoveCharacter()
+    {
+        //if (!isAttacked)
+        //{
+            float moveX = Input.GetAxis("Horizontal");
+            float moveZ = Input.GetAxis("Vertical");
+
+            moveDirection = transform.right * moveX + transform.forward * moveZ;
+            animator.SetFloat("moveSpeed", moveDirection.magnitude);
+        //}
+    }
+    private void HammerAttack()
+    {
         if (Input.GetMouseButtonDown(0) && !isAttacked)
         {
             animator.SetTrigger("Attack");
             animator.SetFloat("moveSpeed", 0);
             isAttacked = true;
-            rb.linearVelocity = Vector3.zero;
-        }
-    }
-
-    private void RotateWithMouse()
-    {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        rotationY += mouseX;
-        transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
-    }
-
-    private void MoveCharacter()
-    {
-        if (!isAttacked)
-        {
-            float moveX = Input.GetAxis("Horizontal");
-            float moveZ = Input.GetAxis("Vertical");
-
-            Vector3 moveDirection = transform.right * moveX + transform.forward * moveZ;
-            Debug.Log(moveDirection.magnitude);
-            animator.SetFloat("moveSpeed", moveDirection.magnitude);
-            rb.linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, rb.linearVelocity.y, 0);
+            GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         }
     }
 
