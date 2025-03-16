@@ -70,7 +70,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7892072990628403454
 Transform:
   m_ObjectHideFlags: 0
@@ -242,4 +242,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   node: {fileID: 0}
   data: {fileID: 0}
-  spawnInterval: 0
+  isCheckingTrigger: 0
+  isEventRunning:
+    m_InternalValue: 0

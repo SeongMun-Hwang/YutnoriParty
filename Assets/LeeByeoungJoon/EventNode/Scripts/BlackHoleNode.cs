@@ -17,12 +17,18 @@ public class BlackHoleNode : EventNode
     //int pausedTurn = 0; //밟아서 비활성화 된 턴을 기록
     //bool isPaused = false;
     WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
+    Animator animator;
 
     NetworkVariable<bool> isPaused = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
     NetworkVariable<bool> isProcessing = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
 
     NetworkVariable<int> pausedTurn = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone);
     NetworkVariable<int> characterCount =new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone);
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -76,8 +82,10 @@ public class BlackHoleNode : EventNode
         pausedTurn.Value = turnAfterSpawned.Value;
         Debug.Log("블랙홀 휴식시작");
 
+        //블랙홀 작동 애니메이션 실행
+
+
         //캐릭터들 이동
-        //MoveCharactersRpc();
         List<CharacterBoardMovement> list = new List<CharacterBoardMovement>();
         List<ulong> playerIds = new List<ulong>();
         List<NetworkObjectReference> characterGameobjects = new List<NetworkObjectReference>();
@@ -85,7 +93,6 @@ public class BlackHoleNode : EventNode
         Vector3 targetPos;
 
         Debug.Log("이동 시작");
-        //PlayerManager.Instance.isMoving = true;
 
         //밟은애도 사라져야하니까 목록에 추가
         playerIds.Add(triggeredCharacter.OwnerClientId);
@@ -168,11 +175,15 @@ public class BlackHoleNode : EventNode
 
         yield return null;
     }
+
     [Rpc(SendTo.Server)]
     public void BlackHoleEventEndRpc()
     {
         isProcessing.Value = false;
         EventEndRpc();
+
+        //블랙홀 쪼그라드는 애니메이션 실행
+        PlayBlackHoleShirinkAnimation();
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -256,5 +267,23 @@ public class BlackHoleNode : EventNode
         isPaused.Value = false;
         pausedTurn.Value = 0;
         Debug.Log("블랙홀 휴식끝");
+
+        //블랙홀 커지는 애니메이션 실핼
+        PlayBlackHoleGrowAnimation();
+    }
+
+    void PlayBlackHoleGrowAnimation()
+    {
+        animator.SetBool("isShrinked", true);
+    }
+
+    void PlayBlackHoleShirinkAnimation()
+    {
+        animator.SetBool("isShrinked", false);
+    }
+
+    void PlayBlackHoleWorkingAnimation()
+    {
+
     }
 }
