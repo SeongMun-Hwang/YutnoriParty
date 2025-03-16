@@ -1,10 +1,11 @@
-using System;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class ItemNode : EventNode
 {
+    [SerializeField] NetworkParticle getEffect;
+    [SerializeField] Transform effectPos;
+
     [Rpc(SendTo.Server)]
     public override void EventStartRpc()
     {
@@ -25,6 +26,9 @@ public class ItemNode : EventNode
         }
 
         Debug.Log(character.OwnerClientId + "플레이어 아이템 획득");
+
+        Instantiate(getEffect, effectPos); //파티클 재생
+
         ItemManager.Instance.GetItemClientRpc(character.OwnerClientId);
         DeactiveNodeRpc();
         EventEndRpc();

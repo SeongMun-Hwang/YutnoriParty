@@ -431,6 +431,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7287534881872593624
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8476722836276272333}
+  m_Layer: 0
+  m_Name: EffectTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8476722836276272333
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7287534881872593624}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.715, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3619457977060884359}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8865519028264795707
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,6 +497,7 @@ Transform:
   - {fileID: 2085421059181836290}
   - {fileID: 7892072990628403454}
   - {fileID: 2628846750924878662}
+  - {fileID: 8476722836276272333}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4911389082946874689
@@ -511,6 +543,8 @@ MonoBehaviour:
   isCheckingTrigger: 0
   isEventRunning:
     m_InternalValue: 0
+  getEffect: {fileID: 5002375572981495116, guid: 3937c0203ee57ec4ca5450798d23b74b, type: 3}
+  effectPos: {fileID: 8476722836276272333}
 --- !u!54 &5683779139776893250
 Rigidbody:
   m_ObjectHideFlags: 0
