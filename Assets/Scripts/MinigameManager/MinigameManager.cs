@@ -213,6 +213,7 @@ public class MinigameManager : NetworkBehaviour
         maingameCamera.gameObject.SetActive(isUnloading); // 윷놀이 판 전용카메라
         YutManager.Instance.gameObject.SetActive(isUnloading); // 윷놀이 관련 활성화
         GameManager.Instance.playerBoard.gameObject.SetActive(isUnloading); // 메인게임 플레이어 프로필 활성화
+        roulette.CloseRouletteForce();
         yield return new WaitForSecondsRealtime(duration);
         FadeUIAnimator.SetTrigger("FadeIn");
         yield return new WaitForSecondsRealtime(0.5f);

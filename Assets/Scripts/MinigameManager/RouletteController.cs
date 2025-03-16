@@ -114,4 +114,9 @@ public class RouletteController : NetworkBehaviour
         }
         StartCoroutine(EndRoulette());
     }
+
+    public void CloseRouletteForce()
+    {
+        RoulettePanel.SetActive(false);
+    }
 }
