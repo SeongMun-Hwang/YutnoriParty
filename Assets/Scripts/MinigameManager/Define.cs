@@ -9,6 +9,7 @@ public class Define
         RunningGame, // 달리기게임
         BasketGame, // 바구니게임
         LuckyCalcGame, // 수식만들기게임
+        HammerGame, // 망치게임 
     }
 
     public enum MGPlayerType

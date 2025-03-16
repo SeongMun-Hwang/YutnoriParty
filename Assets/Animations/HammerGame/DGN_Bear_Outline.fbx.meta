@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: a3ad39b8c24804741a9e132ba61b1ec5
-AssetOrigin:
-  serializedVersion: 1
-  productId: 209295
-  packageName: 'Cute Humanoid Animal Characters: 15 Unique Humanoids, Matcap Magic'
-  packageVersion: 1.0
-  assetPath: Assets/DGN_15_CapsuleAnimals/Models/Characters/Outlined_Characters/DGN_Bear_Outline.fbx
-  uploadId: 699212
+guid: fa7f24b387612544bb90d5dbb2d7622b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
