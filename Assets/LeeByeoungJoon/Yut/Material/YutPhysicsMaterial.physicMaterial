@@ -8,8 +8,8 @@ PhysicsMaterial:
   m_PrefabAsset: {fileID: 0}
   m_Name: YutPhysicsMaterial
   serializedVersion: 2
-  m_DynamicFriction: 50
-  m_StaticFriction: 50
+  m_DynamicFriction: 70
+  m_StaticFriction: 70
   m_Bounciness: 0
   m_FrictionCombine: 0
   m_BounceCombine: 3

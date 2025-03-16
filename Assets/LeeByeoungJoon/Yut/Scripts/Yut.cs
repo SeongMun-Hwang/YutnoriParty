@@ -6,7 +6,7 @@ public class Yut : NetworkBehaviour
 {
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
-    float torque = 5f;
+    float torque = 1f;
     public float torqueSign = 0;
 
     //[SerializeField] new Collider collider;
@@ -22,7 +22,7 @@ public class Yut : NetworkBehaviour
     float gravity = 9.8f;
     float gravityFactor = 1;
     float characterBounce = 1f;
-    bool isGrounded = false;
+    //bool isGrounded = false;
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
     
@@ -30,7 +30,6 @@ public class Yut : NetworkBehaviour
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
-        torque = YutManager.Instance.Torque;
     }
 
     //답답하게 떨어져서 좀 빨리 떨어지게 함
@@ -54,19 +53,19 @@ public class Yut : NetworkBehaviour
             }
         }
 
-        isGrounded = true;
+        //isGrounded = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        isGrounded = false;
+        //isGrounded = false;
     }
 
     private void OnTriggerStay(Collider other)
     {
         if(other.tag == "Ground")
         {
-            Debug.Log("섰음!!!!!!!");
+            //Debug.Log("섰음!!!!!!!");
             //수직으로 섰으니까 토크 가함
             rigidbody.AddTorque(transform.forward * torque * torqueSign, ForceMode.Impulse);
             //마찰력 없는 피직스 머티리얼로 교체
