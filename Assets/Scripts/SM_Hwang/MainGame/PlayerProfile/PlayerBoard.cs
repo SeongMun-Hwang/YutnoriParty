@@ -162,11 +162,11 @@ public class PlayerBoard : NetworkBehaviour
         {           
             if (profile.clientId == targetId)
             {
-                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color(0,255,0);
+                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color32(140, 224, 54, 255);
             }
             else
             {
-                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color(255, 0, 0);
+                profile.gameObject.GetComponent<UnityEngine.UI.Outline>().effectColor = new Color32(224, 190, 155, 255);
             }
         }   
     }
