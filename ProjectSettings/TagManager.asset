@@ -13,7 +13,7 @@ TagManager:
   - _SCH(4)
   - _SCH(5)
   - Obstacle
-  - _HSM(2)
+  - Character
   - _HSM(3)
   - _HSM(4)
   - _HSM(5)

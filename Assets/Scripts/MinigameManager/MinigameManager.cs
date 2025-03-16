@@ -20,7 +20,8 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.ShootingGame, "ShootingScene" },
         { Define.MinigameType.RunningGame, "RunGame" },
         { Define.MinigameType.BasketGame, "BasketGame" },
-        { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" }
+        { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" },
+        {Define.MinigameType.HammerGame,"HammerGame" },
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
