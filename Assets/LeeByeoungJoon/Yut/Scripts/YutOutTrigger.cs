@@ -1,34 +1,53 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class YutOutTrigger : MonoBehaviour
 {
-    int triggerExit = 0;
-    int triggered = 0;
+    List<Rigidbody> rbs = new List<Rigidbody>();
+
+    public Action<int> OnYutTriggerd;
+    int yutTriggered = 0;
+
+    [SerializeField] Transform tmpPos;
+
+    //윷 들어와 있는 개수 확인
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("뭔가 들어옴");
-
-        triggerExit--;
-        if(triggerExit == 0)
+        if(other.tag == "Yut")
         {
-            YutManager.Instance.YutFalledRpc(false);
+            yutTriggered++;
+            
+            rbs.Add(other.GetComponent<Rigidbody>());
+            HoldYuts();
         }
-
-        triggered++;
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("뭔가 나감");
-
-        triggerExit++;
-        if (triggerExit > 0)
+        if (other.tag == "Yut")
         {
-            Debug.Log("낙 감지");
-            YutManager.Instance.YutFalledRpc(true);
+            yutTriggered--;
         }
+    }
 
-        triggered--;
+    //너무 멀리 떨어져서 버그나는거 방지하려고 화면 밖에 잡아둠
+    public void HoldYuts()
+    {
+        foreach(var rb in rbs)
+        {
+            rb.isKinematic = true;
+            rb.gameObject.transform.position = tmpPos.position;
+        }
+    }
+
+    //잡아둔 윷 키네마틱 해제
+    public void ReleaseYuts()
+    {
+        foreach (var rb in rbs)
+        {
+            rb.isKinematic = false;
+        }
+        rbs.Clear();
     }
 }

@@ -25,7 +25,7 @@ public class EventNode : NetworkBehaviour
         null, NetworkVariableReadPermission.Everyone);
 
     //가끔 바뀌는 정보?
-    //[SerializeField] int spawnInterval = 0;
+    [SerializeField] int spawnInterval = 0;
     float triggerTimeOut = 10f;
 
     //네트워크 스폰시 변수들 초기화
