@@ -17,6 +17,7 @@ public class HammerGameController : NetworkBehaviour
     {
         animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
+        gameObject.transform.LookAt(HammerGameManager.Instance.lookAtTransform);
     }
     public override void OnNetworkSpawn()
     {
@@ -24,15 +25,16 @@ public class HammerGameController : NetworkBehaviour
         {
             Debug.Log("set camera");
             mainCamera.gameObject.SetActive(true);
-            mainCamera =Camera.main;
+            mainCamera = Camera.main;
         }
     }
+    
     void Update()
     {
         if (!IsOwner) return;
         RotateWithMouse();
         MoveCharacter();
-        HammerAttack();     
+        HammerAttack();
     }
     private void FixedUpdate()
     {
@@ -61,14 +63,11 @@ public class HammerGameController : NetworkBehaviour
 
     private void MoveCharacter()
     {
-        //if (!isAttacked)
-        //{
-            float moveX = Input.GetAxis("Horizontal");
-            float moveZ = Input.GetAxis("Vertical");
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
 
-            moveDirection = transform.right * moveX + transform.forward * moveZ;
-            animator.SetFloat("moveSpeed", moveDirection.magnitude);
-        //}
+        moveDirection = transform.right * moveX + transform.forward * moveZ;
+        animator.SetFloat("moveSpeed", moveDirection.magnitude);
     }
     private void HammerAttack()
     {
@@ -80,7 +79,6 @@ public class HammerGameController : NetworkBehaviour
             GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         }
     }
-
     public void IsAttackFinished()
     {
         isAttacked = false;

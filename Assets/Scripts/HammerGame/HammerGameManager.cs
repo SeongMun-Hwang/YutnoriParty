@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
 
 public class HammerGameManager : NetworkBehaviour
 {
     [SerializeField] List<GameObject> hammerCharacterPrefabs;
     [SerializeField] List<Transform> spawnPos;
+    [SerializeField] Camera watchCamera;
+    [SerializeField] public Transform lookAtTransform;
     private static HammerGameManager instance;
+    private List<GameObject> playingCharacters = new List<GameObject>();
     public static HammerGameManager Instance
     {
-        get {return instance;}
+        get { return instance; }
     }
     private void Awake()
     {
@@ -19,22 +23,26 @@ public class HammerGameManager : NetworkBehaviour
     {
         if (IsServer)
         {
-            Debug.Log("Spawned");
-            foreach(ulong clientId in NetworkManager.ConnectedClientsIds)
+            foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
             {
                 if (MinigameManager.Instance.IsPlayer(clientId))
                 {
                     SpawnHammerCharacterServerRpc(clientId);
                 }
+                else
+                {
+                    ChangeToWatchCameraClientRpc(clientId);
+                }
             }
         }
     }
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     private void SpawnHammerCharacterServerRpc(ulong clientId)
     {
-        int index=PlayerManager.Instance.GetClientIndex(clientId);
+        int index = PlayerManager.Instance.GetClientIndex(clientId);
         GameObject go = Instantiate(hammerCharacterPrefabs[index], spawnPos[index]);
         go.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+        playingCharacters.Add(go);
     }
     [ServerRpc(RequireOwnership = false)]
     public void AddForceWithHammerServerRpc(NetworkObjectReference noRef, Vector3 forceDir)
@@ -62,8 +70,38 @@ public class HammerGameManager : NetworkBehaviour
             Rigidbody rb = no.gameObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(forceDir *300f, ForceMode.Impulse);
+                rb.AddForce(forceDir * 300f, ForceMode.Impulse);
             }
+        }
+    }
+    [ServerRpc(RequireOwnership = default)]
+    public void DespawnLoserServerRpc(NetworkObjectReference noRef)
+    {
+        noRef.TryGet(out NetworkObject no);
+        ChangeToWatchCameraClientRpc(no.OwnerClientId);
+        no.Despawn();
+        playingCharacters.Remove(no.gameObject);
+        Destroy(no.gameObject);
+        CheckHammerGameEnd();
+
+    }
+    [ClientRpc]
+    private void ChangeToWatchCameraClientRpc(ulong targetId)
+    {
+        if (NetworkManager.LocalClientId != targetId) return;
+        watchCamera.gameObject.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        watchCamera = Camera.main;
+    }
+    private void CheckHammerGameEnd()
+    {
+        if (playingCharacters.Count == 1)
+        {
+            Debug.Log("Hammer Game End");
+            MainGameProgress.Instance.winnerId=playingCharacters[0].GetComponent<NetworkObject>().OwnerClientId;
+            DespawnLoserServerRpc(playingCharacters[0]);
+            Cursor.lockState = CursorLockMode.None;
+            MinigameManager.Instance.EndMinigame();
         }
     }
 }
