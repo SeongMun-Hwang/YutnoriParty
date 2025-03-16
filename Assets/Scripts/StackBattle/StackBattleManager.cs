@@ -122,7 +122,7 @@ public class StackBattleManager : NetworkBehaviour
             yield return null;
         }
 
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("정확한 타이밍에 타일을 배치하라!", 2f);
 
         // 게임 시작 시 랜덤한 플레이어가 첫 턴을 가짐
         int i = UnityEngine.Random.Range(0, playerIds.Count);

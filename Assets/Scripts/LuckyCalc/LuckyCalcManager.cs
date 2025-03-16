@@ -115,7 +115,7 @@ public class LuckyCalcManager : NetworkBehaviour
             yield return null;
         }
 
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Start!", 1f);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("카드를 뒤집어 수식을 완성하라!", 2f);
 
         int i = UnityEngine.Random.Range(0, playerIds.Count);
         currentTurnPlayerId.Value = playerIds[i];

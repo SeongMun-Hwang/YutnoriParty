@@ -7095,7 +7095,6 @@ MonoBehaviour:
   currentCharacter: {fileID: 0}
   maingameCamera: {fileID: 302928133}
   winnerId: 0
-  isMinigamePlaying: 0
   isEndMoveExcuting: 0
   isWaitMinigameEnd: 0
 --- !u!4 &1365642761
@@ -8912,6 +8911,8 @@ MonoBehaviour:
         byte0123: 0
         byte0124: 0
         byte0125: 0
+  winnerCharacterIndex:
+    m_InternalValue: 0
 --- !u!4 &1698649115
 Transform:
   m_ObjectHideFlags: 0
@@ -11238,11 +11239,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   playerBoardParent: {fileID: 1544805677}
   playerProfilePrefab: {fileID: 4201541151108662989, guid: 2dab1cbf65d7dc74ab455a8901fcfa24, type: 3}
-  profileTransforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &2116696342
 GameObject:
   m_ObjectHideFlags: 0
