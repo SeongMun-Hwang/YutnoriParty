@@ -41,5 +41,6 @@ public class EmojiController : MonoBehaviour
     public void SendEmoji(ulong id, int emojiCode)
     {
         GameManager.Instance.playerBoard.DrawEmojiServerRpc(id, emojiCode);
+        transform.parent.gameObject.SetActive(false);
     }
 }
