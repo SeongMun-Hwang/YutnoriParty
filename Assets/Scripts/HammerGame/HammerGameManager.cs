@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class HammerGameManager : NetworkBehaviour
 {
@@ -11,6 +12,7 @@ public class HammerGameManager : NetworkBehaviour
     [SerializeField] Camera watchCamera;
     [SerializeField] public Transform lookAtTransform;
     [SerializeField] GameObject pillar;
+    [SerializeField] PlayerUICanvas playerUICanvas;
     private static HammerGameManager instance;
     private List<GameObject> playingCharacters = new List<GameObject>();
     private int playerNum = 0;
@@ -87,7 +89,11 @@ public class HammerGameManager : NetworkBehaviour
     public void DespawnLoserServerRpc(NetworkObjectReference noRef)
     {
         noRef.TryGet(out NetworkObject no);
-        ChangeToWatchCameraClientRpc(no.OwnerClientId);
+        if (playingCharacters.Count != 1)
+        {
+            playerUICanvas.SetPlayerDeadClientRpc(no.OwnerClientId);
+            ChangeToWatchCameraClientRpc(no.OwnerClientId);
+        }
         no.Despawn();
         playingCharacters.Remove(no.gameObject);
         Destroy(no.gameObject);
