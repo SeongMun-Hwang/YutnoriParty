@@ -48,7 +48,7 @@ public class Boom : NetworkBehaviour
             }
             controller.AddScore(scoreValue);
             SpawnParticleServerRpc(transform.position);
-            PlaySoundClientRpc();
+            PlaySoundForPlayer(playerId);
             Invoke(nameof(DestroyFruitServerRpc), 0.2f);//인보크 안하니깐 소리재생전에 파괴
         }
         else if (other.CompareTag("Ground"))
@@ -58,9 +58,18 @@ public class Boom : NetworkBehaviour
         }
     }
     [ClientRpc]
-    private void PlaySoundClientRpc()
+    private void PlaySoundClientRpc(ClientRpcParams rpcParams)
     {
         AudioManager.instance.Playsfx(3);
+    }
+
+    private void PlaySoundForPlayer(ulong playerId)
+    {
+        ClientRpcParams rpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { playerId } }
+        };
+        PlaySoundClientRpc(rpcParams);
     }
 
     [ServerRpc(RequireOwnership = false)]
