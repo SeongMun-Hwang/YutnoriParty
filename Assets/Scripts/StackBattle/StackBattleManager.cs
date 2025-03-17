@@ -50,7 +50,18 @@ public class StackBattleManager : NetworkBehaviour
 		});
     }
 
-	public override void OnNetworkSpawn()
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (turnButton.onClick != null && turnButton.interactable)
+            {
+                turnButton.onClick.Invoke();
+            }
+        }
+    }
+
+    public override void OnNetworkSpawn()
 	{
         //Debug.Log("네트워크 스폰");
         isPlaying.OnValueChanged += InitScoreBoardUI;

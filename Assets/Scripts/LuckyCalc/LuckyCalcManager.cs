@@ -40,6 +40,7 @@ public class LuckyCalcManager : NetworkBehaviour
     private int[] flippedCardId = new int[2];
 
     public List<FlippableCard> cards = new List<FlippableCard>();
+    [SerializeField] List<GameObject> playerObjects;
 
     private IOperatorStrategy operatorStrategy;
 
@@ -87,6 +88,7 @@ public class LuckyCalcManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
+            playerObjects[i].SetActive(true);
             usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {
@@ -297,10 +299,14 @@ public class LuckyCalcManager : NetworkBehaviour
             if (GetCurrentTurnPlayerId() == playerIds[i])
             {
                 usernameUI[i].color = Color.yellow;
+                playerObjects[i].SetActive(true);
+                playerObjects[i].transform.GetChild(0).GetComponent<Animator>().SetTrigger("MyTurn");
             }
             else
             {
                 usernameUI[i].color = Color.white;
+                playerObjects[i].SetActive(true);
+                playerObjects[i].transform.GetChild(0).GetComponent<Animator>().SetTrigger("NotMyTurn");
             }
         }
     }
