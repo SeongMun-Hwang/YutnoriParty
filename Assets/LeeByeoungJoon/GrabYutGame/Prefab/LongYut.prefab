@@ -957,6 +957,7 @@ GameObject:
   - component: {fileID: 1523123599235480693}
   - component: {fileID: -9023725790082220879}
   - component: {fileID: 8699827845667857214}
+  - component: {fileID: 1224052496586979888}
   m_Layer: 11
   m_Name: LongYut
   m_TagString: Untagged
@@ -1039,12 +1040,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
-  SyncPositionX: 0
+  SyncPositionX: 1
   SyncPositionY: 1
-  SyncPositionZ: 0
+  SyncPositionZ: 1
   SyncRotAngleX: 0
   SyncRotAngleY: 0
   SyncRotAngleZ: 0
@@ -1061,6 +1062,20 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &1224052496586979888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5288479054263726557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9e42ab35d149fd42941038b1e30f119, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  yutTop: {fileID: 4309070618185489490}
 --- !u!1 &5808293780967465911
 GameObject:
   m_ObjectHideFlags: 0

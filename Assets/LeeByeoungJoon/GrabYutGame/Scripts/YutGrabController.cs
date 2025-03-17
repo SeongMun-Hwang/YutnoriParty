@@ -10,66 +10,85 @@ public class YutGrabController : NetworkBehaviour
     float gravity = 4f;
     float minYutHeight = 4;
     float maxYutHeight = 8;
-    float length;
+    float length = 10;
     [SerializeField] Animator animator;
-    [SerializeField] GameObject yutPrefab;
-    [SerializeField] Transform yutTop;
+    [SerializeField] LongYut yutPrefab;
+    [SerializeField] Transform yutTransform;
     [SerializeField] Transform handPos;
+    NetworkObject yutNo;
+    LongYut yut;
+
     public override void OnNetworkSpawn()
     {
-        //윷 높이 초기화
-        yutPrefab.transform.position = new Vector3(yutPrefab.transform.position.x , Random.Range(minYutHeight, maxYutHeight), yutPrefab.transform.position.z);
-        SpawnYutRpc(true);
-        length = yutTop.position.y - handPos.position.y;
+        if(!IsOwner) return;
+        SpawnYutRpc(OwnerClientId);
+    }
+
+    [Rpc(SendTo.Server)]
+    void SpawnYutRpc(ulong clientId)
+    {
+        Vector3 yutPos = new Vector3(yutTransform.position.x, Random.Range(minYutHeight, maxYutHeight), yutTransform.position.z);
+        yutNo = Instantiate(yutPrefab).GetComponent<NetworkObject>();
+        yutNo.transform.position = yutPos;
+        yutNo.SpawnWithOwnership(OwnerClientId);
+        //yutNo.TrySetParent(gameObject);
+        SetYutRpc(yutNo);
+    }
+
+    [Rpc(SendTo.Owner)]
+    void SetYutRpc(NetworkObjectReference noRef)
+    {
+        if(!noRef.TryGet(out NetworkObject no))
+        {
+            //Debug.Log("네트워크 오브젝트 못찾음");
+            return;
+        }
+
+        yutNo = no;
+        yut = yutNo.GetComponent<LongYut>();
+        //Debug.Log("윷 할당함 : " + yutNo.NetworkObjectId);
     }
 
     public override void OnNetworkDespawn()
     {
-        SpawnYutRpc(false);
-    }
-
-    [Rpc(SendTo.Server)]
-    void SpawnYutRpc(bool isSpawn)
-    {
-        NetworkObject No = yutPrefab.GetComponent<NetworkObject>();
-        if (isSpawn)
-        {
-            No.Spawn(); //스폰
-        }
-        else
-        {
-            No.Despawn(); //디스폰
-        }
+        if(!IsServer) return;
+        yutNo.Despawn();
     }
 
     void Update()
     {
         if (!isPlaying) return;
-
-        length = yutTop.position.y - handPos.position.y;
-        //Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
-
-        //손 아래로 떨어져버리면 기회 없음
-        if (length < 0)
+        //오너만 계산
+        if (IsOwner)
         {
-            SendResult();
-        }
+            length = yut.yutTop.position.y - handPos.position.y;
+            //Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
 
-        //이미 스페이스바 눌렀으면 조작 불가
-        if (!isSpacePressed)
-        {
-            //스페이스바 누르면 윷을 잡음
-            if (Input.GetKeyDown(KeyCode.Space))
+            //손 아래로 떨어져버리면 기회 없음
+            if (length < 0)
             {
-                GrabYut();
+                SendResult();
+                //Debug.Log("놓침!");
             }
-        }
 
-        //잡았으면 윷 떨어지는거 멈춤
-        //못잡으면 윷 계속 떨어지게 하고싶은데 흠
-        if (!isGrabbed)
-        {
-            yutPrefab.transform.Translate(gravity * Time.deltaTime * Vector3.left);
+            //이미 스페이스바 눌렀으면 조작 불가
+            if (!isSpacePressed)
+            {
+                //스페이스바 누르면 윷을 잡음
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    //Debug.Log("스페이스바 누름");
+                    GrabYut();
+                }
+            }
+
+            //잡았으면 윷 떨어지는거 멈춤
+            //못잡으면 윷 계속 떨어지게 하고싶은데 흠
+            if (!isGrabbed)
+            {
+                //Debug.Log("윷 내려가라");
+                yut.transform.Translate(gravity * Time.deltaTime * Vector3.left);
+            }
         }
     }
 
@@ -88,7 +107,7 @@ public class YutGrabController : NetworkBehaviour
         Debug.Log("잡아라!");
         isSpacePressed = true;
         animator.SetBool("DoGrab", true);
-        result = yutTop.transform.position.y - handPos.transform.position.y;
+        result = length;
         Debug.Log("기록 : " +  result);
         
         //결과가 양수면 잡음

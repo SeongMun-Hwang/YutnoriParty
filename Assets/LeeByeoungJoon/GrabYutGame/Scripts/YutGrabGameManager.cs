@@ -219,7 +219,7 @@ public class YutGrabGameManager : NetworkBehaviour
     public void NoChanceRpc()
     {
         noChancePlayer++;
-
+        Debug.Log("기회 쓴 플레이어 수 : " +  noChancePlayer + " 앞으로 : " + (playerIds.Count - noChancePlayer));
         //게임에 참가한 플레이어들 모두가 기회를 소모하면 조금 기다렸다 승자 발표
         if(noChancePlayer >= playerIds.Count && !isGameEnd)
         {

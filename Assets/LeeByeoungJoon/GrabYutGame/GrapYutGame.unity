@@ -3478,7 +3478,7 @@ PrefabInstance:
     - target: {fileID: 714916745518609723, guid: 6df5b235f26573a49a9f89cf7442a8b2, type: 3}
       propertyPath: gameScene
       value: 
-      objectReference: {fileID: 71154783}
+      objectReference: {fileID: 0}
     - target: {fileID: 714916745518609723, guid: 6df5b235f26573a49a9f89cf7442a8b2, type: 3}
       propertyPath: watchCamera
       value: 
