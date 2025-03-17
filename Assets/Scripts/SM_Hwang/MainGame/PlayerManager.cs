@@ -137,6 +137,10 @@ public class PlayerManager : NetworkBehaviour
     {
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
+            if(parent.GetComponent<CharacterBoardMovement>().currentNode != child.GetComponent<CharacterBoardMovement>().currentNode)
+            {
+                return;
+            }
             child.TrySetParent(parent.transform);
             int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;
