@@ -88,6 +88,14 @@ public class HammerGameController : NetworkBehaviour
         isAttacked = false;
         animator.SetTrigger("Idle");
     }
+    public void PlayAttackSound()
+    {
+        AudioManager.instance.Playsfx(14);
+    }
+    public void PlayHitSound()
+    {
+        AudioManager.instance.Playsfx(15);
+    }
     [ClientRpc]
     public void StartHammerGameClientRpc()
     {
