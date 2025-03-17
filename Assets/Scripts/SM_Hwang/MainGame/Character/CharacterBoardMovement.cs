@@ -10,7 +10,7 @@ public class CharacterBoardMovement : MonoBehaviour
     private Animator animator;
     private Node selectedNode;
     private bool meetObstacle = false;
-    Node currentNode;
+    [HideInInspector] public Node currentNode;
     Vector3 targetPos;
     float moveSpeed = 10f;
     private void Awake()

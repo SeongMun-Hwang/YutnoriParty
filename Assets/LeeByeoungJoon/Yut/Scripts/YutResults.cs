@@ -17,17 +17,17 @@ public class YutResults : NetworkBehaviour
     {
         if (PlayerManager.Instance.isMoving)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Other Character is moving");
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
             return;
         }
         if (MainGameProgress.Instance.currentCharacter == null)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Character First!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("말을 선택하세요!", 2f);
             return;
         }
         if (YutManager.Instance.isCalulating)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Yut Result", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("윷 결과를 기다리세요", 2f);
             return;
         }
         if (EventNodeManager.Instance.checkingStepOn.Value)
@@ -45,7 +45,7 @@ public class YutResults : NetworkBehaviour
         //이동 못하는 애 골랐으면 다시 고르라고 안내함
         if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("This Character Cannot Move!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("무인도에 갇혔습니다!", 2f);
             return;
         }
         ItemManager.Instance.RemoveItem();
