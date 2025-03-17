@@ -49,17 +49,17 @@ public class PlayerProfile : MonoBehaviour
         //Debug.Log(code);
         if (transform.GetSiblingIndex() < 2)
         {
-            TopEmojiSlot.gameObject.SetActive(true);
+            TopEmojiSlot.transform.parent.gameObject.SetActive(true);
             TopEmojiSlot.sprite = GameManager.Instance.emojiList[code];
             yield return new WaitForSecondsRealtime(4f);
-            TopEmojiSlot.gameObject.SetActive(false);
+            TopEmojiSlot.transform.parent.gameObject.SetActive(false);
         }
         else
         {
-            BottomEmojiSlot.gameObject.SetActive(true);
+            BottomEmojiSlot.transform.parent.gameObject.SetActive(true);
             BottomEmojiSlot.sprite = GameManager.Instance.emojiList[code];
             yield return new WaitForSecondsRealtime(4f);
-            BottomEmojiSlot.gameObject.SetActive(false);
+            BottomEmojiSlot.transform.parent.gameObject.SetActive(false);
         }
     }
 
