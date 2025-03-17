@@ -42,7 +42,7 @@ public class MinigameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        gameType = Define.MinigameType.GrapYutGame;
+
         if (IsServer)
         {
             MinigameButtonUI.SetActive(true);
