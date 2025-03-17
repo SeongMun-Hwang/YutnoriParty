@@ -48,5 +48,8 @@ public class CrowdController : MonoBehaviour
 
         // 위치 보정 (숫자 오차로 인해 정확한 원위치 보장)
         transform.position = startPos;
+
+        int type = Random.Range(0, 9);
+        GetComponent<Animator>().SetInteger("type", type);
     }
 }
