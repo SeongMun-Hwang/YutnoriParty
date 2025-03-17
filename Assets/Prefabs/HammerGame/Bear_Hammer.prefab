@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 824733587378949585}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0.1}
+  m_LocalPosition: {x: 0, y: 2, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -182,7 +182,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalRotation.x
@@ -190,7 +190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalRotation.z
@@ -202,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -223,6 +223,10 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8398442326752525675, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -256,6 +260,11 @@ PrefabInstance:
 --- !u!95 &116378710076275057 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
+  m_PrefabInstance: {fileID: 5834378648320410848}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &2628592229235784075 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8398442326752525675, guid: fa7f24b387612544bb90d5dbb2d7622b, type: 3}
   m_PrefabInstance: {fileID: 5834378648320410848}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &5045088286231331737 stripped
@@ -414,6 +423,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   mainCamera: {fileID: 2568813710680974101}
   cameraParent: {fileID: 8892863688866704544}
+  characterRenderer: {fileID: 2628592229235784075}
+  hammerSound: {fileID: 8300000, guid: af310dc65a597b3408f748f5ce63e6fc, type: 3}
   moveSpeed: 10
   mouseSensitivity: 2
 --- !u!1001 &7614050188534785950
