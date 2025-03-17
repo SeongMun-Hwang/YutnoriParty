@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private Button button;
     private bool isToggled = false;
@@ -134,6 +134,16 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     }
 
     public void OnPointerExit(PointerEventData eventData)
+    {
+        TooltipManager.Instance.EraseTooltip();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        TooltipManager.Instance.EraseTooltip();
+    }
+
+    public void OnDestroy()
     {
         TooltipManager.Instance.EraseTooltip();
     }
