@@ -15,6 +15,7 @@ public class HammerGameController : NetworkBehaviour
     private float rotationY = 0f;
     private Vector3 moveDirection;
     private bool isHammerGameStart = false;
+    private float gravityForce = 10f;
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -46,11 +47,11 @@ public class HammerGameController : NetworkBehaviour
         if (!IsOwner) return;
         if (moveDirection != Vector3.zero)
         {
-            GetComponent<Rigidbody>().linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+            GetComponent<Rigidbody>().linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, -gravityForce, 0);
         }
         else
         {
-            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, -gravityForce, 0);
         }
     }
     private void RotateWithMouse()

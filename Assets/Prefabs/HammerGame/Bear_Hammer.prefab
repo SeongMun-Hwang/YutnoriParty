@@ -330,9 +330,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -365,7 +365,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
@@ -377,7 +377,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6644649663038110129}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: d6b14c5ba01953142a93dab78f3f5938, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -424,7 +424,6 @@ MonoBehaviour:
   mainCamera: {fileID: 2568813710680974101}
   cameraParent: {fileID: 8892863688866704544}
   characterRenderer: {fileID: 2628592229235784075}
-  hammerSound: {fileID: 8300000, guid: af310dc65a597b3408f748f5ce63e6fc, type: 3}
   moveSpeed: 10
   mouseSensitivity: 2
 --- !u!1001 &7614050188534785950

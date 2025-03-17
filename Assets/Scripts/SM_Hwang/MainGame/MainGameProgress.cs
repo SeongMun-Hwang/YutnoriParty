@@ -427,24 +427,27 @@ public class MainGameProgress : NetworkBehaviour
         if (isMinigamePlaying || PlayerManager.Instance.isMoving) return;
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            if (Camera.main != null)
             {
-                if (hit.collider.TryGetComponent<NetworkObject>(out var networkObject) &&
-                    networkObject.OwnerClientId != NetworkManager.LocalClientId)
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
                 {
-                    Debug.Log("본인 캐릭터가 아닙니다!");
-                    return;
-                }
-                if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
-                {
-                    if (currentCharacter != null)
+                    if (hit.collider.TryGetComponent<NetworkObject>(out var networkObject) &&
+                        networkObject.OwnerClientId != NetworkManager.LocalClientId)
                     {
-                        currentCharacter.GetComponent<Outline>().DisableOutline();
+                        Debug.Log("본인 캐릭터가 아닙니다!");
+                        return;
                     }
-                    hit.collider.gameObject.GetComponent<Outline>().EnableOutline();
-                    currentCharacter = character;
+                    if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
+                    {
+                        if (currentCharacter != null)
+                        {
+                            currentCharacter.GetComponent<Outline>().DisableOutline();
+                        }
+                        hit.collider.gameObject.GetComponent<Outline>().EnableOutline();
+                        currentCharacter = character;
+                    }
                 }
             }
         }
