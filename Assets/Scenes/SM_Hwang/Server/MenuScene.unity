@@ -5851,6 +5851,10 @@ PrefabInstance:
       propertyPath: 'sfxClips.Array.data[15]'
       value: 
       objectReference: {fileID: 8300000, guid: 6e8ac10cbb9ff7449b00a66dc21763d2, type: 3}
+    - target: {fileID: 2132971629577853937, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
+      propertyPath: 'sfxClips.Array.data[16]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 86f174c599fc8c24fb0e2ba5d872eb1c, type: 3}
     - target: {fileID: 3333844486308260652, guid: 17fed6e49379ab5428c4bcf6bea7850a, type: 3}
       propertyPath: m_Name
       value: AudioManager

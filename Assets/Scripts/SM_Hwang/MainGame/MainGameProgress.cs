@@ -424,7 +424,7 @@ public class MainGameProgress : NetworkBehaviour
     //내 말이 아니면 메시지 출력
     public void ChooseCharacter()
     {
-        if (isMinigamePlaying) return;
+        if (isMinigamePlaying || PlayerManager.Instance.isMoving) return;
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -434,7 +434,7 @@ public class MainGameProgress : NetworkBehaviour
                 if (hit.collider.TryGetComponent<NetworkObject>(out var networkObject) &&
                     networkObject.OwnerClientId != NetworkManager.LocalClientId)
                 {
-                    GameManager.Instance.announceCanvas.ShowAnnounceText("본인 캐릭터가 아닙니다!", 2f);
+                    Debug.Log("본인 캐릭터가 아닙니다!");
                     return;
                 }
                 if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))

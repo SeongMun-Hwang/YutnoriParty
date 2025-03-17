@@ -7,7 +7,6 @@ public class HammerDeadZone : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Character"))
         {
-            Debug.Log("zone : " + gameObject.GetComponent<NetworkObject>() == null);
             HammerGameManager.Instance.DespawnLoserServerRpc(collision.gameObject.GetComponent<NetworkObject>());
         }
     }

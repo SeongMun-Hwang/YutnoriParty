@@ -50,7 +50,6 @@ public class HammerGameManager : NetworkBehaviour
         playingCharacters.Add(go);
         if (playingCharacters.Count == playerNum)
         {
-            Debug.Log("All players spawned, start coutdown");
             StartCoroutine(StartGameTimer(5));
         }
     }
@@ -141,7 +140,7 @@ public class HammerGameManager : NetworkBehaviour
             if (timer <= 15f)
             {
                 float scaleFactor = timer / 15f;
-                pillar.transform.localScale = new Vector3(initialScale.x * scaleFactor, initialScale.y * scaleFactor, initialScale.z);
+                pillar.transform.localScale = new Vector3(initialScale.x * scaleFactor, initialScale.y, initialScale.z * scaleFactor);
             }
         }
         yield break;

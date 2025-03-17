@@ -35,10 +35,11 @@ public class HammerGameController : NetworkBehaviour
     {
         if (!IsOwner) return;
         RotateWithMouse();
-        if (isHammerGameStart) { 
-        MoveCharacter();
-        HammerAttack();
-    }
+        if (isHammerGameStart)
+        {
+            MoveCharacter();
+            HammerAttack();
+        }
     }
     private void FixedUpdate()
     {
