@@ -1,16 +1,21 @@
 
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class YutResults : NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI yutText;
+    [SerializeField] List<Color32> yutColors;
+    [SerializeField] List<string> yutNames;
     YutResult yutResult;
     public void SetYutText(YutResult result)
     {
         yutResult = result;
-        yutText.text = result.ToString();
+        GetComponent<Image>().color = yutColors[(int)result];
+        yutText.text = yutNames[(int)result];
     }
 
     public void OnButtonPressed()
