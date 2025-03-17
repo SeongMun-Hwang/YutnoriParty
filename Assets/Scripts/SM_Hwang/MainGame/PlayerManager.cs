@@ -53,6 +53,11 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!", 2f);
             return;
         }
+        if (isMoving)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
+            return;
+        }
         SpawnCharacterServerRpc(GetClientIndex());
     }
     private void Update()
@@ -132,6 +137,10 @@ public class PlayerManager : NetworkBehaviour
     {
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
+            if(parent.GetComponent<CharacterBoardMovement>().currentNode != child.GetComponent<CharacterBoardMovement>().currentNode)
+            {
+                return;
+            }
             child.TrySetParent(parent.transform);
             int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;

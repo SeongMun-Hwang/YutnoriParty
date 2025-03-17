@@ -68,7 +68,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         Debug.Log("Start Turn");
         GameManager.Instance.playerBoard.SetProfileOutlineClientRpc(NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 "+currentPlayerNumber.Value + "턴!", 2f);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + currentPlayerNumber.Value + "턴!", 2f);
         SpawnInGameCanvasClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)n } } });
     }
     /*UI 소환*/
@@ -94,7 +94,7 @@ public class MainGameProgress : NetworkBehaviour
         isEndMoveExcuting = true;
 
         Debug.Log("EndMove 호출 : " + NetworkManager.Singleton.LocalClientId);
-        
+
         isEventChecking = true;
         bool subscribed = false;
         //여기인듯? 위에거 실행 끝날때까지 안기다려버림
@@ -260,6 +260,7 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
+            DestoryCharacterOnStartNode();
             EndTurnServerRpc();
         }
 
@@ -342,13 +343,13 @@ public class MainGameProgress : NetworkBehaviour
             //캐릭터 처리
             foreach (var characterRef in characterList)
             {
-                if(!characterRef.TryGet(out NetworkObject character)) continue;
+                if (!characterRef.TryGet(out NetworkObject character)) continue;
 
                 //승자의 캐릭터가 아니면 다 디스폰
-                if(character.OwnerClientId != winnerId)
+                if (character.OwnerClientId != winnerId)
                 {
                     PlayerManager.Instance.DespawnCharacterServerRpc(character, character.OwnerClientId);
-                    Debug.Log("캐릭터 id : " +  character.NetworkObjectId);
+                    Debug.Log("캐릭터 id : " + character.NetworkObjectId);
                 }
                 else//승자 캐릭터는 리스트로 따로 추출
                 {
@@ -357,7 +358,7 @@ public class MainGameProgress : NetworkBehaviour
             }
 
             //승자의 캐릭터가 둘 이상일때 쌓기 실행
-            if(winnerCharacters.Count >= 2)
+            if (winnerCharacters.Count >= 2)
             {
                 StackCharactersClientRpc(winnerCharacters.ToArray(), new ClientRpcParams
                 {
@@ -368,7 +369,7 @@ public class MainGameProgress : NetworkBehaviour
                 });
             }
 
-            if(!triggeredCharacter.TryGet(out NetworkObject triggered))
+            if (!triggeredCharacter.TryGet(out NetworkObject triggered))
             {
                 Debug.Log("네트워크 오브젝트 못찾음");
             }
@@ -403,13 +404,13 @@ public class MainGameProgress : NetworkBehaviour
     {
         //네트워크 오브젝트 레퍼런스 -> 게임 오브젝트 리스트로 변환
         List<GameObject> characters = new List<GameObject>();
-        for(int i = 0; i < arr.Length; i++)
+        for (int i = 0; i < arr.Length; i++)
         {
             arr[i].TryGet(out NetworkObject character);
             characters.Add(character.gameObject);
         }
 
-        for(int i=1; i< characters.Count; i++)
+        for (int i = 1; i < characters.Count; i++)
         {
             PlayerManager.Instance.OverlapCharacter(characters[0], characters[i]); //겹치고
             characters[i].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
@@ -564,5 +565,16 @@ public class MainGameProgress : NetworkBehaviour
         noRef.TryGet(out NetworkObject no);
         no.Despawn();
         Destroy(no.gameObject);
+    }
+    private void DestoryCharacterOnStartNode()
+    {
+        for (int i = PlayerManager.Instance.currentCharacters.Count - 1; i >= 0; i--)
+        {
+            GameObject go = PlayerManager.Instance.currentCharacters[i];
+            if (go.GetComponent<CharacterBoardMovement>().currentNode == GameManager.Instance.startNode)
+            {
+                PlayerManager.Instance.DespawnCharacterServerRpc(go, go.GetComponent<NetworkObject>().OwnerClientId);
+            }
+        }
     }
 }
