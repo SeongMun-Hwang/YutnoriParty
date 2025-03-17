@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
@@ -49,5 +50,17 @@ public class GameManager : NetworkBehaviour
     {
         yield return new WaitForSecondsRealtime(duration);
         isEmojiDelay = false;
+    }
+
+    public void ToggleProfile()
+    {
+        if (playerBoard.gameObject.activeSelf)
+        {
+            playerBoard.gameObject.SetActive(false);
+        }
+        else
+        {
+            playerBoard.gameObject.SetActive(true);
+        }
     }
 }
