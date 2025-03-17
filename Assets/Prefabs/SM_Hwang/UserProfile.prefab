@@ -765,6 +765,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 25623b356e02b8c4c9da9c7ff08042ac, type: 3}
   - {fileID: 21300000, guid: e015260be56478e419f9f65a17b1c7c9, type: 3}
   - {fileID: 21300000, guid: c343a55932d56eb4cb91b69ea04e6dbd, type: 3}
+  CharacterIconList: {fileID: 8879454839268599167}
   ProfileImage: {fileID: 2797881595100922694}
   ProfileImageBackground: {fileID: 997179791775337543}
   clientId: 0

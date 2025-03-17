@@ -12,6 +12,7 @@ public class PlayerProfile : MonoBehaviour
 
     public List<Color32> ProfileColor;
     public List<Sprite> ProfileSpriteList;
+    public Transform CharacterIconList;
     public Image ProfileImage;
     public Image ProfileImageBackground;
     public ulong clientId;
@@ -23,6 +24,7 @@ public class PlayerProfile : MonoBehaviour
         this.clientId = clientId;
         this.username = username;
         this.score = score;
+        SetScoreIcon();
         SetColorAndImage();
         playerNameTmp.text = username.ToString();
         characterNumber.text = score + "/4";
@@ -32,5 +34,17 @@ public class PlayerProfile : MonoBehaviour
     {
         ProfileImageBackground.color = ProfileColor[transform.GetSiblingIndex()];
         ProfileImage.sprite = ProfileSpriteList[transform.GetSiblingIndex()];
+    }
+
+    private void SetScoreIcon()
+    {
+        for (int i = 0; i < CharacterIconList.childCount; i++)
+        {
+            if (i < score)
+            {
+                Image icon = CharacterIconList.GetChild(i).GetComponent<Image>();
+                icon.color = new Color32(140, 224, 54, 255);
+            }
+        }
     }
 }
