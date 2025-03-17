@@ -6,9 +6,11 @@ public class YutGrabController : NetworkBehaviour
     public float result;
     bool isGrabbed = false;
     bool isSpacePressed = false;
-    float gravity = 12f;
+    bool isPlaying = false;
+    float gravity = 9.8f;
     float minYutHeight = 4;
     float maxYutHeight = 8;
+    float length;
     [SerializeField] Animator animator;
     [SerializeField] GameObject yutPrefab;
     [SerializeField] Transform yutTop;
@@ -16,12 +18,20 @@ public class YutGrabController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         //윷 높이 초기화
-        yutPrefab.transform.position = new Vector3(transform.position.x, Random.Range(minYutHeight, maxYutHeight), transform.position.z);
+        yutPrefab.transform.position = new Vector3(transform.position.x , Random.Range(minYutHeight, maxYutHeight), transform.localPosition.z);
     }
 
     void Update()
     {
-        if (!YutGrabGameManager.Instance.isPlaying.Value) return;
+        if (!isPlaying) return;
+
+        length = yutTop.position.y - handPos.position.y; //손 아래로 떨어져버리면 기회 없음
+        Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
+
+        if(length < 0)
+        {
+            SendResult();
+        }
 
         //이미 스페이스바 눌렀으면 조작 불가
         if (!isSpacePressed)
@@ -36,9 +46,15 @@ public class YutGrabController : NetworkBehaviour
         //잡았으면 윷 떨어지는거 멈춤
         if (!isGrabbed)
         {
-            Debug.Log("떨어진다");
             yutPrefab.transform.Translate(gravity * Time.deltaTime * Vector3.left);
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void GameStartRpc()
+    {
+        Debug.Log("윷 잡기 게임 시작함");
+        isPlaying = true;
     }
 
     void GrabYut()
@@ -46,6 +62,7 @@ public class YutGrabController : NetworkBehaviour
         //오너만 조작 가능
         if (!IsOwner) return;
 
+        Debug.Log("잡아라!");
         isSpacePressed = true;
         animator.SetBool("DoGrab", true);
         result = yutTop.transform.position.y - handPos.transform.position.y;
@@ -54,6 +71,16 @@ public class YutGrabController : NetworkBehaviour
         if(result > 0)
         {
             isGrabbed = true;
+            Debug.Log("잡음!");
         }
+
+        SendResult();
+    }
+
+    void SendResult()
+    {
+        isPlaying = false;
+        YutGrabGameManager.Instance.SendReultRpc(result);
+        YutGrabGameManager.Instance.NoChanceRpc();
     }
 }
