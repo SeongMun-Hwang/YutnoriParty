@@ -11470,6 +11470,7 @@ MonoBehaviour:
   - {fileID: 1308161019}
   - {fileID: 1060160656}
   - {fileID: 798918494}
+  - {fileID: 2113713787}
   isEmojiDelay: 0
   emojiList:
   - {fileID: 21300000, guid: f64b5b4b5092358409693b4515554ec6, type: 3}
