@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3049282094617675059}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0.1}
+  m_LocalPosition: {x: 0, y: 2, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -326,12 +326,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -478,7 +486,7 @@ MonoBehaviour:
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
-  SlerpPosition: 0
+  SlerpPosition: 1
 --- !u!54 &-4927738856756028618
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -559,5 +567,12 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   mainCamera: {fileID: 3895700783260440596}
   cameraParent: {fileID: 5840811607987003556}
+  characterRenderer: {fileID: 8093909549650840867}
+  hammerSound: {fileID: 8300000, guid: af310dc65a597b3408f748f5ce63e6fc, type: 3}
   moveSpeed: 5
   mouseSensitivity: 2
+--- !u!137 &8093909549650840867 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4562076418093036610, guid: 8eea48a02c7458942830614df0a2015e, type: 3}
+  m_PrefabInstance: {fileID: 3522774168920934045}
+  m_PrefabAsset: {fileID: 0}
