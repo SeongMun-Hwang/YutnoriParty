@@ -53,6 +53,11 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!", 2f);
             return;
         }
+        if (isMoving)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
+            return;
+        }
         SpawnCharacterServerRpc(GetClientIndex());
     }
     private void Update()
