@@ -3333,6 +3333,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 771495093016190712, guid: d431e5d15ff388f4aa8db21618214f96, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8820a2398dad96c41a40372573afac44, type: 2}
+    - target: {fileID: 771495093016190712, guid: d431e5d15ff388f4aa8db21618214f96, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3150737322163967616, guid: d431e5d15ff388f4aa8db21618214f96, type: 3}
       propertyPath: m_Pivot.x
       value: 0

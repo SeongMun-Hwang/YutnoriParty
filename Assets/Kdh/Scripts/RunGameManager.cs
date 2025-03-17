@@ -118,7 +118,7 @@ public class RunGameManager : NetworkBehaviour
         if (countdown > 0)
             countdownText.text = countdown.ToString();
         else if (countdown == 0)
-            countdownText.text = "GO!";
+            countdownText.text = "시작!";
         else
             countdownText.gameObject.SetActive(false);
     }

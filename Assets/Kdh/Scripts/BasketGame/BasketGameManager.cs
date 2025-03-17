@@ -130,7 +130,7 @@ public class BasketGameManager : NetworkBehaviour
         if (countdown > 0)
             countdownText.text = countdown.ToString();
         else if (countdown == 0)
-            countdownText.text = "GO!";
+            countdownText.text = "시작!";
         else
             countdownText.gameObject.SetActive(false);
     }
@@ -190,9 +190,9 @@ public class BasketGameManager : NetworkBehaviour
         if (remainingTimeText != null)
         {
             if (time > 0)
-                remainingTimeText.text = $"Time: {time}s";
+                remainingTimeText.text = $"남은 시간: {time}초";
             else
-                remainingTimeText.text = "Finish!";
+                remainingTimeText.text = "게임 종료!";
         }
     }
 
