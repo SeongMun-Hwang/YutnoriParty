@@ -7,7 +7,7 @@ public class YutGrabController : NetworkBehaviour
     bool isGrabbed = false;
     bool isSpacePressed = false;
     bool isPlaying = false;
-    float gravity = 9.8f;
+    float gravity = 4f;
     float minYutHeight = 4;
     float maxYutHeight = 8;
     float length;
@@ -18,17 +18,39 @@ public class YutGrabController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         //윷 높이 초기화
-        yutPrefab.transform.position = new Vector3(transform.position.x , Random.Range(minYutHeight, maxYutHeight), transform.localPosition.z);
+        yutPrefab.transform.position = new Vector3(yutPrefab.transform.position.x , Random.Range(minYutHeight, maxYutHeight), yutPrefab.transform.position.z);
+        SpawnYutRpc(true);
+        length = yutTop.position.y - handPos.position.y;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        SpawnYutRpc(false);
+    }
+
+    [Rpc(SendTo.Server)]
+    void SpawnYutRpc(bool isSpawn)
+    {
+        NetworkObject No = yutPrefab.GetComponent<NetworkObject>();
+        if (isSpawn)
+        {
+            No.Spawn(); //스폰
+        }
+        else
+        {
+            No.Despawn(); //디스폰
+        }
     }
 
     void Update()
     {
         if (!isPlaying) return;
 
-        length = yutTop.position.y - handPos.position.y; //손 아래로 떨어져버리면 기회 없음
-        Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
+        length = yutTop.position.y - handPos.position.y;
+        //Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
 
-        if(length < 0)
+        //손 아래로 떨어져버리면 기회 없음
+        if (length < 0)
         {
             SendResult();
         }
@@ -44,13 +66,14 @@ public class YutGrabController : NetworkBehaviour
         }
 
         //잡았으면 윷 떨어지는거 멈춤
+        //못잡으면 윷 계속 떨어지게 하고싶은데 흠
         if (!isGrabbed)
         {
             yutPrefab.transform.Translate(gravity * Time.deltaTime * Vector3.left);
         }
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
+    [Rpc(SendTo.Owner)]
     public void GameStartRpc()
     {
         Debug.Log("윷 잡기 게임 시작함");
@@ -66,6 +89,7 @@ public class YutGrabController : NetworkBehaviour
         isSpacePressed = true;
         animator.SetBool("DoGrab", true);
         result = yutTop.transform.position.y - handPos.transform.position.y;
+        Debug.Log("기록 : " +  result);
         
         //결과가 양수면 잡음
         if(result > 0)
@@ -80,7 +104,13 @@ public class YutGrabController : NetworkBehaviour
     void SendResult()
     {
         isPlaying = false;
-        YutGrabGameManager.Instance.SendReultRpc(result);
+
+        //못잡으면 기록 안되게 함
+        if (isGrabbed)
+        {
+            YutGrabGameManager.Instance.SendReultRpc(result, NetworkManager.Singleton.LocalClientId);
+        }
+
         YutGrabGameManager.Instance.NoChanceRpc();
     }
 }

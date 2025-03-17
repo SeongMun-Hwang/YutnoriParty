@@ -133,7 +133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5288479054263726557, guid: 8cc4e6c4583f7b746ad1c6fb8f963d31, type: 3}
       propertyPath: m_Name
-      value: LongYut (1)
+      value: LongYut
       objectReference: {fileID: 0}
     - target: {fileID: 5288479054263726557, guid: 8cc4e6c4583f7b746ad1c6fb8f963d31, type: 3}
       propertyPath: m_Layer
@@ -225,7 +225,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       propertyPath: m_LocalRotation.w

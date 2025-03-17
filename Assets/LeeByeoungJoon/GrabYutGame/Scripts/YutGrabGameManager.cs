@@ -7,7 +7,7 @@ using UnityEngine;
 public class YutGrabGameManager : NetworkBehaviour
 {
     //씬 언로드용
-    [SerializeField] NetworkObject gameScene;
+    //[SerializeField] NetworkObject gameScene;
 
     //UI관련
     [SerializeField] private List<TMP_Text> usernameUI;
@@ -28,6 +28,9 @@ public class YutGrabGameManager : NetworkBehaviour
     [SerializeField] List<Transform> spawnPos;
     [SerializeField] Camera watchCamera;
     private List<GameObject> playingCharacters = new List<GameObject>();
+
+    //카메라
+    [SerializeField] List<Camera> cameras = new List<Camera>();
 
     //public NetworkVariable<bool> isPlaying = new NetworkVariable<bool>();
     bool isGameEnd = false;
@@ -60,15 +63,70 @@ public class YutGrabGameManager : NetworkBehaviour
             }
         }
 
-        //기록 초기화
-        for(int i=0; i<playerIds.Count; i++)
+        //플레이에 참가한 인원수만큼
+        int playerNum = playerIds.Count;
+        for (int i=0; i<playerNum; i++)
         {
-            playerRecord.Add(0);
+            playerRecord.Add(10000); //플레이어 기록 초기화
         }
+        bestRecord.Value = 10000; //최고기록 초기화
 
-        InitScoreBoardUI();
+        //카메라 세팅
+        SetCamerasRpc(playerNum);
+
+        InitScoreBoardUIRpc();
 
         StartCoroutine(StartGameTimer(5));
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void SetCamerasRpc(int playerNum)
+    {
+        //Debug.Log("참가 플레이어 : " + playerNum);
+
+        float w = 1;
+        float h = 1;
+        float x = 0;
+        float y = 0;
+
+        switch (playerNum)
+        {
+            case 2:
+                w = 0.5f;
+                h = 1;
+
+                for (int i = 0; i < playerNum; i++)
+                {
+                    cameras[i].rect = new Rect(i * w, y, w, h);
+                    cameras[i].gameObject.SetActive(true);
+                    //Debug.Log($"카메라 x:{i * w} y:{y} w:{w} h:{h}");
+                }
+                break;
+            case 3:
+                w = 0.3333f;
+                h = 1;
+
+                for (int i = 0; i < playerNum; i++)
+                {
+                    cameras[i].rect = new Rect(i * w, y, w, h);
+                    cameras[i].gameObject.SetActive(true);
+                }
+                break;
+            case 4:
+                w = 0.5f;
+                h = 0.5f;
+                float[] dx = new float[4] {0, 0.5f, 0, 0.5f};
+                float[] dy = new float[4] { 0, 0, 0.5f, 0.5f };
+
+                for (int i = 0; i < playerNum; i++)
+                {
+                    cameras[i].rect = new Rect(x + dx[i], y + dy[i], w, h);
+                    cameras[i].gameObject.SetActive(true);
+                }
+                break;
+        }
+
+        Debug.Log("카메라 세팅 완료");
     }
 
     [Rpc(SendTo.Server)]
@@ -83,12 +141,11 @@ public class YutGrabGameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     void SetSpectorRpc(RpcParams rpcParams)
     {
-        watchCamera.gameObject.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
-        watchCamera = Camera.main;
     }
 
-    public void InitScoreBoardUI()
+    [Rpc(SendTo.ClientsAndHost)]
+    public void InitScoreBoardUIRpc()
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
@@ -131,22 +188,29 @@ public class YutGrabGameManager : NetworkBehaviour
         //isPlaying.Value = true;
 
         Debug.Log("게임 스타트 요청");
-
-        playingCharacters[0].GetComponent<YutGrabController>().GameStartRpc();
+        for(int i = 0; i < playingCharacters.Count; i++)
+        {
+            playingCharacters[i].GetComponent<YutGrabController>().GameStartRpc();
+        }
     }
 
     [Rpc(SendTo.Server)]
-    public void SendReultRpc(float result)
+    public void SendReultRpc(float result, ulong playerId)
     {
-        ulong playerId = NetworkManager.Singleton.LocalClientId;
         int idx = playerIds.IndexOf(playerId);
-        playerRecord[idx] = result;
 
-        if(0 < result && result < bestRecord.Value)
+        Debug.Log("플레이어 id : " + playerId + " 인덱스 : " + idx);
+        
+        playerRecord[idx] = result;
+        Debug.Log("플레이어 기록 : " + playerRecord[idx]);
+
+        if (0 < result && result < bestRecord.Value)
         {
             bestRecord.Value = result;
             bestPlayerId.Value = playerId;
         }
+
+        Debug.Log("최고 기록 : " + bestRecord.Value + " , " +  bestPlayerId.Value + "번 플레이어");
 
         UpdateScoreUIRpc();
     }
