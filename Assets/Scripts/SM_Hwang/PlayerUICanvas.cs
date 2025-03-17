@@ -42,7 +42,7 @@ public class PlayerUICanvas : NetworkBehaviour
     [ClientRpc]
     public void SetPlayerDeadClientRpc(ulong clientId)
     {
-        int index = playerIds.IndexOf(clientId);
+        int index = PlayerManager.Instance.GetClientIndex(clientId);
         playerUIs[index].gameObject.GetComponent<MiniGameProfile>().SetStatus("Dead");
     }
 }

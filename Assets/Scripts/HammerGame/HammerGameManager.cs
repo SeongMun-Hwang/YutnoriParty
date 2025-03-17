@@ -92,8 +92,8 @@ public class HammerGameManager : NetworkBehaviour
         if (playingCharacters.Count != 1)
         {
             playerUICanvas.SetPlayerDeadClientRpc(no.OwnerClientId);
-            ChangeToWatchCameraClientRpc(no.OwnerClientId);
         }
+        ChangeToWatchCameraClientRpc(no.OwnerClientId);
         no.Despawn();
         playingCharacters.Remove(no.gameObject);
         Destroy(no.gameObject);

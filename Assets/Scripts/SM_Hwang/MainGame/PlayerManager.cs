@@ -53,11 +53,6 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!", 2f);
             return;
         }
-        if (YutManager.Instance.Results.Count <= currentCharacters.Count)
-        {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("결과 이상으로 소환할 수 없습니다!", 2f);
-            return;
-        }
         SpawnCharacterServerRpc(GetClientIndex());
     }
     private void Update()
