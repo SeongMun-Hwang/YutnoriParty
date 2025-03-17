@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
@@ -29,11 +30,24 @@ public class GameManager : NetworkBehaviour
     public List<GameObject> playerCharacters;
     public List<Transform> profilePositions;
     public List<GameObject> hideableWhenOtherScene;
+    public bool isEmojiDelay = false;
+    public List<Sprite> emojiList;
     public NetworkVariable<FixedString128Bytes> lobbyId = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> winnerName = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<int> winnerCharacterIndex = new NetworkVariable<int>();
     public override void OnNetworkSpawn()
     {
         if(IsServer) lobbyId.Value = HostSingleton.Instance.ReturnJoinCode();
+    }
+
+    public void HandleEmojiDelay(float duration)
+    {
+        StartCoroutine(EmojiDelay(duration));
+    }
+
+    private IEnumerator EmojiDelay(float duration)
+    {
+        yield return new WaitForSecondsRealtime(duration);
+        isEmojiDelay = false;
     }
 }
