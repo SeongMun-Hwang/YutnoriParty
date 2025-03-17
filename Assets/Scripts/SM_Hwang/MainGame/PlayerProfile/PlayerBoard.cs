@@ -170,6 +170,25 @@ public class PlayerBoard : NetworkBehaviour
             }
         }   
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DrawEmojiServerRpc(ulong targetId, int emojiCode)
+    {
+        DrawEmojiClientRpc(targetId, emojiCode);
+    }
+
+    [ClientRpc]
+    public void DrawEmojiClientRpc(ulong targetId, int emojiCode)
+    {
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            if (profile.clientId == targetId)
+            {
+                profile.DrawEmoji(emojiCode);
+            }
+        }
+    }
+
     public void ClearAllProfiles()
     {
         if (IsServer)

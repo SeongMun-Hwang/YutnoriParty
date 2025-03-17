@@ -29,8 +29,11 @@ public class MinigameManager : NetworkBehaviour
     public Define.MGPlayerType playerType;
     private bool isRandomGame = false;
 
+    [SerializeField] private List<GameObject> HideableWhenMinigame;
+
     public Camera maingameCamera;
 
+    [SerializeField] private GameObject devCheatMinigameMenuUI;
     [SerializeField] private GameObject spectatorUI;
     [SerializeField] private GameObject MinigameButtonUI;
     [SerializeField] private Animator FadeUIAnimator;
@@ -213,9 +216,13 @@ public class MinigameManager : NetworkBehaviour
                 yield return new WaitUntil(() => sceneUnloaded);
             }
         }
-        maingameCamera.gameObject.SetActive(isUnloading); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(isUnloading); // 윷놀이 관련 활성화
-        GameManager.Instance.playerBoard.gameObject.SetActive(isUnloading); // 메인게임 플레이어 프로필 활성화
+
+        devCheatMinigameMenuUI.SetActive(isUnloading && IsServer);
+        foreach (var go in HideableWhenMinigame)
+        {
+            go.SetActive(isUnloading);
+        }
+        
         roulette.CloseRouletteForce();
         yield return new WaitForSecondsRealtime(duration);
         FadeUIAnimator.SetTrigger("FadeIn");

@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class HammerGameManager : NetworkBehaviour
 {
@@ -9,8 +11,12 @@ public class HammerGameManager : NetworkBehaviour
     [SerializeField] List<Transform> spawnPos;
     [SerializeField] Camera watchCamera;
     [SerializeField] public Transform lookAtTransform;
+    [SerializeField] GameObject pillar;
+    [SerializeField] PlayerUICanvas playerUICanvas;
     private static HammerGameManager instance;
     private List<GameObject> playingCharacters = new List<GameObject>();
+    private int playerNum = 0;
+    private float timer = 30f;
     public static HammerGameManager Instance
     {
         get { return instance; }
@@ -27,6 +33,7 @@ public class HammerGameManager : NetworkBehaviour
             {
                 if (MinigameManager.Instance.IsPlayer(clientId))
                 {
+                    playerNum++;
                     SpawnHammerCharacterServerRpc(clientId);
                 }
                 else
@@ -43,6 +50,10 @@ public class HammerGameManager : NetworkBehaviour
         GameObject go = Instantiate(hammerCharacterPrefabs[index], spawnPos[index]);
         go.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
         playingCharacters.Add(go);
+        if (playingCharacters.Count == playerNum)
+        {
+            StartCoroutine(StartGameTimer(5));
+        }
     }
     [ServerRpc(RequireOwnership = false)]
     public void AddForceWithHammerServerRpc(NetworkObjectReference noRef, Vector3 forceDir)
@@ -65,12 +76,12 @@ public class HammerGameManager : NetworkBehaviour
         Debug.Log("add force client rpc");
         if (noRef.TryGet(out NetworkObject no))
         {
-            if (!no.IsOwner) return; // Owner만 실행하도록 체크
+            if (!no.IsOwner) return;
 
             Rigidbody rb = no.gameObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(forceDir * 300f, ForceMode.Impulse);
+                rb.AddForce(forceDir, ForceMode.Impulse);
             }
         }
     }
@@ -78,6 +89,10 @@ public class HammerGameManager : NetworkBehaviour
     public void DespawnLoserServerRpc(NetworkObjectReference noRef)
     {
         noRef.TryGet(out NetworkObject no);
+        if (playingCharacters.Count != 1)
+        {
+            playerUICanvas.SetPlayerDeadClientRpc(no.OwnerClientId);
+        }
         ChangeToWatchCameraClientRpc(no.OwnerClientId);
         no.Despawn();
         playingCharacters.Remove(no.gameObject);
@@ -98,10 +113,42 @@ public class HammerGameManager : NetworkBehaviour
         if (playingCharacters.Count == 1)
         {
             Debug.Log("Hammer Game End");
-            MainGameProgress.Instance.winnerId=playingCharacters[0].GetComponent<NetworkObject>().OwnerClientId;
+            MainGameProgress.Instance.winnerId = playingCharacters[0].GetComponent<NetworkObject>().OwnerClientId;
             DespawnLoserServerRpc(playingCharacters[0]);
             Cursor.lockState = CursorLockMode.None;
             MinigameManager.Instance.EndMinigame();
         }
+    }
+    private IEnumerator StartGameTimer(int timer = 3)
+    {
+        while (timer > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            timer--;
+            if (timer == 0) break;
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
+            yield return null;
+        }
+        foreach (GameObject player in playingCharacters)
+        {
+            player.GetComponent<HammerGameController>().StartHammerGameClientRpc();
+        }
+        //StartCoroutine(PillarScaleDecrease());
+
+    }
+    private IEnumerator PillarScaleDecrease()
+    {
+        Vector3 initialScale = pillar.transform.localScale; // 초기 크기 저장
+        while (timer > 0)
+        {
+            timer -= 0.1f;
+            yield return new WaitForSecondsRealtime(0.1f);
+            if (timer <= 15f)
+            {
+                float scaleFactor = Mathf.Max(timer / 15f, 0.3f);
+                pillar.transform.localScale = new Vector3(initialScale.x * scaleFactor, initialScale.y, initialScale.z * scaleFactor);
+            }
+        }
+        yield break;
     }
 }
