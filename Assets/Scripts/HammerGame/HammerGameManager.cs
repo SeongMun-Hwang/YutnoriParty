@@ -50,7 +50,6 @@ public class HammerGameManager : NetworkBehaviour
         playingCharacters.Add(go);
         if (playingCharacters.Count == playerNum)
         {
-            Debug.Log("All players spawned, start coutdown");
             StartCoroutine(StartGameTimer(5));
         }
     }
@@ -75,12 +74,12 @@ public class HammerGameManager : NetworkBehaviour
         Debug.Log("add force client rpc");
         if (noRef.TryGet(out NetworkObject no))
         {
-            if (!no.IsOwner) return; // Owner만 실행하도록 체크
+            if (!no.IsOwner) return;
 
             Rigidbody rb = no.gameObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(forceDir * 300f, ForceMode.Impulse);
+                rb.AddForce(forceDir, ForceMode.Impulse);
             }
         }
     }
@@ -128,7 +127,7 @@ public class HammerGameManager : NetworkBehaviour
         {
             player.GetComponent<HammerGameController>().StartHammerGameClientRpc();
         }
-        StartCoroutine(PillarScaleDecrease());
+        //StartCoroutine(PillarScaleDecrease());
 
     }
     private IEnumerator PillarScaleDecrease()
@@ -140,8 +139,8 @@ public class HammerGameManager : NetworkBehaviour
             yield return new WaitForSecondsRealtime(0.1f);
             if (timer <= 15f)
             {
-                float scaleFactor = timer / 15f;
-                pillar.transform.localScale = new Vector3(initialScale.x * scaleFactor, initialScale.y * scaleFactor, initialScale.z);
+                float scaleFactor = Mathf.Max(timer / 15f, 0.3f);
+                pillar.transform.localScale = new Vector3(initialScale.x * scaleFactor, initialScale.y, initialScale.z * scaleFactor);
             }
         }
         yield break;
