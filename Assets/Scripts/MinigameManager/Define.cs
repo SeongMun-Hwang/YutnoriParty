@@ -10,6 +10,7 @@ public class Define
         BasketGame, // 바구니게임
         LuckyCalcGame, // 수식만들기게임
         HammerGame, // 망치게임 
+        GrapYutGame // 윷잡기 게임
     }
 
     public enum MGPlayerType

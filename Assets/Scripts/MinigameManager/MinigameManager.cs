@@ -22,6 +22,7 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.BasketGame, "BasketGame" },
         { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" },
         {Define.MinigameType.HammerGame,"HammerGame" },
+        { Define.MinigameType.GrapYutGame, "GrapYutGame" }
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
@@ -38,6 +39,7 @@ public class MinigameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        gameType = Define.MinigameType.GrapYutGame;
         if (IsServer)
         {
             MinigameButtonUI.SetActive(true);
