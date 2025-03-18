@@ -16,7 +16,7 @@ public class HammerGameManager : NetworkBehaviour
     private static HammerGameManager instance;
     private List<GameObject> playingCharacters = new List<GameObject>();
     private int playerNum = 0;
-    private float timer = 30f;
+    private float timer = 45f;
     public static HammerGameManager Instance
     {
         get { return instance; }
@@ -133,7 +133,7 @@ public class HammerGameManager : NetworkBehaviour
         {
             player.GetComponent<HammerGameController>().StartHammerGameClientRpc();
         }
-        //StartCoroutine(PillarScaleDecrease());
+        StartCoroutine(PillarScaleDecrease());
 
     }
     private IEnumerator PillarScaleDecrease()
