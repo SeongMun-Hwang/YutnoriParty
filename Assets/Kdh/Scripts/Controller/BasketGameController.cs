@@ -16,7 +16,7 @@ public class BasketGameController : NetworkBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();        
-        rb.position = targetPosition;
+        rb.position = spawnPosition;
         animator = GetComponent<Animator>();
         
     }
