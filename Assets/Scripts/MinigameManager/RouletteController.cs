@@ -123,6 +123,7 @@ public class RouletteController : NetworkBehaviour
             itemList[i].SetActive(i == newValue);
         }
         StartCoroutine(EndRoulette());
+        GetComponent<Animator>().SetTrigger("Finish");
     }
 
     public void CloseRouletteForce()
