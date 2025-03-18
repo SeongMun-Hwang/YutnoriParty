@@ -1,6 +1,7 @@
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -41,5 +42,14 @@ public class Menu : MonoBehaviour
     public async void ChangeName()
     {
         await AuthenticationService.Instance.UpdatePlayerNameAsync(userNameField.text);
+    }
+
+    public void ExiteGame()
+    {
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+        Application.Quit();
+#endif
     }
 }

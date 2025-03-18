@@ -93,6 +93,7 @@ public class RouletteController : NetworkBehaviour
             current++;
 
             waitTime = Mathf.Lerp(0.01f, 0.1f, (float)current / duration);
+            AudioManager.instance.Playsfx(13);
             yield return new WaitForSecondsRealtime(waitTime);
         }
 
@@ -106,6 +107,8 @@ public class RouletteController : NetworkBehaviour
 
     private IEnumerator EndRoulette()
     {
+        GetComponent<Animator>().SetTrigger("Finish");
+        AudioManager.instance.Playsfx(5);
         yield return new WaitForSecondsRealtime(2f);
         if (IsServer)
         {
@@ -116,6 +119,7 @@ public class RouletteController : NetworkBehaviour
 
     private void FixRoulette(int oldValue, int newValue)
     {
+        GetComponent<Animator>().SetTrigger("Reset");
         isRolling = false;
         StopCoroutine(rollingCoroutine);
         for (int i = 0; i < itemCount; i++)
@@ -123,7 +127,6 @@ public class RouletteController : NetworkBehaviour
             itemList[i].SetActive(i == newValue);
         }
         StartCoroutine(EndRoulette());
-        GetComponent<Animator>().SetTrigger("Finish");
     }
 
     public void CloseRouletteForce()

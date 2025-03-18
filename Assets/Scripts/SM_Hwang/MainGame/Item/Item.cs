@@ -143,6 +143,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public void OnPointerClick(PointerEventData eventData)
     {
         TooltipManager.Instance.EraseTooltip();
+        AudioManager.instance.Playsfx(13);
     }
 
     public void OnDestroy()

@@ -20,6 +20,8 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
+        AudioManager.instance.Playsfx(13);
+
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
