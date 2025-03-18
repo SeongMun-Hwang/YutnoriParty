@@ -535,7 +535,14 @@ public class MainGameProgress : NetworkBehaviour
             EndMiniGameClientRpc();
 
             //미니 게임 승자 판별과 패배한 말 처리
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
+            if (winnerId != 99)
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
+            }
+            else
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("무승부!", 2f);
+            }
             ItemManager.Instance.GetItemClientRpc(winnerId);
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());

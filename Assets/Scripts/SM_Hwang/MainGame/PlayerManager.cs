@@ -60,13 +60,6 @@ public class PlayerManager : NetworkBehaviour
         }
         SpawnCharacterServerRpc(GetClientIndex());
     }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Keypad5))
-        {
-            Debug.Log(GetClientIndex());
-        }
-    }
     [ServerRpc(RequireOwnership = false)]
     public void SpawnCharacterServerRpc(int index, ServerRpcParams rpcParams = default)
     {

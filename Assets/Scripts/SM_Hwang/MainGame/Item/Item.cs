@@ -40,12 +40,12 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             }
             if (itemName == ItemName.ReverseMove)
             {
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Choose target!", 2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("대상을 고르세요!", 2f);
                 coroutine = StartCoroutine(ChooseTarget());
             }
             if (itemName == ItemName.Obstacle)
             {
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Node!", 2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("노드를 고르세요!", 2f);
                 coroutine = StartCoroutine(ChooseNode());
             }
         }

@@ -46,6 +46,7 @@ public class ItemManager : NetworkBehaviour
     [ClientRpc]
     public void GetItemClientRpc(ulong targetId)
     {
+        if (targetId == 99) return;
         Debug.Log("Player" + targetId + "Get Item");
         if (NetworkManager.Singleton.LocalClientId != targetId) return;
         GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
