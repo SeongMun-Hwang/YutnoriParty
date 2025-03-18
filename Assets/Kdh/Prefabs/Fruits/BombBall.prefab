@@ -180,5 +180,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  scoreValue: -100
+  scoreValue: -500
   collectParticlePrefab: {fileID: 103336, guid: e2c6bdc8b7c39da42b885d093f93ee5d, type: 3}
