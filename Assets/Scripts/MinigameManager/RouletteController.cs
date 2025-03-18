@@ -13,7 +13,8 @@ public class RouletteController : NetworkBehaviour
     private List<GameObject> itemList;
     private int itemCount;
     private int rollIndex = 0;
-    private int previousIndex = 0;
+    private int previousIndex = 0; // -1 인덱스를 의미 (직전에 플레이한 게임이 아님)
+    private int previousPlayingIndex = -1; // 직전에 플레이한 게임 인덱스
     private bool isRolling = false;
 
     public NetworkVariable<int> MinigameIndex = new NetworkVariable<int>(-1);
@@ -45,9 +46,17 @@ public class RouletteController : NetworkBehaviour
         if (IsServer)
         {
             Debug.Log($"{itemCount}개 중에서 롤렛 돌리자");
-            int durationFactor = 5;
-            int minRoll = itemCount * durationFactor;
-            int minigameIndex = UnityEngine.Random.Range(0, itemCount);
+            int durationFactor = 2;
+            int minRoll = itemCount * durationFactor; // 일단 최소한 돌려야되는 횟수 : 현재 14번
+            int minigameIndex = UnityEngine.Random.Range(0, itemCount); // 사실상 결과를 정의하는 부분
+
+            // 직전에 플레이한 게임은 나오지 않도록 함
+            // 불필요한 딜레이를 줄이기 위해 그냥 그 다음 게임으로 지정
+            if (minigameIndex == previousPlayingIndex)
+            {
+                minigameIndex = (minigameIndex + 1) % itemCount;
+            }
+
             StartRollClientRpc(minRoll + minigameIndex);
         }
     }
@@ -66,6 +75,7 @@ public class RouletteController : NetworkBehaviour
         itemList[previousIndex].SetActive(false);
 
         rollIndex = (rollIndex + 1) % itemCount;
+
         itemList[rollIndex].SetActive(true);
 
         previousIndex = rollIndex;
@@ -75,14 +85,14 @@ public class RouletteController : NetworkBehaviour
     {
         Debug.Log("Rolling");
         int current = 0;
-        float waitTime = 0.05f;
+        float waitTime;
 
         while (current < duration && isRolling)
         {
             PassItemOnce();
             current++;
 
-            waitTime = Mathf.Lerp(0.01f, 0.4f, (float)current / duration);
+            waitTime = Mathf.Lerp(0.01f, 0.1f, (float)current / duration);
             yield return new WaitForSecondsRealtime(waitTime);
         }
 

@@ -10080,6 +10080,7 @@ MonoBehaviour:
   sfxSlider: {fileID: 7074890450869661650}
   sfxText: {fileID: 3061511935293934085}
   volumeUI: {fileID: 3044612667628808714}
+  titleMenuCanvas: {fileID: 203840266}
 --- !u!1 &299830017636719986
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
