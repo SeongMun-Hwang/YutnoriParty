@@ -21,11 +21,12 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.RunningGame, "RunGame" },
         { Define.MinigameType.BasketGame, "BasketGame" },
         { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" },
-        {Define.MinigameType.HammerGame,"HammerGame" },
+        { Define.MinigameType.HammerGame,"HammerGame" },
         { Define.MinigameType.GrapYutGame, "GrapYutGame" }
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
+    public List<ulong> playerList;
     public Define.MGPlayerType playerType;
     private bool isRandomGame = false;
 
@@ -117,8 +118,8 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     private void UpdateSpectatorClientRpc(ulong[] players)
     {
-        List<ulong> pl = players.ToList();
-        if (!pl.Contains(NetworkManager.Singleton.LocalClientId))
+        playerList = players.ToList();
+        if (!playerList.Contains(NetworkManager.Singleton.LocalClientId))
         {
             playerType = Define.MGPlayerType.Spectator;
             spectatorUI.SetActive(true);

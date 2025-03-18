@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerBoard : NetworkBehaviour
 {
@@ -187,6 +188,22 @@ public class PlayerBoard : NetworkBehaviour
                 profile.DrawEmoji(emojiCode);
             }
         }
+    }
+
+    public int GetOrderOfPlayerById(ulong id)
+    {
+        int i = 0;
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            if (profile.clientId == id)
+            {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
     }
 
     public void ClearAllProfiles()

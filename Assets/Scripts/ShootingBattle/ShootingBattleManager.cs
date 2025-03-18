@@ -115,7 +115,8 @@ public class ShootingBattleManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
-            playerObjects[i].SetActive(true);
+            int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+            playerObjects[order].SetActive(true);
             usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {
