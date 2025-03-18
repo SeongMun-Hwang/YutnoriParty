@@ -125,6 +125,9 @@ public class YutManager : NetworkBehaviour
             }
 
             Yut yut = yuts[i];
+
+            yut.soundActivated = true;
+
             //윷 전체의 중심 위치 맞추기 위한 똥꼬쇼
             yut.transform.position = pos + new Vector3(0, 0, -((yutNum - 1) * yutSpacing) / 2);
             yut.GetComponent<NetworkObject>().Spawn();
@@ -155,6 +158,7 @@ public class YutManager : NetworkBehaviour
         for (int i=0; i< yutNum; i++)
         {
             Yut yut = yuts[i];
+            yut.soundActivated = false;
             //yutList.Add(yut.GetComponent<NetworkObject>());
             //yut.GetComponent<NetworkObject>().NetworkHide((ulong)i);
             //yut.gameObject.SetActive(false);
@@ -187,6 +191,7 @@ public class YutManager : NetworkBehaviour
         for (int i = 0; i < yutNum; i++)
         {
             Yut yut = yuts[i];
+            yut.soundActivated = true;
             //yutList.Add(yut.GetComponent<NetworkObject>());
             //yut.gameObject.SetActive(true);
         }
@@ -366,6 +371,7 @@ public class YutManager : NetworkBehaviour
             //yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
 
             yut.torqueSign = randomSign; //토크 부호 저장
+            yut.soundActivated = true; //사운드 켬
             //yut.Rigidbody.excludeLayers = LayerMask.GetMask("Player");
         }
         
