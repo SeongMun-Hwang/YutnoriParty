@@ -125,9 +125,9 @@ public class PlayerManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = default)]
     private void OverlapCharacterServerRpc(NetworkObjectReference parentNo, NetworkObjectReference childNo)
     {
+        Debug.Log("말 업기 서버 함수");
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
-        Debug.Log("말 업기 서버 함수");
             child.TrySetParent(parent.transform);
             int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;

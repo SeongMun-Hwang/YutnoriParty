@@ -448,6 +448,7 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     void StackCharactersClientRpc(NetworkObjectReference[] arr, ClientRpcParams rpcParams)
     {
+        Debug.Log("Statck character");
         //네트워크 오브젝트 레퍼런스 -> 게임 오브젝트 리스트로 변환
         List<GameObject> characters = new List<GameObject>();
         for (int i = 0; i < arr.Length; i++)
