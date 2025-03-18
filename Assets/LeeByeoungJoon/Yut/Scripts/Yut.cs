@@ -7,7 +7,10 @@ public class Yut : NetworkBehaviour
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
     float torque = 1f;
-    float smallSoundPower = 10f;
+    float smallSoundPower = 2f;
+    float middleSoundPower = 7f;
+    float largeSoundPower = 12f;
+
     public float torqueSign = 0;
 
     //[SerializeField] new Collider collider;
@@ -27,6 +30,17 @@ public class Yut : NetworkBehaviour
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
     
+    private bool _soundActivated = false;
+    public bool soundActivated
+    {
+        get { return _soundActivated; }
+        set
+        {
+            Debug.Log($"soundActivated 값 변경 : {_soundActivated} -> {value}");
+            _soundActivated = value;
+        }
+    }
+
 
     private void Awake()
     {
@@ -52,21 +66,45 @@ public class Yut : NetworkBehaviour
                 //Debug.DrawRay(contact.point, contact.normal, Color.yellow);
                 rigidbody.AddForce(contact.normal * characterBounce, ForceMode.Impulse);
             }
-            return; //플레이어랑 부딫히면 말랑말랑하니까 윷 소리 안남
+        }
+
+        //사운드 활성화 안되어있으면 소리 안나게
+        if (!soundActivated) return;
+
+        //Debug.Log("소리 날거임");
+
+        if(collision.gameObject.tag != "Player") //플레이어는 말랑하니까 나무소리 안남
+        {
+            //Debug.Log("플레이어 아님");
+
+            float collisionPower = collision.relativeVelocity.magnitude;
+            //Debug.Log("힘: " + collisionPower);
+            if (collisionPower > smallSoundPower)
+            {
+                //Debug.Log("소리 조건 충족");
+
+                PlayYutSoundRpc(collisionPower);
+            }
         }
         
-        if(collision.relativeVelocity.magnitude > smallSoundPower)
-        {
-            PlayYutSoundRpc();
-        }
         //isGrounded = true;
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    void PlayYutSoundRpc()
+    void PlayYutSoundRpc(float power)
     {
-        int idx = Random.Range(19, 22);
-        AudioManager.instance.Playsfx(idx);
+        if(power > largeSoundPower)
+        {
+            AudioManager.instance.Playsfx(20);
+        }
+        else if(power > middleSoundPower)
+        {
+            AudioManager.instance.Playsfx(21);
+        }
+        else //제일 작은 소리
+        {
+            AudioManager.instance.Playsfx(19);
+        }
     }
 
     private void OnCollisionExit(Collision collision)

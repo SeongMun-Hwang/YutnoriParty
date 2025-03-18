@@ -187,6 +187,11 @@ public class MainGameProgress : NetworkBehaviour
                 }
                 else if (character.GetComponent<NetworkObject>().OwnerClientId == NetworkManager.Singleton.LocalClientId)//내 말이면
                 {
+                    if (character.GetComponent<CharacterBoardMovement>().currentNode != currentCharacter.GetComponent<CharacterBoardMovement>().currentNode)
+                    {
+                        Debug.Log("말 업기 실패 - 위치가 같지 않음 ");
+                        return false;
+                    }
                     PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
                     currentCharacter.GetComponent<Outline>().DisableOutline();
                     currentCharacter = character;
@@ -479,6 +484,11 @@ public class MainGameProgress : NetworkBehaviour
         bool isIslandBattle = (playerNetObj.GetComponent<CharacterInfo>().inIsland.Value || enemyNetObj.GetComponent<CharacterInfo>().inIsland.Value);
         Debug.Log("섬 전투임? : " + isIslandBattle);
 
+        if (isIslandBattle)
+        {
+            EventNodeManager.Instance.islandBattleExcuting.Value = true;
+        }
+
         // 미니 게임이 끝났을 때 서버에서 발생시킬 이벤트를 지정
         endMinigameActions = null;
         endMinigameActions += (() =>
@@ -504,6 +514,11 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, playerId);
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemyId);
 
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
+                }
+
                 return;
             }
 
@@ -522,6 +537,7 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
                 if (isIslandBattle)
                 {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
                     return;
                 }
             }
@@ -538,6 +554,7 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
                 if (isIslandBattle)
                 {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
                     return;
                 }
             }

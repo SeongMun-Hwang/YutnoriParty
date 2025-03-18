@@ -20,6 +20,8 @@ public class YutResults : NetworkBehaviour
 
     public void OnButtonPressed()
     {
+        AudioManager.instance.Playsfx(13);
+
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
@@ -36,6 +38,11 @@ public class YutResults : NetworkBehaviour
             return;
         }
         if (EventNodeManager.Instance.checkingStepOn.Value)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Event Excute", 2f);
+            return;
+        }
+        if (EventNodeManager.Instance.islandBattleExcuting.Value)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Event Excute", 2f);
             return;
@@ -58,6 +65,12 @@ public class YutResults : NetworkBehaviour
                 {
                     MainGameProgress.Instance.EndMove();
                 }
+                Destroy(gameObject);
+            }
+            if(YutManager.Instance.Results.Count == 1 && yutResult==YutResult.BackDo)
+            {
+                YutManager.Instance.RemoveYutResult(yutResult);
+                MainGameProgress.Instance.EndMove();
                 Destroy(gameObject);
             }
             return;
