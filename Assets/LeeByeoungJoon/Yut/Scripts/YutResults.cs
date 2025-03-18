@@ -65,6 +65,12 @@ public class YutResults : NetworkBehaviour
                 }
                 Destroy(gameObject);
             }
+            if(YutManager.Instance.Results.Count == 1 && yutResult==YutResult.BackDo)
+            {
+                YutManager.Instance.RemoveYutResult(yutResult);
+                MainGameProgress.Instance.EndMove();
+                Destroy(gameObject);
+            }
             return;
         }
         ItemManager.Instance.RemoveItem();
