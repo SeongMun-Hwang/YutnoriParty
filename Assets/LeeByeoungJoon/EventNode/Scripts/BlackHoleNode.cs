@@ -185,6 +185,7 @@ public class BlackHoleNode : EventNode
     public void BlackHoleEventEndRpc()
     {
         isProcessing.Value = false;
+        enteredPlayers.Clear();
         EventEndRpc();
 
         //블랙홀 쪼그라드는 애니메이션 실행
