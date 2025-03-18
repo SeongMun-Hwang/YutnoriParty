@@ -132,4 +132,6 @@ public class IslandNode : EventNode
         }
         player.GetComponent<CharacterInfo>().canMove.Value = canMove;
     }
+
+    //겹쳤을때 판정하고 미니게임 한 다음 무인도에서 탈출시키는 부분이 끝나고 움직여야 하는데 그 전에 움직여서 오류남
 }

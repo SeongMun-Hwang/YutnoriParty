@@ -100,7 +100,12 @@ public class BlackHoleNode : EventNode
 
         for (int i = 0; i < targetNodes.Count; i++)
         {
-            list.AddRange(targetNodes[i].GetCharacters());
+            var targets = targetNodes[i].GetCharacters();
+            if(targets == null)
+            {
+                continue;
+            }
+            list.AddRange(targets);
         }
 
         characterCount.Value = list.Count;
