@@ -14,6 +14,7 @@ public class YutGrabGameManager : NetworkBehaviour
     [SerializeField] private List<TMP_Text> usernameUI;
     [SerializeField] private List<TMP_Text> scoreUI;
     [SerializeField] private GameObject winMessageUI;
+    [SerializeField] private GameObject drawMessageUI;
     [SerializeField] private GameObject loseMessageUI;
 
     // 게임에 참여하는 유저 관련
@@ -332,24 +333,35 @@ public class YutGrabGameManager : NetworkBehaviour
 
         if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { yield return null; }
 
-        if (NetworkManager.Singleton.LocalClientId == bestPlayerId.Value)
+        ulong winnerId = bestPlayerId.Value;
+
+        //최고기록이 초기화 값에서 안벗어났으면 무승부
+        if (bestRecord.Value > 9999)
         {
-            winMessageUI.SetActive(true);
+            winnerId = 99;
+            drawMessageUI.SetActive(true);
         }
-        else
+        else //기록 있으면 정상 진행
         {
-            loseMessageUI.SetActive(true);
+            if (NetworkManager.Singleton.LocalClientId == winnerId)
+            {
+                winMessageUI.SetActive(true);
+            }
+            else
+            {
+                loseMessageUI.SetActive(true);
+            }
         }
 
         yield return new WaitForSecondsRealtime(2f);
 
-        FinishGameRpc();
+        FinishGameRpc(winnerId);
         
         yield return null;
     }
 
     [Rpc(SendTo.Server)]
-    void FinishGameRpc()
+    void FinishGameRpc(ulong winnerId)
     {
         //서버에서 한번만 실행
         if (isGameFinishExcute) return;
@@ -357,7 +369,7 @@ public class YutGrabGameManager : NetworkBehaviour
         isGameFinishExcute = true;
         Debug.Log("윷 잡기 게임 종료");
 
-        MainGameProgress.Instance.winnerId = bestPlayerId.Value;
+        MainGameProgress.Instance.winnerId = winnerId;
         MinigameManager.Instance.EndMinigame();
 
         //남은 게임오브젝트들 삭제
