@@ -100,7 +100,7 @@ public class BlackHoleNode : EventNode
 
         for (int i = 0; i < targetNodes.Count; i++)
         {
-            list.AddRange(targetNodes[i].GetCharacters());
+            list.AddRange(targetNodes[i].GetCharacters()); //빈 리스트를 끌어올라 했다??
         }
 
         characterCount.Value = list.Count;
@@ -180,6 +180,7 @@ public class BlackHoleNode : EventNode
     public void BlackHoleEventEndRpc()
     {
         isProcessing.Value = false;
+        enteredPlayers.Clear(); //밟은애들 없애
         EventEndRpc();
 
         //블랙홀 쪼그라드는 애니메이션 실행
