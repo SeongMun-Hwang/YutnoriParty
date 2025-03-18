@@ -6,8 +6,41 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/SM_Hwang/Server/NetConnect.unity
+    guid: 59297312c2f955f4cafd1fb1b13cfb1c
+  - enabled: 0
+    path: Assets/Scenes/SM_Hwang/Server/MenuSceneOld.unity
+    guid: 54a40b1840a1b114a9be712c65edce8a
+  - enabled: 1
+    path: Assets/Scenes/SM_Hwang/Server/MenuScene.unity
+    guid: 624565376f81f2e4490ba5d95882751d
+  - enabled: 1
+    path: Assets/Scenes/SM_Hwang/Server/MainGame.unity
+    guid: d2c81f8ee311e3b42a891ef191ed8d17
+  - enabled: 1
+    path: Assets/Kdh/Scenes/RunGame.unity
+    guid: e253b03ab636d78468cddc31d3050473
+  - enabled: 1
+    path: Assets/Scenes/StackBattle/StackScene.unity
+    guid: 26c2f7c08c4df3d49b32de19efad0e22
+  - enabled: 1
+    path: Assets/Scenes/ShootingBattle/ShootingScene.unity
+    guid: 0fbc667ec93a5ca42a761f7284c72e78
+  - enabled: 1
+    path: Assets/Kdh/Scenes/BasketGame.unity
+    guid: 75a621f51f601d14e9a7ae7d2a1c6f6a
+  - enabled: 1
+    path: Assets/Scenes/LuckyCalc/LuckyCalcGame.unity
+    guid: d201faee32dad304b9c94bf6ce38111d
+  - enabled: 1
+    path: Assets/Scenes/WinnerAward/AwardScene.unity
+    guid: 46892d73e1099094cb8f7cd8f5053f61
+  - enabled: 1
+    path: Assets/Scenes/HammerGame/HammerGame.unity
+    guid: 3b8fdf1c39058a84683428a849f7a2df
+  - enabled: 1
+    path: Assets/LeeByeoungJoon/GrabYutGame/GrapYutGame.unity
+    guid: a0080219dffcdff4d8b42c0e660da2ad
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

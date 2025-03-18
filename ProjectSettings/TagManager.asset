@@ -2,8 +2,35 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Ground
+  - _LBJ(4)
+  - _LBJ(5)
+  - _SCH(1)
+  - _SCH(2)
+  - _SCH(3)
+  - _SCH(4)
+  - _SCH(5)
+  - Obstacle
+  - Character
+  - _HSM(3)
+  - _HSM(4)
+  - _HSM(5)
+  - _HTW(1)
+  - _HTW(2)
+  - _HTW(3)
+  - _HTW(4)
+  - _HTW(5)
+  - _KDH(1)
+  - _KDH(2)
+  - _KDH(3)
+  - _KDH(4)
+  - _KDH(5)
+  - grandma
+  - Fruit
+  - Basket
+  - Yut
   layers:
   - Default
   - TransparentFX
@@ -11,13 +38,13 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - PlayerCharacter
+  - Yut
+  - YutVertical
+  - YutOut
+  - MinigameObject
+  - MinigameUI
   - 
   - 
   - 
@@ -50,27 +77,3 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
