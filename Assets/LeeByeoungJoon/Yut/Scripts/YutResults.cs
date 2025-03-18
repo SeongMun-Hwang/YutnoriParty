@@ -40,6 +40,11 @@ public class YutResults : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Event Excute", 2f);
             return;
         }
+        if (EventNodeManager.Instance.islandBattleExcuting.Value)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Event Excute", 2f);
+            return;
+        }
         if (GameManager.Instance.mainGameProgress.isEndMoveExcuting)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("Wait EndMove Excute", 2f);
