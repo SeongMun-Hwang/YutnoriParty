@@ -88,7 +88,6 @@ public class LuckyCalcManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
-            playerObjects[i].SetActive(true);
             usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {
@@ -296,17 +295,31 @@ public class LuckyCalcManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
+            int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+            playerObjects[order].SetActive(true);
+        }
+
+        for (int i = 0; i < playerIds.Count; i++)
+        {
             if (GetCurrentTurnPlayerId() == playerIds[i])
             {
-                usernameUI[i].color = Color.yellow;
-                playerObjects[i].SetActive(true);
-                playerObjects[i].transform.GetChild(0).GetComponent<Animator>().SetTrigger("MyTurn");
+                int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+
+                if (order != -1)
+                {
+                    usernameUI[i].color = Color.yellow;
+                    playerObjects[order].transform.GetChild(0).GetComponent<Animator>().SetTrigger("MyTurn");
+                }
             }
             else
             {
-                usernameUI[i].color = Color.white;
-                playerObjects[i].SetActive(true);
-                playerObjects[i].transform.GetChild(0).GetComponent<Animator>().SetTrigger("NotMyTurn");
+                int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+
+                if (order != -1)
+                {
+                    usernameUI[i].color = Color.white;
+                    playerObjects[order].transform.GetChild(0).GetComponent<Animator>().SetTrigger("NotMyTurn");
+                }
             }
         }
     }

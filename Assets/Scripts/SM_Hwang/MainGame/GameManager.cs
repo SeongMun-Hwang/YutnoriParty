@@ -63,4 +63,9 @@ public class GameManager : NetworkBehaviour
             playerBoard.gameObject.SetActive(true);
         }
     }
+
+    public int GetOrderOfPlayerById(ulong id)
+    {
+        return playerBoard.GetOrderOfPlayerById(id);
+    }
 }

@@ -30,15 +30,6 @@ public class TooltipManager : MonoBehaviour
         tooltipCanvas.SetActive(true);
     }
 
-    private void Update()
-    {
-        if (tooltipCanvas.gameObject.activeSelf)
-        {
-            Vector2 mousePosition = Input.mousePosition;
-            tooltipPanel.anchoredPosition = mousePosition + new Vector2(0, 150);
-        }
-    }
-
     public void EraseTooltip()
     {
         tooltipCanvas.gameObject.SetActive(false);
