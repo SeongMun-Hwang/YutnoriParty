@@ -219,4 +219,8 @@ public class PlayerManager : NetworkBehaviour
             return clientList.IndexOf((ulong)targetId);
         }
     }
+    public int ReturnNumOfCharacter()
+    {
+        return numOfCharacter;
+    }
 }
