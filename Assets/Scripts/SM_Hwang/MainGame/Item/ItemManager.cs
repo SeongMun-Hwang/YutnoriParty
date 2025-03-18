@@ -32,17 +32,6 @@ public class ItemManager : NetworkBehaviour
     {
         if (IsClient) { instance = this; }
     }
-    private void Update()
-    {
-        if(Input.GetKeyUp(KeyCode.Keypad0))
-        {
-            GetItemClientRpc(0);
-        }
-        if (Input.GetKeyUp(KeyCode.Keypad1))
-        {
-            GetItemClientRpc(1);
-        }
-    }
     [ClientRpc]
     public void GetItemClientRpc(ulong targetId)
     {
