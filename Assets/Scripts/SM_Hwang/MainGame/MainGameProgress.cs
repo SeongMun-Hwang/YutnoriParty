@@ -209,7 +209,7 @@ public class MainGameProgress : NetworkBehaviour
         }
         yield return new WaitForSeconds(1f);
         if (YutManager.Instance.YutResultCount() == 0 && !PlayerManager.Instance.isMoving
-            && YutManager.Instance.throwChance == 0)
+            && YutManager.Instance.throwChance == 0 && !YutManager.Instance.isCalulating)
         {
             CheckAllPlayerTurnPassed();
         }
