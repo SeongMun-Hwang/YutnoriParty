@@ -6692,6 +6692,7 @@ MonoBehaviour:
   joinCodeField: {fileID: 814333108}
   userNameField: {fileID: 1804061046}
   roomNameField: {fileID: 2145630267}
+  confirmMessageCanvas: {fileID: 8197872765954580649, guid: 4c631d06fd19ae34fb11af7e35823207, type: 3}
 --- !u!4 &1538737365
 Transform:
   m_ObjectHideFlags: 0
