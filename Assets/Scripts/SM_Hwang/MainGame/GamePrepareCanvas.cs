@@ -36,7 +36,7 @@ public class GamePrepareCanvas : NetworkBehaviour
         }
         else
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Players not enough!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("플레이어가 부족합니다!", 2f);
         }
     }
     public void RoomOut()
