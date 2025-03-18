@@ -7,6 +7,7 @@ public class Yut : NetworkBehaviour
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
     float torque = 1f;
+    float smallSoundPower = 10f;
     public float torqueSign = 0;
 
     //[SerializeField] new Collider collider;
@@ -51,9 +52,21 @@ public class Yut : NetworkBehaviour
                 //Debug.DrawRay(contact.point, contact.normal, Color.yellow);
                 rigidbody.AddForce(contact.normal * characterBounce, ForceMode.Impulse);
             }
+            return; //플레이어랑 부딫히면 말랑말랑하니까 윷 소리 안남
         }
-
+        
+        if(collision.relativeVelocity.magnitude > smallSoundPower)
+        {
+            PlayYutSoundRpc();
+        }
         //isGrounded = true;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void PlayYutSoundRpc()
+    {
+        int idx = Random.Range(19, 22);
+        AudioManager.instance.Playsfx(idx);
     }
 
     private void OnCollisionExit(Collision collision)

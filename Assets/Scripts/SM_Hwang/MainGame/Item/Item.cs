@@ -149,4 +149,9 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     {
         TooltipManager.Instance.EraseTooltip();
     }
+
+    public void OnDisable()
+    {
+        TooltipManager.Instance.EraseTooltip();
+    }
 }

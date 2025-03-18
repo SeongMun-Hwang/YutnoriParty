@@ -60,6 +60,8 @@ public class HostSingleton : MonoBehaviour
         //�κ� ����
         try
         {
+            string finalRoomName = string.IsNullOrWhiteSpace(roomName) ? $"공개방{joinCode}" : roomName;
+
             CreateLobbyOptions options=new CreateLobbyOptions();
             options.IsPrivate = false;
             options.Data = new Dictionary<string, Unity.Services.Lobbies.Models.DataObject>
@@ -68,7 +70,7 @@ public class HostSingleton : MonoBehaviour
                     "JoinCode",new Unity.Services.Lobbies.Models.DataObject(Unity.Services.Lobbies.Models.DataObject.VisibilityOptions.Member, joinCode)
                 },
                 {
-                    "RoomName",new DataObject(DataObject.VisibilityOptions.Public, roomName ?? $"공개방#{joinCode}")
+                    "RoomName",new DataObject(DataObject.VisibilityOptions.Public, finalRoomName)
                 },
                 {
                     "HostName",new DataObject(DataObject.VisibilityOptions.Public, AuthenticationService.Instance.PlayerName ?? "Anonymous")
@@ -76,7 +78,7 @@ public class HostSingleton : MonoBehaviour
             };
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(joinCode, MaxConnections, options);
             lobbyId = lobby.Id;
-            lobbyName = roomName ?? $"공개방#{joinCode}";
+            lobbyName = finalRoomName;
             StartCoroutine(HeartBeatLobby(15));
         }
         catch(LobbyServiceException e)

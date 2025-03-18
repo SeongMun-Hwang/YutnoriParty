@@ -227,8 +227,8 @@ public class PlayerManager : NetworkBehaviour
         {
             playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(clientId)].userName.ToString();
         }
-        int index = playerName.IndexOf("#");
-        playerName = playerName.Substring(0, index);
+        //int index = playerName.IndexOf("#");
+        //playerName = playerName.Substring(0, index);
         return playerName;
     }
 }
