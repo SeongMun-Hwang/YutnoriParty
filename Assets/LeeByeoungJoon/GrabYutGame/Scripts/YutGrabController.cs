@@ -124,7 +124,7 @@ public class YutGrabController : NetworkBehaviour
     {
         isPlaying = false;
 
-        //못잡으면 기록 안되게 함
+        //잡으면 기록
         if (isGrabbed)
         {
             YutGrabGameManager.Instance.SendReultRpc(result, NetworkManager.Singleton.LocalClientId);
