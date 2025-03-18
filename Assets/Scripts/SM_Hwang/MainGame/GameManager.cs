@@ -34,11 +34,13 @@ public class GameManager : NetworkBehaviour
     public bool isEmojiDelay = false;
     public List<Sprite> emojiList;
     public NetworkVariable<FixedString128Bytes> lobbyId = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<FixedString128Bytes> lobbyName = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> winnerName = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<int> winnerCharacterIndex = new NetworkVariable<int>();
     public override void OnNetworkSpawn()
     {
         if(IsServer) lobbyId.Value = HostSingleton.Instance.ReturnJoinCode();
+        if(IsServer) lobbyName.Value = HostSingleton.Instance.ReturnRoomName();
     }
 
     public void HandleEmojiDelay(float duration)

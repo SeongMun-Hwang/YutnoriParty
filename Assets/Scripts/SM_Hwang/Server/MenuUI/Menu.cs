@@ -9,6 +9,7 @@ public class Menu : MonoBehaviour
 {
     [SerializeField] TMP_InputField joinCodeField;
     [SerializeField] TMP_InputField userNameField;
+    [SerializeField] TMP_InputField roomNameField;
     private void Start()
     {
         if (GameObject.FindFirstObjectByType<NetworkManager>() == null)
@@ -31,7 +32,7 @@ public class Menu : MonoBehaviour
     }
     public async void StartHost()
     {
-        await HostSingleton.Instance.StartHostAsync();
+        await HostSingleton.Instance.StartHostAsync(roomNameField.text);
     }
     public async void StartClient()
     {

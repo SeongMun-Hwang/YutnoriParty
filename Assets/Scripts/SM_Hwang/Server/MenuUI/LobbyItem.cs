@@ -5,6 +5,7 @@ using UnityEngine;
 public class LobbyItem : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI lobbyTitleText;
+    [SerializeField] TextMeshProUGUI lobbyHostText;
     [SerializeField] TextMeshProUGUI lobbyPlayerText;
 
     LobbyList lobbyList;
@@ -12,7 +13,11 @@ public class LobbyItem : MonoBehaviour
 
     public void SetItem(LobbyList lobbyList, Lobby lobby)
     {
-        lobbyTitleText.text = lobby.Name;
+        string lobbyName = lobby.Data.ContainsKey("RoomName") ? lobby.Data["RoomName"].Value : $"공개방#{lobby.Name}";
+        string hostName = lobby.Data.ContainsKey("HostName") ? lobby.Data["HostName"].Value : "Anonymous";
+
+        lobbyTitleText.text = lobbyName;
+        lobbyHostText.text = hostName;
         lobbyPlayerText.text = lobby.Players.Count + "/" + lobby.MaxPlayers;
         this.lobbyList = lobbyList;
         this.lobby = lobby;

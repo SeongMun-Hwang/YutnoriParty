@@ -15,6 +15,7 @@ using Unity.Services.Authentication;
 using System;
 using WebSocketSharp;
 using Unity.Collections;
+using UnityEngine.UIElements;
 public class HostSingleton : MonoBehaviour
 {
     static HostSingleton instance;
@@ -35,9 +36,10 @@ public class HostSingleton : MonoBehaviour
     const int MaxConnections = 4;
     Allocation allocation;
     string joinCode;
+    string lobbyName;
     string lobbyId;
 
-    public async Task StartHostAsync()
+    public async Task StartHostAsync(string roomName)
     {
         try
         {
@@ -63,12 +65,18 @@ public class HostSingleton : MonoBehaviour
             options.Data = new Dictionary<string, Unity.Services.Lobbies.Models.DataObject>
             {
                 {
-                    //Unity.Services.Lobbies.Models.DataObject.VisibilityOptions.Member : �������� �� �� �ִ°�
                     "JoinCode",new Unity.Services.Lobbies.Models.DataObject(Unity.Services.Lobbies.Models.DataObject.VisibilityOptions.Member, joinCode)
+                },
+                {
+                    "RoomName",new DataObject(DataObject.VisibilityOptions.Public, roomName ?? $"공개방#{joinCode}")
+                },
+                {
+                    "HostName",new DataObject(DataObject.VisibilityOptions.Public, AuthenticationService.Instance.PlayerName ?? "Anonymous")
                 }
             };
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(joinCode, MaxConnections, options);
             lobbyId = lobby.Id;
+            lobbyName = roomName ?? $"공개방#{joinCode}";
             StartCoroutine(HeartBeatLobby(15));
         }
         catch(LobbyServiceException e)
@@ -150,5 +158,10 @@ public class HostSingleton : MonoBehaviour
     public FixedString128Bytes ReturnJoinCode()
     {
         return joinCode;
+    }
+
+    public FixedString128Bytes ReturnRoomName()
+    {
+        return lobbyName;
     }
 }
