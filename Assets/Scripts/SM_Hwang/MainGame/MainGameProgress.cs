@@ -485,6 +485,28 @@ public class MainGameProgress : NetworkBehaviour
         {
             EndMiniGameClientRpc();
 
+            //무승부나면 둘 다 사망
+            if(winnerId == 99)
+            {
+                Debug.Log("Attacker Draw / Enemy Draw");
+                ulong playerId = playerNetObj.OwnerClientId;
+                ulong enemyId = enemyNetObj.OwnerClientId;
+
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.EscapeIslandCallRpc(playerNetObj);
+                    EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
+                }
+
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(playerId) + "무승부!", 2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(enemyId) + "무승부!", 2f);
+
+                PlayerManager.Instance.DespawnCharacterServerRpc(player, playerId);
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemyId);
+
+                return;
+            }
+
             //미니 게임 승자 판별과 패배한 말 처리
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
             if (winnerId == playerNetObj.OwnerClientId)
