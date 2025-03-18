@@ -43,14 +43,14 @@ public class MinigameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (IsServer)
-        {
-            MinigameButtonUI.SetActive(true);
-        }
-        else
-        {
-            MinigameButtonUI.SetActive(false);
-        }
+        //if (IsServer)
+        //{
+        //    MinigameButtonUI.SetActive(true);
+        //}
+        //else
+        //{
+        //    MinigameButtonUI.SetActive(false);
+        //}
 
         if (instance == null)
         {
