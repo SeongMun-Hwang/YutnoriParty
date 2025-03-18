@@ -95,14 +95,14 @@ public class YutGrabGameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            Debug.Log("플레이어 기록 출력");
-            for(int i=0; i<playerIds.Count; i++)
-            {
-                Debug.Log("플레이어 인덱스 : " + i + " 기록 : " + playerRecord[i]);
-            }
-        }
+        //if (Input.GetKeyDown(KeyCode.G))
+        //{
+        //    Debug.Log("플레이어 기록 출력");
+        //    for(int i=0; i<playerIds.Count; i++)
+        //    {
+        //        Debug.Log("플레이어 인덱스 : " + i + " 기록 : " + playerRecord[i]);
+        //    }
+        //}
     }
 
     [Rpc(SendTo.ClientsAndHost)]

@@ -217,12 +217,12 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            throwChance++;
-            Debug.Log(throwChance);
-            //YutResultCount();
-        }
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    throwChance++;
+        //    Debug.Log(throwChance);
+        //    //YutResultCount();
+        //}
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
