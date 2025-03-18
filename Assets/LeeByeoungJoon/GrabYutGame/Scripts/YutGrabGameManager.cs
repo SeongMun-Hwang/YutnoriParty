@@ -203,18 +203,10 @@ public class YutGrabGameManager : NetworkBehaviour
             //초기값아니고 기록이 있을때만 업데이트
             if (playerRecord[id] < 10000.0f)
             {
-                //미터, 센티미터 단위로 표기
-                int meters = (int)playerRecord[id];
-                int centimeteres = (int)((playerRecord[id] - meters) * 100);
+                //센티미터 단위로 표기
+                int centimeteres = (int)(playerRecord[id] * 100);
                 
-                if(meters > 0)
-                {
-                    scoreUI[id].text = $"{meters}m {centimeteres}cm";
-                }
-                else
-                {
-                    scoreUI[id].text = $"{centimeteres}cm";
-                }
+                scoreUI[id].text = $"{centimeteres}cm";
             }
             else//기록 없으면 X표기
             {
