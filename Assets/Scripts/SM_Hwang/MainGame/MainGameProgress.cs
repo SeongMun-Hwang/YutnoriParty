@@ -187,6 +187,11 @@ public class MainGameProgress : NetworkBehaviour
                 }
                 else if (character.GetComponent<NetworkObject>().OwnerClientId == NetworkManager.Singleton.LocalClientId)//내 말이면
                 {
+                    if (character.GetComponent<CharacterBoardMovement>().currentNode != currentCharacter.GetComponent<CharacterBoardMovement>().currentNode)
+                    {
+                        Debug.Log("말 업기 실패 - 위치가 같지 않음 ");
+                        return false;
+                    }
                     PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
                     currentCharacter.GetComponent<Outline>().DisableOutline();
                     currentCharacter = character;

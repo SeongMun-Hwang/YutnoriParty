@@ -126,6 +126,13 @@ public class CharacterBoardMovement : MonoBehaviour
                 break;
             }
         }
+        if (GetComponent<CharacterInfo>().childs != null)
+        {
+            foreach(CharacterBoardMovement info in GetComponent<CharacterInfo>().childs)
+            {
+                info.GetComponent<CharacterBoardMovement>().currentNode = currentNode;
+            }
+        }
         //이동 종료 후 처리
         PlayerManager.Instance.isMoving = false;
         animator.SetFloat("isMoving", 0f);

@@ -63,6 +63,7 @@ public class PlayerManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawnCharacterServerRpc(int index, ServerRpcParams rpcParams = default)
     {
+        Debug.Log("소환 인덱스 : " + index); 
         ulong senderId = rpcParams.Receive.SenderClientId;
         
         GameObject go = Instantiate(GameManager.Instance.playerCharacters[index], Vector3.zero, Quaternion.identity);
@@ -118,8 +119,10 @@ public class PlayerManager : NetworkBehaviour
     }
     public void OverlapCharacter(GameObject parent, GameObject child)
     {
+        Debug.Log("말업기 일반 함수");
         Debug.Log("Overlap Character");
         child.GetComponent<Collider>().enabled = false;
+        parent.GetComponent<CharacterInfo>().childs.Add(child.GetComponent<CharacterBoardMovement>());
         //parent.GetComponent<CharacterInfo>().overlappedCount++;
         OverlapCharacterServerRpc(parent, child);
     }
@@ -130,10 +133,7 @@ public class PlayerManager : NetworkBehaviour
     {
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
-            if(parent.GetComponent<CharacterBoardMovement>().currentNode != child.GetComponent<CharacterBoardMovement>().currentNode)
-            {
-                return;
-            }
+        Debug.Log("말 업기 서버 함수");
             child.TrySetParent(parent.transform);
             int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;
