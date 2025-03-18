@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -73,10 +74,34 @@ public class YutGrabGameManager : NetworkBehaviour
 
         //카메라 세팅
         SetCamerasRpc(playerNum);
-
+        //각종 초기화
         InitScoreBoardUIRpc();
+        InItEventsRpc();
 
         StartCoroutine(StartGameTimer(5));
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        playerRecord.OnListChanged -= UpdateScoreUI;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void InItEventsRpc()
+    {
+        playerRecord.OnListChanged += UpdateScoreUI;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            Debug.Log("플레이어 기록 출력");
+            for(int i=0; i<playerIds.Count; i++)
+            {
+                Debug.Log("플레이어 인덱스 : " + i + " 기록 : " + playerRecord[i]);
+            }
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -149,7 +174,7 @@ public class YutGrabGameManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
-            usernameUI[i].transform.parent.gameObject.SetActive(true);
+            //usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {
                 if (data.clientId == playerIds[i])
@@ -164,9 +189,66 @@ public class YutGrabGameManager : NetworkBehaviour
     private void UpdateScoreUIRpc()
     {
         // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
-        for (int i = 0; i < MinigameManager.Instance.maxPlayers.Value; i++)
+        for (int i = 0; i < playerIds.Count; i++)
         {
-            scoreUI[i].text = playerRecord[i].ToString("F2"); //소수점 두자리까지만 표시
+            int id = (int)playerIds[i];
+            //기회 쓴 애들만 기록 보이게 함
+            if (!usernameUI[id].transform.parent.gameObject.activeSelf)
+            {
+                usernameUI[id].transform.parent.gameObject.SetActive(true);
+            }
+
+            Debug.Log("i : " + id + " 기록 : " + playerRecord[id]);
+
+            //초기값아니고 기록이 있을때만 업데이트
+            if (playerRecord[id] < 10000.0f)
+            {
+                //센티미터 단위로 표기
+                int centimeteres = (int)(playerRecord[id] * 100);
+                
+                scoreUI[id].text = $"{centimeteres}cm";
+            }
+            else//기록 없으면 X표기
+            {
+                scoreUI[id].text = "X";
+            }
+        }
+    }
+
+    private void UpdateScoreUI(NetworkListEvent<float> changeEvent)
+    {
+        // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
+        for (int i = 0; i < playerIds.Count; i++)
+        {
+            int id = (int)playerIds[i];
+            //기회 쓴 애들만 기록 보이게 함
+            if (!usernameUI[id].transform.parent.gameObject.activeSelf)
+            {
+                usernameUI[id].transform.parent.gameObject.SetActive(true);
+            }
+
+            Debug.Log("i : " + id + " 기록 : " + playerRecord[id]);
+
+            //초기값아니고 기록이 있을때만 업데이트
+            if (playerRecord[id] < 10000.0f)
+            {
+                //미터, 센티미터 단위로 표기
+                int meters = (int)playerRecord[id];
+                int centimeteres = (int)((playerRecord[id] - meters) * 100);
+
+                if (meters > 0)
+                {
+                    scoreUI[id].text = $"{meters}m {centimeteres}cm";
+                }
+                else
+                {
+                    scoreUI[id].text = $"{centimeteres}cm";
+                }
+            }
+            else//기록 없으면 X표기
+            {
+                scoreUI[id].text = "X";
+            }
         }
     }
 
@@ -212,6 +294,15 @@ public class YutGrabGameManager : NetworkBehaviour
 
         Debug.Log("최고 기록 : " + bestRecord.Value + " , " +  bestPlayerId.Value + "번 플레이어");
 
+        //StartCoroutine(DelayUpdateScore(0.5f));
+    }
+
+    IEnumerator DelayUpdateScore(float time)
+    {
+        Debug.Log("스코어 업데이트 기다림.. "  + time);
+        yield return new WaitForSeconds(time);
+
+        Debug.Log("스코어 업데이트 요청");
         UpdateScoreUIRpc();
     }
 
@@ -220,6 +311,7 @@ public class YutGrabGameManager : NetworkBehaviour
     {
         noChancePlayer++;
         Debug.Log("기회 쓴 플레이어 수 : " +  noChancePlayer + " 앞으로 : " + (playerIds.Count - noChancePlayer));
+
         //게임에 참가한 플레이어들 모두가 기회를 소모하면 조금 기다렸다 승자 발표
         if(noChancePlayer >= playerIds.Count && !isGameEnd)
         {
