@@ -290,7 +290,7 @@ public class YutManager : NetworkBehaviour
         if (isCalulating)
         {
             //버튼 못누른다고 안내
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Wait Yut Result!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("결과 대기 중!", 2f);
             return;
         }
         //지금 누구 턴인지
@@ -302,6 +302,7 @@ public class YutManager : NetworkBehaviour
         if (throwChance < 1)
         {
             Debug.Log("던질 기회 없음");
+            GameManager.Instance.announceCanvas.ShowAnnounceText("기회 없음!");
             return;
         }
         //누르고 있는 동안 파워 게이지 작동
@@ -541,7 +542,7 @@ public class YutManager : NetworkBehaviour
         if (!yutStable)
         {
             Debug.Log("결과 산출 실패 : 타임아웃");
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Timeout, Throw again!");
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("시간 초과, 다시 던지세요!");
             //타임아웃나면 다시 던질 수 있게 기회 더 줌
             ThrowChanceChangeClientRpc(1, senderId);
 
@@ -552,7 +553,7 @@ public class YutManager : NetworkBehaviour
         if (isFaceError)
         {
             Debug.Log("결과 산출 실패 : 면 판단 실패");
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Failed result, Throw again!");
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("결과 오류, 다시 던지세요!");
             ThrowChanceChangeClientRpc(1, senderId);
 
             EndYutCalculatingRpc();
@@ -564,30 +565,30 @@ public class YutManager : NetworkBehaviour
             case 0:
                 AddYutResultClientRpc(YutResult.Mo, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Mo!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("모!");
                 break;
             case 1:
                 if (backDo)
                 {
                     AddYutResultClientRpc(YutResult.BackDo, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("oD!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("백도!");
                     break;
                 }
                 AddYutResultClientRpc(YutResult.Do, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Do!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("도!");
                 break;
             case 2:
                 AddYutResultClientRpc(YutResult.Gae, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Gae!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("개!");
                 break;
             case 3:
                 AddYutResultClientRpc(YutResult.Gur, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Girl!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("걸!");
                 break;
             case 4:
                 AddYutResultClientRpc(YutResult.Yut, senderId);
                 ThrowChanceChangeClientRpc(1, senderId);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("Yut!");
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("윷!");
                 break;
             default:
                 AddYutResultClientRpc(YutResult.Error, senderId);
@@ -604,6 +605,7 @@ public class YutManager : NetworkBehaviour
     {
         isCalulating = false;
         isYutFalled = false;
+        powerGauge.fillAmount = 1f;
     }
 
     [Rpc(SendTo.SpecifiedInParams)]

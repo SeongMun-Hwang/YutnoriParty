@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,16 +27,33 @@ public class ShootingBattleManager : NetworkBehaviour
     private NetworkList<int> playerScore = new NetworkList<int>(); // 플레이어들의 획득 점수
     private int topPlayerId = 0;
     private int topPlayerScore = 0;
+    private List<Vector3> starPositions = new List<Vector3>();
+    private LineRenderer lineRender;
 
     // 게임 규칙 관련
     [SerializeField] private float spawnDuration = 1.5f;
 
     // 게임 요소 관련
     [SerializeField] Camera mainCamera;
+    [SerializeField] List<GameObject> playerObjects;
     [SerializeField] GameObject StarPrefab;
+    [SerializeField] GameObject StarPointPrefab;
     [SerializeField] GameObject CursorPrefab;
 
     int colorIndex = 0;
+
+    private void Start()
+    {
+        // LineRenderer 초기화
+        lineRender = gameObject.AddComponent<LineRenderer>();
+        lineRender.positionCount = 0;
+        lineRender.startWidth = 0.02f;
+        lineRender.endWidth = 0.02f;
+        lineRender.material = new Material(Shader.Find("Sprites/Default"));
+        lineRender.startColor = Color.white;
+        lineRender.endColor = Color.white;
+    }
+
     public override void OnNetworkSpawn()
     {
         isPlaying.OnValueChanged += InitScoreBoardUI;
@@ -97,6 +115,8 @@ public class ShootingBattleManager : NetworkBehaviour
     {
         for (int i = 0; i < playerIds.Count; i++)
         {
+            int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+            playerObjects[order].SetActive(true);
             usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {
@@ -139,6 +159,7 @@ public class ShootingBattleManager : NetworkBehaviour
                 ShootableStar star = hit.collider.GetComponent<ShootableStar>();
                 if (star != null)
                 {
+                    AddStarPosition(hit.transform.position);
                     star.OnClick(crosshairColors[currentId]);
                     AddScoreServerRpc(currentId);
                 }
@@ -220,6 +241,8 @@ public class ShootingBattleManager : NetworkBehaviour
     {
         if (MinigameManager.Instance.playerType != Define.MGPlayerType.Player) { return; }
 
+        DrawConstellation();
+
         if (NetworkManager.Singleton.LocalClientId == winClientId)
         {
             winMessageUI.SetActive(true);
@@ -234,7 +257,27 @@ public class ShootingBattleManager : NetworkBehaviour
 
     public IEnumerator PassTheScene()
     {
-        yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForSecondsRealtime(4f);
         MinigameManager.Instance.EndMinigame();
+    }
+
+    public void AddStarPosition(Vector3 position)
+    {
+        starPositions.Add(position);
+    }
+
+    private void DrawConstellation()
+    {
+        if (starPositions.Count < 2) return; // 최소 두 개 이상이어야 선을 그림
+
+        lineRender.positionCount = starPositions.Count;
+        for (int i = 0; i < starPositions.Count; i++)
+        {
+            lineRender.SetPosition(i, starPositions[i]);
+            GameObject star = Instantiate(StarPointPrefab, SceneManager.GetSceneByName("ShootingScene")).GameObject();
+            star.transform.position = starPositions[i];
+        }
+
+        Debug.Log("별자리 생성 완료!");
     }
 }

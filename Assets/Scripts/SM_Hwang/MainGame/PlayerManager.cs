@@ -40,17 +40,22 @@ public class PlayerManager : NetworkBehaviour
     {
         if (YutManager.Instance.Results.Count <= 0)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Throw First!");
+            GameManager.Instance.announceCanvas.ShowAnnounceText("먼저 던지세요!");
             return;
         }
         if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0] == YutResult.BackDo && currentCharacters.Count > 0)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Cannot spawn when backdo");
+            GameManager.Instance.announceCanvas.ShowAnnounceText("백도를 이동하세요!");
             return;
         }
         if (currentCharacters.Count >= numOfCharacter)
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Character Fulled", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!", 2f);
+            return;
+        }
+        if (isMoving)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
             return;
         }
         SpawnCharacterServerRpc(GetClientIndex());
@@ -132,6 +137,10 @@ public class PlayerManager : NetworkBehaviour
     {
         if (parentNo.TryGet(out NetworkObject parent) && childNo.TryGet(out NetworkObject child))
         {
+            if(parent.GetComponent<CharacterBoardMovement>().currentNode != child.GetComponent<CharacterBoardMovement>().currentNode)
+            {
+                return;
+            }
             child.TrySetParent(parent.transform);
             int n = ++parent.GetComponent<CharacterInfo>().overlappedCount;
             parent.GetComponent<CharacterInfo>().overlappedCount += child.GetComponent<CharacterInfo>().overlappedCount;
@@ -209,5 +218,9 @@ public class PlayerManager : NetworkBehaviour
         {
             return clientList.IndexOf((ulong)targetId);
         }
+    }
+    public int ReturnNumOfCharacter()
+    {
+        return numOfCharacter;
     }
 }

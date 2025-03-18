@@ -6,6 +6,7 @@ public class HammerGameController : NetworkBehaviour
 {
     [SerializeField] Camera mainCamera;
     [SerializeField] GameObject cameraParent;
+    [SerializeField] SkinnedMeshRenderer characterRenderer;
     public float moveSpeed = 5f;
     public float mouseSensitivity = 2f;
     private bool isAttacked = false;
@@ -13,11 +14,12 @@ public class HammerGameController : NetworkBehaviour
     private float rotationX = 0f;
     private float rotationY = 0f;
     private Vector3 moveDirection;
+    private bool isHammerGameStart = false;
+    private float gravityForce = 10f;
     void Start()
     {
         animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
-        gameObject.transform.LookAt(HammerGameManager.Instance.lookAtTransform);
     }
     public override void OnNetworkSpawn()
     {
@@ -26,26 +28,30 @@ public class HammerGameController : NetworkBehaviour
             Debug.Log("set camera");
             mainCamera.gameObject.SetActive(true);
             mainCamera = Camera.main;
+            characterRenderer.enabled = false;
         }
     }
-    
+
     void Update()
     {
         if (!IsOwner) return;
         RotateWithMouse();
-        MoveCharacter();
-        HammerAttack();
+        if (isHammerGameStart)
+        {
+            MoveCharacter();
+            HammerAttack();
+        }
     }
     private void FixedUpdate()
     {
         if (!IsOwner) return;
         if (moveDirection != Vector3.zero)
         {
-            GetComponent<Rigidbody>().linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+            GetComponent<Rigidbody>().linearVelocity = moveDirection.normalized * moveSpeed + new Vector3(0, -gravityForce, 0);
         }
         else
         {
-            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, GetComponent<Rigidbody>().linearVelocity.y, 0);
+            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, -gravityForce, 0);
         }
     }
     private void RotateWithMouse()
@@ -57,7 +63,7 @@ public class HammerGameController : NetworkBehaviour
         transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
 
         rotationX -= mousey;
-        rotationX = Mathf.Clamp(rotationX, -90f, 90f);
+        rotationX = Mathf.Clamp(rotationX, -60f, 60f);
         cameraParent.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
     }
 
@@ -83,5 +89,18 @@ public class HammerGameController : NetworkBehaviour
     {
         isAttacked = false;
         animator.SetTrigger("Idle");
+    }
+    public void PlayAttackSound()
+    {
+        AudioManager.instance.Playsfx(14);
+    }
+    public void PlayHitSound()
+    {
+        AudioManager.instance.Playsfx(15);
+    }
+    [ClientRpc]
+    public void StartHammerGameClientRpc()
+    {
+        isHammerGameStart = true;
     }
 }

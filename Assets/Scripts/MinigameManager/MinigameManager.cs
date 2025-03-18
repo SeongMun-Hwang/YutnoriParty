@@ -21,15 +21,20 @@ public class MinigameManager : NetworkBehaviour
         { Define.MinigameType.RunningGame, "RunGame" },
         { Define.MinigameType.BasketGame, "BasketGame" },
         { Define.MinigameType.LuckyCalcGame, "LuckyCalcGame" },
-        {Define.MinigameType.HammerGame,"HammerGame" },
+        { Define.MinigameType.HammerGame,"HammerGame" },
+        { Define.MinigameType.GrapYutGame, "GrapYutGame" }
     };
     private Define.MinigameType gameType;
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
+    public List<ulong> playerList;
     public Define.MGPlayerType playerType;
     private bool isRandomGame = false;
 
+    [SerializeField] private List<GameObject> HideableWhenMinigame;
+
     public Camera maingameCamera;
 
+    [SerializeField] private GameObject devCheatMinigameMenuUI;
     [SerializeField] private GameObject spectatorUI;
     [SerializeField] private GameObject MinigameButtonUI;
     [SerializeField] private Animator FadeUIAnimator;
@@ -38,6 +43,7 @@ public class MinigameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
         if (IsServer)
         {
             MinigameButtonUI.SetActive(true);
@@ -112,8 +118,8 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     private void UpdateSpectatorClientRpc(ulong[] players)
     {
-        List<ulong> pl = players.ToList();
-        if (!pl.Contains(NetworkManager.Singleton.LocalClientId))
+        playerList = players.ToList();
+        if (!playerList.Contains(NetworkManager.Singleton.LocalClientId))
         {
             playerType = Define.MGPlayerType.Spectator;
             spectatorUI.SetActive(true);
@@ -211,9 +217,13 @@ public class MinigameManager : NetworkBehaviour
                 yield return new WaitUntil(() => sceneUnloaded);
             }
         }
-        maingameCamera.gameObject.SetActive(isUnloading); // 윷놀이 판 전용카메라
-        YutManager.Instance.gameObject.SetActive(isUnloading); // 윷놀이 관련 활성화
-        GameManager.Instance.playerBoard.gameObject.SetActive(isUnloading); // 메인게임 플레이어 프로필 활성화
+
+        devCheatMinigameMenuUI.SetActive(isUnloading && IsServer);
+        foreach (var go in HideableWhenMinigame)
+        {
+            go.SetActive(isUnloading);
+        }
+        
         roulette.CloseRouletteForce();
         yield return new WaitForSecondsRealtime(duration);
         FadeUIAnimator.SetTrigger("FadeIn");

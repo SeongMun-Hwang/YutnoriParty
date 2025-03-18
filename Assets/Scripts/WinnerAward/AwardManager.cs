@@ -22,23 +22,34 @@ public class AwardManager : MonoBehaviour
 
     public void BackToLobby()
     {
-        // TODO : 각종 싱글톤 및 게임 데이터를 삭제하고 타이틀로 돌아가기
         if (NetworkManager.Singleton.IsHost)
         {
+            CleanupNetworkObjects();
             HostSingleton.Instance.ShutDown();
         }
+
         if (NetworkManager.Singleton.IsConnectedClient)
         {
             NetworkManager.Singleton.Shutdown();
         }
-        if (FindFirstObjectByType<HostSingleton>() != null)
-            Destroy(FindFirstObjectByType<HostSingleton>().gameObject);
 
-        if (FindFirstObjectByType<ClientSingleton>() != null)
-            Destroy(FindFirstObjectByType<ClientSingleton>().gameObject);
-
-        if (FindFirstObjectByType<ServerSingleton>() != null)
-            Destroy(FindFirstObjectByType<ServerSingleton>().gameObject);
         SceneManager.LoadScene("MenuScene");
+    }
+
+    public void CleanupNetworkObjects()
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            List<NetworkObject> spawnedObjects = new List<NetworkObject>(NetworkManager.Singleton.SpawnManager.SpawnedObjects.Values);
+
+            foreach (var networkObject in spawnedObjects)
+            {
+                if (networkObject.IsSpawned)
+                {
+                    networkObject.Despawn();
+                    Destroy(networkObject.gameObject);
+                }
+            }
+        }
     }
 }

@@ -44,7 +44,7 @@ public class RouletteController : NetworkBehaviour
         RoulettePanel.SetActive(true);
         if (IsServer)
         {
-            Debug.Log("롤렛 돌리자");
+            Debug.Log($"{itemCount}개 중에서 롤렛 돌리자");
             int durationFactor = 5;
             int minRoll = itemCount * durationFactor;
             int minigameIndex = UnityEngine.Random.Range(0, itemCount);

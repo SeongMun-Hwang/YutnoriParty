@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6061753081334807143}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0.1}
+  m_LocalPosition: {x: 0, y: 2, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -240,6 +240,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5433593347150352624}
   m_SourcePrefab: {fileID: 100100000, guid: 5a018996525816848ba1def434e55708, type: 3}
+--- !u!137 &32882857359737588 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -9218786167795494850, guid: 5a018996525816848ba1def434e55708, type: 3}
+  m_PrefabInstance: {fileID: 28314735114146506}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &571430931116471585 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5a018996525816848ba1def434e55708, type: 3}
@@ -320,9 +325,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -332,7 +337,7 @@ MonoBehaviour:
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
-  SlerpPosition: 0
+  SlerpPosition: 1
 --- !u!54 &-7453452767955873184
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -355,7 +360,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
@@ -367,7 +372,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911400357625491355}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: d6b14c5ba01953142a93dab78f3f5938, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -413,6 +418,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   mainCamera: {fileID: 4559912599829660117}
   cameraParent: {fileID: 7941329985998705046}
+  characterRenderer: {fileID: 32882857359737588}
+  hammer: {fileID: 5938523101061291562}
   moveSpeed: 5
   mouseSensitivity: 2
 --- !u!4 &1626003368976438707 stripped

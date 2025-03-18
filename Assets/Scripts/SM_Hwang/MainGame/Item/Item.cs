@@ -2,9 +2,10 @@ using System.Collections;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Item : MonoBehaviour
+public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private Button button;
     private bool isToggled = false;
@@ -113,5 +114,37 @@ public class Item : MonoBehaviour
     public ItemName GetItemName()
     {
         return itemName;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (TooltipManager.Instance.IsTooltipActive()) return;
+        switch (itemName)
+        {
+            case ItemName.ChanceUp:
+                TooltipManager.Instance.DrawTooltip("한번 더!", "당신이 윷을 한 번 더 던질 수 있는 기회가 주어집니다.");
+                break;
+            case ItemName.ReverseMove:
+                TooltipManager.Instance.DrawTooltip("반대 이동", "선택한 상대방의 말의 이동방향을 딱 한 번 반대로 설정합니다.");
+                break;
+            case ItemName.Obstacle:
+                TooltipManager.Instance.DrawTooltip("장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.");
+                break;
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        TooltipManager.Instance.EraseTooltip();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        TooltipManager.Instance.EraseTooltip();
+    }
+
+    public void OnDestroy()
+    {
+        TooltipManager.Instance.EraseTooltip();
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerBoard : NetworkBehaviour
 {
@@ -170,6 +171,41 @@ public class PlayerBoard : NetworkBehaviour
             }
         }   
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DrawEmojiServerRpc(ulong targetId, int emojiCode)
+    {
+        DrawEmojiClientRpc(targetId, emojiCode);
+    }
+
+    [ClientRpc]
+    public void DrawEmojiClientRpc(ulong targetId, int emojiCode)
+    {
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            if (profile.clientId == targetId)
+            {
+                profile.DrawEmoji(emojiCode);
+            }
+        }
+    }
+
+    public int GetOrderOfPlayerById(ulong id)
+    {
+        int i = 0;
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            if (profile.clientId == id)
+            {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
     public void ClearAllProfiles()
     {
         if (IsServer)

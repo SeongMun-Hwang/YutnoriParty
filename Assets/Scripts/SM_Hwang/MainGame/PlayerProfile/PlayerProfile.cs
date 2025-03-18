@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
@@ -15,6 +16,8 @@ public class PlayerProfile : MonoBehaviour
     public Transform CharacterIconList;
     public Image ProfileImage;
     public Image ProfileImageBackground;
+    public Image TopEmojiSlot;
+    public Image BottomEmojiSlot;
     public ulong clientId;
     public FixedString128Bytes username;
     public int score;
@@ -34,6 +37,30 @@ public class PlayerProfile : MonoBehaviour
     {
         ProfileImageBackground.color = ProfileColor[transform.GetSiblingIndex()];
         ProfileImage.sprite = ProfileSpriteList[transform.GetSiblingIndex()];
+    }
+
+    public void DrawEmoji(int code)
+    {
+        StartCoroutine(DrawEmojiCoroutine(code));
+    }
+
+    private IEnumerator DrawEmojiCoroutine(int code)
+    {
+        //Debug.Log(code);
+        if (transform.GetSiblingIndex() < 2)
+        {
+            TopEmojiSlot.transform.parent.gameObject.SetActive(true);
+            TopEmojiSlot.sprite = GameManager.Instance.emojiList[code];
+            yield return new WaitForSecondsRealtime(4f);
+            TopEmojiSlot.transform.parent.gameObject.SetActive(false);
+        }
+        else
+        {
+            BottomEmojiSlot.transform.parent.gameObject.SetActive(true);
+            BottomEmojiSlot.sprite = GameManager.Instance.emojiList[code];
+            yield return new WaitForSecondsRealtime(4f);
+            BottomEmojiSlot.transform.parent.gameObject.SetActive(false);
+        }
     }
 
     private void SetScoreIcon()
