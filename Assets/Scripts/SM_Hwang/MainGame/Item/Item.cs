@@ -21,7 +21,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     void ToggleState()
     {
         Item currentItem = ItemManager.Instance.ReturnCurrentItem();
-        if (currentItem != null && currentItem!=this)
+        if (currentItem != null && currentItem != this)
         {
             currentItem.isToggled = !isToggled;
             currentItem.button.GetComponent<Image>().color = Color.white;
@@ -35,15 +35,15 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             if (itemName == ItemName.ChanceUp)
             {
                 YutManager.Instance.throwChance++;
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("기회 +1", 2f);
+                ItemManager.Instance.ItemUseAnnounceServerRpc("한 번 더", NetworkManager.Singleton.LocalClientId);
                 ItemManager.Instance.RemoveItem();
             }
             if (itemName == ItemName.ReverseMove)
             {
-                GameManager.Instance.announceCanvas.ShowAnnounceText("Choose target!",2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceText("Choose target!", 2f);
                 coroutine = StartCoroutine(ChooseTarget());
             }
-            if(itemName == ItemName.Obstacle)
+            if (itemName == ItemName.Obstacle)
             {
                 GameManager.Instance.announceCanvas.ShowAnnounceText("Choose Node!", 2f);
                 coroutine = StartCoroutine(ChooseNode());
@@ -71,6 +71,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                     {
                         if (no.OwnerClientId != NetworkManager.Singleton.LocalClientId)
                         {
+                            ItemManager.Instance.ItemUseAnnounceServerRpc("혼란", NetworkManager.Singleton.LocalClientId);
                             Debug.Log("Find target");
                             ItemManager.Instance.RemoveItem();
                             ItemManager.Instance.SpawnItemEffectServerRpc(no);
@@ -95,6 +96,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                     if (hit.collider.TryGetComponent<Node>(out Node no))
                     {
                         Debug.Log("Find Node");
+                        ItemManager.Instance.ItemUseAnnounceServerRpc("장애물", NetworkManager.Singleton.LocalClientId);
                         ItemManager.Instance.SetObstacleServerRpc(no.transform.position);
                         ItemManager.Instance.RemoveItem();
                     }
@@ -105,7 +107,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     }
     public bool IsToggled()
     {
-        return isToggled;   
+        return isToggled;
     }
     public void SetItemName(ItemName name)
     {
@@ -125,7 +127,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                 TooltipManager.Instance.DrawTooltip("한번 더!", "당신이 윷을 한 번 더 던질 수 있는 기회가 주어집니다.");
                 break;
             case ItemName.ReverseMove:
-                TooltipManager.Instance.DrawTooltip("반대 이동", "선택한 상대방의 말의 이동방향을 딱 한 번 반대로 설정합니다.");
+                TooltipManager.Instance.DrawTooltip("혼란", "선택한 상대방의 말의 이동방향을 딱 한 번 반대로 설정합니다.");
                 break;
             case ItemName.Obstacle:
                 TooltipManager.Instance.DrawTooltip("장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.");

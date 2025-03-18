@@ -223,4 +223,19 @@ public class PlayerManager : NetworkBehaviour
     {
         return numOfCharacter;
     }
+    public string RetrunPlayerName(ulong clientId=99)
+    {
+        string playerName;
+        if (clientId == 99)
+        {
+            playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(NetworkManager.Singleton.LocalClientId)].userName.ToString();
+        }
+        else
+        {
+            playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(clientId)].userName.ToString();
+        }
+        int index = playerName.IndexOf("#");
+        playerName = playerName.Substring(0, index);
+        return playerName;
+    }
 }

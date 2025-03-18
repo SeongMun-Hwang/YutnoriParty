@@ -135,4 +135,10 @@ public class ItemManager : NetworkBehaviour
             Destroy(go);
         }
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void ItemUseAnnounceServerRpc(string text, ulong clientId)
+    {
+        string playerName = PlayerManager.Instance.RetrunPlayerName(clientId);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(playerName + "가 " + text + " 아이템을 사용했습니다!", 2f);
+    }
 }
