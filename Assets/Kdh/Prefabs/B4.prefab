@@ -236,7 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  moveSpeed: 5
+  moveSpeed: 10
   canMove:
     m_InternalValue: 0
   spawnPosition: {x: 100, y: 0, z: 65}
