@@ -60,13 +60,6 @@ public class PlayerManager : NetworkBehaviour
         }
         SpawnCharacterServerRpc(GetClientIndex());
     }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Keypad5))
-        {
-            Debug.Log(GetClientIndex());
-        }
-    }
     [ServerRpc(RequireOwnership = false)]
     public void SpawnCharacterServerRpc(int index, ServerRpcParams rpcParams = default)
     {
@@ -222,5 +215,20 @@ public class PlayerManager : NetworkBehaviour
     public int ReturnNumOfCharacter()
     {
         return numOfCharacter;
+    }
+    public string RetrunPlayerName(ulong clientId=99)
+    {
+        string playerName;
+        if (clientId == 99)
+        {
+            playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(NetworkManager.Singleton.LocalClientId)].userName.ToString();
+        }
+        else
+        {
+            playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(clientId)].userName.ToString();
+        }
+        int index = playerName.IndexOf("#");
+        playerName = playerName.Substring(0, index);
+        return playerName;
     }
 }

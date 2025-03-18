@@ -46,6 +46,7 @@ public class ItemManager : NetworkBehaviour
     [ClientRpc]
     public void GetItemClientRpc(ulong targetId)
     {
+        if (targetId == 99) return;
         Debug.Log("Player" + targetId + "Get Item");
         if (NetworkManager.Singleton.LocalClientId != targetId) return;
         GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
@@ -134,5 +135,11 @@ public class ItemManager : NetworkBehaviour
             go.GetComponent<NetworkObject>().Despawn();
             Destroy(go);
         }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void ItemUseAnnounceServerRpc(string text, ulong clientId)
+    {
+        string playerName = PlayerManager.Instance.RetrunPlayerName(clientId);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(playerName + "가 " + text + " 아이템을 사용했습니다!", 2f);
     }
 }
