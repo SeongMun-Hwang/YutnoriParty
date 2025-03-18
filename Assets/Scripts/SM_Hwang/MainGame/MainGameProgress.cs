@@ -174,7 +174,6 @@ public class MainGameProgress : NetworkBehaviour
 
         if (currentCharacter == null) return false;
         Collider[] hitColliders = Physics.OverlapSphere(currentCharacter.transform.position, 1f);
-        Debug.Log("hit colliers : " + hitColliders.Length);
         foreach (Collider collider in hitColliders)
         {
             if (collider.gameObject == currentCharacter.gameObject) continue;
@@ -492,25 +491,33 @@ public class MainGameProgress : NetworkBehaviour
             {
                 Debug.Log("Attacker Win / Enemy Lose");
 
-                //승자가 섬을 바로 탈출
+                AddThrowChanceClientRpc(winnerId);
                 if (isIslandBattle)
                 {
                     EventNodeManager.Instance.EscapeIslandCallRpc(playerNetObj);
+                    EventNodeManager.Instance.EscapeIslandCallRpc(enemy.GetComponent<NetworkObject>());
+                }
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
+                if (isIslandBattle)
+                {
                     return;
                 }
-                AddThrowChanceClientRpc(winnerId);
-                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
             }
             else
             {
                 Debug.Log("Attacker Lose / Enemy Win");
+
                 //승자가 섬을 바로 탈출
                 if (isIslandBattle)
                 {
                     EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
-                    return;
+                    EventNodeManager.Instance.EscapeIslandCallRpc(player.GetComponent<NetworkObject>());
                 }
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
+                if (isIslandBattle)
+                {
+                    return;
+                }
             }
         });
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
