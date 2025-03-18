@@ -70,15 +70,20 @@ public class LobbyList : MonoBehaviour
                     )
             };
             QueryResponse lobbies=await LobbyService.Instance.QueryLobbiesAsync(options);
-            foreach(Transform child in lobbyItemParent)
+
+            if (lobbyItemParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in lobbyItemParent)
+                {
+                    Destroy(child.gameObject);
+                }
+                foreach (Lobby lobby in lobbies.Results)
+                {
+                    LobbyItem lobbyItem = Instantiate(lobbyItemPrefab, lobbyItemParent);
+                    lobbyItem.SetItem(this, lobby);
+                }
             }
-            foreach(Lobby lobby in lobbies.Results)
-            {
-                LobbyItem lobbyItem = Instantiate(lobbyItemPrefab, lobbyItemParent);
-                lobbyItem.SetItem(this, lobby);
-            }
+            
 
         }
         catch (LobbyServiceException e)
