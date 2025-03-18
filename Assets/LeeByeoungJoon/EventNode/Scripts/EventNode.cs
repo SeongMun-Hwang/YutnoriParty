@@ -79,7 +79,7 @@ public class EventNode : NetworkBehaviour
         {
             //Debug.Log("목록에 있는 id : " + character.GetComponent<NetworkObject>().NetworkObjectId + " 트리거 들어온놈 id + " + enteredCharacter.NetworkObjectId);
 
-            if (character.GetComponent<NetworkObject>().NetworkObjectId == enteredPlayer.NetworkObjectId)
+            if (character.GetComponent<NetworkObject>() == enteredPlayer)
             {
                 //찾음
                 //Debug.Log("목록에서 찾음");
