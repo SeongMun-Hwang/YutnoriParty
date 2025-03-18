@@ -10,15 +10,26 @@ public class NetworkParticle : NetworkBehaviour
 
     private void Awake()
     {
+        //InitParticleRpc();
+    }
+    public override void OnNetworkSpawn()
+    {
+        PlayParticleRpc();
+        DespawnSelf();
+    }
+
+    [Rpc(SendTo.Server)]
+    void InitParticleRpc()
+    {
         duration = particle.main.duration;
         networkObject = GetComponent<NetworkObject>();
         networkObject.Spawn();
     }
 
-    public override void OnNetworkSpawn()
+    [Rpc(SendTo.ClientsAndHost)]
+    void PlayParticleRpc()
     {
         particle.gameObject.SetActive(true); //파티클 재생
-        DespawnSelf();
     }
 
     //파티클 지속시간 후에 스스로 디스폰

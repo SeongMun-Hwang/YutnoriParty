@@ -83,7 +83,7 @@ public class BlackHoleNode : EventNode
         Debug.Log("블랙홀 휴식시작");
 
         //블랙홀 작동 애니메이션 실행
-
+        AudioManager.instance.Playsfx(17);
 
         //캐릭터들 이동
         List<CharacterBoardMovement> list = new List<CharacterBoardMovement>();
