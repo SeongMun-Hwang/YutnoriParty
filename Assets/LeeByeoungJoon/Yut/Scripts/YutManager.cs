@@ -222,12 +222,14 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    throwChance++;
-        //    Debug.Log(throwChance);
-        //    //YutResultCount();
-        //}
+        if (!IsOwner) return; //오너 아니면 리턴
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            throwChance++;
+            Debug.Log(throwChance);
+            //YutResultCount();
+        }
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
@@ -685,10 +687,15 @@ public class YutManager : NetworkBehaviour
         //윷 던지는거 요청한 클라이언트의 윷 결과창을 갱신
         if (senderId == NetworkManager.Singleton.LocalClientId)
         {
+            Debug.Log("윷 결과 스폰 요청");
+
             results.Add(result);
+            //SpawnYutResultServerRpc(result, senderId);
             //SetViewportTransform();
-            Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
         }
+        var yutResult = Instantiate(yutResultPrefab, yutResultContent.transform);
+        yutResult.SetYutText(result);
+        yutResult.SetClientId(senderId);
     }
 
     //리스트에서 윷 결과 삭제
@@ -697,6 +704,22 @@ public class YutManager : NetworkBehaviour
         //Debug.Log("id : " + NetworkManager.Singleton.LocalClientId + "" + result + "삭제");
         results.Remove(result);
         //SetViewportTransform();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SpawnYutResultServerRpc(YutResult result, ulong senderId)
+    {
+        Debug.Log("윷 결과 스폰");
+        var yutResult = Instantiate(yutResultPrefab);
+        yutResult.SetYutText(result);
+        var no = yutResult.GetComponent<NetworkObject>();
+        no.SpawnWithOwnership(senderId);
+
+        if (no.TrySetParent(yutResultContent.transform))
+        {
+            Debug.Log("부모 설정 성공");
+        }
+
     }
 
     //윷 결과를 중앙에 정렬하기 위한 함수

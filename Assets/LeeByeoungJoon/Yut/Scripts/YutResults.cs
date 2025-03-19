@@ -10,7 +10,11 @@ public class YutResults : NetworkBehaviour
     [SerializeField] TextMeshProUGUI yutText;
     [SerializeField] List<Color32> yutColors;
     [SerializeField] List<string> yutNames;
+
+    ulong targetId;
+
     YutResult yutResult;
+
     public void SetYutText(YutResult result)
     {
         yutResult = result;
@@ -18,10 +22,20 @@ public class YutResults : NetworkBehaviour
         yutText.text = yutNames[(int)result];
     }
 
+    public void SetClientId(ulong id)
+    {
+        targetId = id;
+    }
+
     public void OnButtonPressed()
     {
         AudioManager.instance.Playsfx(13);
 
+        if (NetworkManager.Singleton.LocalClientId != targetId)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 플레이어의 턴입니다!");
+            return;
+        }
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
@@ -113,5 +127,12 @@ public class YutResults : NetworkBehaviour
 
         //버튼 없앰
         Destroy(gameObject);
+        DestroyYutResultRpc();
+    }
+
+    [Rpc(SendTo.NotMe)]
+    void DestroyYutResultRpc()
+    {
+        Debug.Log(gameObject);
     }
 }
