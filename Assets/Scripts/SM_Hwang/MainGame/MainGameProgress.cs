@@ -193,9 +193,7 @@ public class MainGameProgress : NetworkBehaviour
                         return false;
                     }
                     PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
-                    currentCharacter.GetComponent<Outline>().DisableOutline();
-                    currentCharacter = character;
-                    character.GetComponent<Outline>().EnableOutline();
+                    ChangeCurrentPlayer(character.gameObject);
                     return false;
                 }
             }
@@ -421,9 +419,7 @@ public class MainGameProgress : NetworkBehaviour
             PlayerManager.Instance.OverlapCharacter(characters[0], characters[i]); //겹치고
             characters[i].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
         }
-
-        currentCharacter = characters[0].GetComponent<CharacterBoardMovement>(); //현재 캐릭터 제일 밑에 있는애로 바꿔주고
-        characters[0].GetComponent<Outline>().EnableOutline(); //밑에 있는 애 아웃라인 켜고
+        ChangeCurrentPlayer(characters[0]);
     }
 
     /*캐릭터 선택*/
@@ -453,7 +449,7 @@ public class MainGameProgress : NetworkBehaviour
                             currentCharacter.GetComponent<Outline>().DisableOutline();
                         }
                         hit.collider.gameObject.GetComponent<Outline>().EnableOutline();
-                        currentCharacter = character;
+                        ChangeCurrentPlayer(character.gameObject);
                     }
                 }
             }
@@ -631,5 +627,17 @@ public class MainGameProgress : NetworkBehaviour
                 PlayerManager.Instance.DespawnCharacterServerRpc(go, go.GetComponent<NetworkObject>().OwnerClientId);
             }
         }
+    }
+    public void ChangeCurrentPlayer(GameObject nextCharacter)
+    {
+        if(currentCharacter != null)
+        {
+            currentCharacter.GetComponent<CharacterInfo>().SetPyramidServerRpc(false);
+            currentCharacter.GetComponent<Outline>().DisableOutline();
+        }
+
+        currentCharacter = nextCharacter.GetComponent<CharacterBoardMovement>();
+        currentCharacter.GetComponent<CharacterInfo>().SetPyramidServerRpc(true);
+        currentCharacter.GetComponent<Outline>().EnableOutline();
     }
 }

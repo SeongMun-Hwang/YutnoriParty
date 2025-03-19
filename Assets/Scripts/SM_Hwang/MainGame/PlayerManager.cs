@@ -85,8 +85,7 @@ public class PlayerManager : NetworkBehaviour
         {
             MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
         }
-        MainGameProgress.Instance.currentCharacter = no.GetComponent<CharacterBoardMovement>();
-        no.GetComponent<Outline>().EnableOutline();
+        MainGameProgress.Instance.ChangeCurrentPlayer(no.gameObject);
     }
 
     [ServerRpc(RequireOwnership = default)]
