@@ -17,6 +17,7 @@ public class YutGrabGameManager : NetworkBehaviour
     [SerializeField] private GameObject drawMessageUI;
     [SerializeField] private GameObject loseMessageUI;
     [SerializeField] private GameObject howToPlayUI;
+    [SerializeField] private GameObject guidePanel;
 
     //카메라 UI
     [SerializeField] Canvas camOutlineCanvas;
@@ -293,6 +294,7 @@ public class YutGrabGameManager : NetworkBehaviour
     void DeactiveHowToPlayUIRpc()
     {
         howToPlayUI.SetActive(false);
+        guidePanel.SetActive(false);
     }
 
     [Rpc(SendTo.Server)]

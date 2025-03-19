@@ -130,13 +130,17 @@ public class HammerGameManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
             yield return null;
         }
-        guidePanel.SetActive(false);
         foreach (GameObject player in playingCharacters)
         {
             player.GetComponent<HammerGameController>().StartHammerGameClientRpc();
         }
         StartCoroutine(PillarScaleDecrease());
-
+        CloseGuidePanelClientRpc();
+    }
+    [ClientRpc]
+    private void CloseGuidePanelClientRpc()
+    {
+        guidePanel.SetActive(false);
     }
     private IEnumerator PillarScaleDecrease()
     {
