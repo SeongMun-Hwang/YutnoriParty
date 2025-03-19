@@ -67,6 +67,7 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            if (MainGameProgress.Instance.isGameEnd.Value) { return; }
             if (!isRandomGame)
             {
                 StartMiniGameClientRpc();
@@ -142,6 +143,8 @@ public class MinigameManager : NetworkBehaviour
     // 참가자의 목록만 인자로 지정해주면 나머지는 자동으로 관전자로 정해짐
     public void SetPlayers(ulong[] players)
     {
+        if (NetworkManager.Singleton.IsServer && MainGameProgress.Instance.isGameEnd.Value) { return; }
+
         playerTypes = new Dictionary<ulong, Define.MGPlayerType>();
         maxPlayers.Value = players.Length;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
