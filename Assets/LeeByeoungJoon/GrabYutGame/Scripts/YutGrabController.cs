@@ -1,12 +1,15 @@
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class YutGrabController : NetworkBehaviour
 {
-    public float result;
+    public float result = 10000;
     bool isGrabbed = false;
     bool isSpacePressed = false;
     bool isPlaying = false;
+    bool inRange = false;
+    bool resultSent = false;
     float gravity = 4f;
     float minYutHeight = 4;
     float maxYutHeight = 8;
@@ -63,9 +66,20 @@ public class YutGrabController : NetworkBehaviour
         {
             length = yut.yutTop.position.y - handPos.position.y;
             //Debug.Log(NetworkManager.Singleton.LocalClientId + "번 플레이어 기록 : " + length);
+            
+            if(yut.yutBottom.position.y < handPos.position.y + 0.0236f && length > 0)
+            {
+                //Debug.Log("범위 안임");
+                inRange = true;
+            }
+            else
+            {
+                //Debug.Log("범위 밖임");
+                inRange = false;
+            }
 
             //손 아래로 떨어져버리면 기회 없음
-            if (length < 0)
+            if (length < 0 && !resultSent)
             {
                 SendResult();
                 //Debug.Log("놓침!");
@@ -74,8 +88,8 @@ public class YutGrabController : NetworkBehaviour
             //이미 스페이스바 눌렀으면 조작 불가
             if (!isSpacePressed)
             {
-                //스페이스바 누르면 윷을 잡음
-                if (Input.GetKeyDown(KeyCode.Space))
+                //스페이스바 or 클릭 누르면 윷을 잡음
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
                 {
                     //Debug.Log("스페이스바 누름");
                     GrabYut();
@@ -107,13 +121,15 @@ public class YutGrabController : NetworkBehaviour
         Debug.Log("잡아라!");
         isSpacePressed = true;
         animator.SetBool("DoGrab", true);
-        result = length;
-        Debug.Log("기록 : " +  result);
-        
-        //결과가 양수면 잡음
-        if(result > 0)
+
+        //손 범위 안에 들어왔을때만 기록
+        if (inRange)
         {
+            result = length;
+            Debug.Log("기록 : " + result);
+
             isGrabbed = true;
+            AudioManager.instance.Playsfx(18); //본인한테만 소리 재생
             Debug.Log("잡음!");
         }
 
@@ -122,9 +138,10 @@ public class YutGrabController : NetworkBehaviour
 
     void SendResult()
     {
-        isPlaying = false;
+        //isPlaying = false;
+        resultSent = true;
 
-        //못잡으면 기록 안되게 함
+        //잡으면 기록
         if (isGrabbed)
         {
             YutGrabGameManager.Instance.SendReultRpc(result, NetworkManager.Singleton.LocalClientId);

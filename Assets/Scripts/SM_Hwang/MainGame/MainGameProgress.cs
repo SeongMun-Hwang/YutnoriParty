@@ -68,7 +68,7 @@ public class MainGameProgress : NetworkBehaviour
     {
         Debug.Log("Start Turn");
         GameManager.Instance.playerBoard.SetProfileOutlineClientRpc(NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
-        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + currentPlayerNumber.Value + "턴!", 2f);
+        GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName((ulong)n)+ "턴!", 2f);
         SpawnInGameCanvasClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)n } } });
     }
     /*UI 소환*/
@@ -187,6 +187,11 @@ public class MainGameProgress : NetworkBehaviour
                 }
                 else if (character.GetComponent<NetworkObject>().OwnerClientId == NetworkManager.Singleton.LocalClientId)//내 말이면
                 {
+                    if (character.GetComponent<CharacterBoardMovement>().currentNode != currentCharacter.GetComponent<CharacterBoardMovement>().currentNode)
+                    {
+                        Debug.Log("말 업기 실패 - 위치가 같지 않음 ");
+                        return false;
+                    }
                     PlayerManager.Instance.OverlapCharacter(character.gameObject, currentCharacter.gameObject);
                     currentCharacter.GetComponent<Outline>().DisableOutline();
                     currentCharacter = character;
@@ -221,7 +226,8 @@ public class MainGameProgress : NetworkBehaviour
 
         isWaitMinigameEnd = false;
     }
-    /*모든 유저 턴이 한 번 씩 진행됐는지 확인*/
+    /*모든 유저 턴
+     * 이 한 번 씩 진행됐는지 확인*/
     //다 지나갔으면 파티게임 진행
     private void CheckAllPlayerTurnPassed()
     {
@@ -339,7 +345,7 @@ public class MainGameProgress : NetworkBehaviour
             List<NetworkObjectReference> winnerCharacters = new List<NetworkObjectReference>();
 
             //미니 게임 승자 판별
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + winnerId + "승리!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
             //캐릭터 처리
             foreach (var characterRef in characterList)
             {
@@ -478,37 +484,78 @@ public class MainGameProgress : NetworkBehaviour
         bool isIslandBattle = (playerNetObj.GetComponent<CharacterInfo>().inIsland.Value || enemyNetObj.GetComponent<CharacterInfo>().inIsland.Value);
         Debug.Log("섬 전투임? : " + isIslandBattle);
 
+        if (isIslandBattle)
+        {
+            EventNodeManager.Instance.islandBattleExcuting.Value = true;
+        }
+
         // 미니 게임이 끝났을 때 서버에서 발생시킬 이벤트를 지정
         endMinigameActions = null;
         endMinigameActions += (() =>
         {
             EndMiniGameClientRpc();
 
+            //무승부나면 둘 다 사망
+            if(winnerId == 99)
+            {
+                Debug.Log("Attacker Draw / Enemy Draw");
+                ulong playerId = playerNetObj.OwnerClientId;
+                ulong enemyId = enemyNetObj.OwnerClientId;
+
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.EscapeIslandCallRpc(playerNetObj);
+                    EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
+                }
+
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("무승부!", 2f);
+
+                PlayerManager.Instance.DespawnCharacterServerRpc(player, playerId);
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemyId);
+
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
+                }
+
+                return;
+            }
+
             //미니 게임 승자 판별과 패배한 말 처리
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + winnerId + "승리!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
             if (winnerId == playerNetObj.OwnerClientId)
             {
                 Debug.Log("Attacker Win / Enemy Lose");
 
-                //승자가 섬을 바로 탈출
+                AddThrowChanceClientRpc(winnerId);
                 if (isIslandBattle)
                 {
                     EventNodeManager.Instance.EscapeIslandCallRpc(playerNetObj);
+                    EventNodeManager.Instance.EscapeIslandCallRpc(enemy.GetComponent<NetworkObject>());
+                }
+                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
                     return;
                 }
-                AddThrowChanceClientRpc(winnerId);
-                PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemy.GetComponent<NetworkObject>().OwnerClientId);
             }
             else
             {
                 Debug.Log("Attacker Lose / Enemy Win");
+
                 //승자가 섬을 바로 탈출
                 if (isIslandBattle)
                 {
                     EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
-                    return;
+                    EventNodeManager.Instance.EscapeIslandCallRpc(player.GetComponent<NetworkObject>());
                 }
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, player.GetComponent<NetworkObject>().OwnerClientId);
+                if (isIslandBattle)
+                {
+                    EventNodeManager.Instance.islandBattleExcuting.Value = false;
+                    return;
+                }
             }
         });
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
@@ -533,7 +580,14 @@ public class MainGameProgress : NetworkBehaviour
             EndMiniGameClientRpc();
 
             //미니 게임 승자 판별과 패배한 말 처리
-            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("플레이어 " + winnerId + "승리!", 2f);
+            if (winnerId != 99)
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(winnerId) + "승리!", 2f);
+            }
+            else
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("무승부!", 2f);
+            }
             ItemManager.Instance.GetItemClientRpc(winnerId);
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());

@@ -7,6 +7,10 @@ public class Yut : NetworkBehaviour
     [HideInInspector] public Vector3 originPos;
     [HideInInspector] public Quaternion originRot;
     float torque = 1f;
+    float smallSoundPower = 2f;
+    float middleSoundPower = 7f;
+    float largeSoundPower = 12f;
+
     public float torqueSign = 0;
 
     //[SerializeField] new Collider collider;
@@ -26,6 +30,17 @@ public class Yut : NetworkBehaviour
     bool isVertical = false;
     public bool IsVertical { get { return isVertical; } }
     
+    private bool _soundActivated = false;
+    public bool soundActivated
+    {
+        get { return _soundActivated; }
+        set
+        {
+            Debug.Log($"soundActivated 값 변경 : {_soundActivated} -> {value}");
+            _soundActivated = value;
+        }
+    }
+
 
     private void Awake()
     {
@@ -53,7 +68,43 @@ public class Yut : NetworkBehaviour
             }
         }
 
+        //사운드 활성화 안되어있으면 소리 안나게
+        if (!soundActivated) return;
+
+        //Debug.Log("소리 날거임");
+
+        if(collision.gameObject.tag != "Player") //플레이어는 말랑하니까 나무소리 안남
+        {
+            //Debug.Log("플레이어 아님");
+
+            float collisionPower = collision.relativeVelocity.magnitude;
+            //Debug.Log("힘: " + collisionPower);
+            if (collisionPower > smallSoundPower)
+            {
+                //Debug.Log("소리 조건 충족");
+
+                PlayYutSoundRpc(collisionPower);
+            }
+        }
+        
         //isGrounded = true;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void PlayYutSoundRpc(float power)
+    {
+        if(power > largeSoundPower)
+        {
+            AudioManager.instance.Playsfx(20);
+        }
+        else if(power > middleSoundPower)
+        {
+            AudioManager.instance.Playsfx(21);
+        }
+        else //제일 작은 소리
+        {
+            AudioManager.instance.Playsfx(19);
+        }
     }
 
     private void OnCollisionExit(Collision collision)

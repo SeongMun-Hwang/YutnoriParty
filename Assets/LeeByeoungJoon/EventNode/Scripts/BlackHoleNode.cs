@@ -83,7 +83,8 @@ public class BlackHoleNode : EventNode
         Debug.Log("블랙홀 휴식시작");
 
         //블랙홀 작동 애니메이션 실행
-
+        //사운드 재생
+        PlayBlackHoleSoundRpc(17);
 
         //캐릭터들 이동
         List<CharacterBoardMovement> list = new List<CharacterBoardMovement>();
@@ -100,7 +101,12 @@ public class BlackHoleNode : EventNode
 
         for (int i = 0; i < targetNodes.Count; i++)
         {
-            list.AddRange(targetNodes[i].GetCharacters());
+            var targets = targetNodes[i].GetCharacters();
+            if(targets == null)
+            {
+                continue;
+            }
+            list.AddRange(targets);
         }
 
         characterCount.Value = list.Count;
@@ -180,10 +186,14 @@ public class BlackHoleNode : EventNode
     public void BlackHoleEventEndRpc()
     {
         isProcessing.Value = false;
+        enteredPlayers.Clear();
         EventEndRpc();
 
         //블랙홀 쪼그라드는 애니메이션 실행
-        PlayBlackHoleShirinkAnimation();
+        if (isPaused.Value)
+        {
+            PlayBlackHoleShirinkAnimation();
+        }
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -272,14 +282,20 @@ public class BlackHoleNode : EventNode
         PlayBlackHoleGrowAnimation();
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    void PlayBlackHoleSoundRpc(int idx)
+    {
+        AudioManager.instance.Playsfx(idx);
+    }
+
     void PlayBlackHoleGrowAnimation()
     {
-        animator.SetBool("isShrinked", true);
+        animator.SetBool("isShrinked", false);
     }
 
     void PlayBlackHoleShirinkAnimation()
     {
-        animator.SetBool("isShrinked", false);
+        animator.SetBool("isShrinked", true);
     }
 
     void PlayBlackHoleWorkingAnimation()

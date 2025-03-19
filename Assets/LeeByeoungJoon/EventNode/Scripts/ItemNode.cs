@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ItemNode : EventNode
 {
-    [SerializeField] NetworkParticle getEffect;
+    [SerializeField] GameObject getEffect;
     [SerializeField] Transform effectPos;
 
     [Rpc(SendTo.Server)]
@@ -27,10 +27,19 @@ public class ItemNode : EventNode
 
         Debug.Log(character.OwnerClientId + "플레이어 아이템 획득");
 
-        Instantiate(getEffect, effectPos); //파티클 재생
+        
+        GameObject go = Instantiate(getEffect, effectPos); //파티클 재생
+        go.GetComponent<NetworkObject>().Spawn();
+        PlayItemSoundRpc(16);
 
         ItemManager.Instance.GetItemClientRpc(character.OwnerClientId);
         DeactiveNodeRpc();
         EventEndRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void PlayItemSoundRpc(int idx)
+    {
+        AudioManager.instance.Playsfx(idx);
     }
 }

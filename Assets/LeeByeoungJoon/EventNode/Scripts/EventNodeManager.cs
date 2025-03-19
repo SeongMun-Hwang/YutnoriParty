@@ -45,6 +45,7 @@ public class EventNodeManager : NetworkBehaviour
     public static EventNodeManager Instance {  get { return instance; } }
 
     public NetworkVariable<bool> checkingStepOn = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
+    public NetworkVariable<bool> islandBattleExcuting = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone);
 
     private void Awake()
     {

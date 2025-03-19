@@ -13,7 +13,8 @@ using UnityEngine.UI;
 public class GamePrepareCanvas : NetworkBehaviour
 {
     [SerializeField] Button gameStartBtn;
-    [SerializeField] TextMeshProUGUI roomCodeTmp;
+    [SerializeField] TMP_InputField roomCodeField;
+    [SerializeField] TextMeshProUGUI roomNameTmp;
     public override async void OnNetworkSpawn()
     {
         if (IsServer)
@@ -22,7 +23,8 @@ public class GamePrepareCanvas : NetworkBehaviour
         }
         var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
         Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyIds[0]);
-        roomCodeTmp.text = GameManager.Instance.lobbyId.Value.ToString();
+        roomCodeField.text = GameManager.Instance.lobbyId.Value.ToString();
+        roomNameTmp.text = GameManager.Instance.lobbyName.Value.ToString();
     }
     public void GameStart()
     {
@@ -34,7 +36,7 @@ public class GamePrepareCanvas : NetworkBehaviour
         }
         else
         {
-            GameManager.Instance.announceCanvas.ShowAnnounceText("Players not enough!", 2f);
+            GameManager.Instance.announceCanvas.ShowAnnounceText("플레이어가 부족합니다!", 2f);
         }
     }
     public void RoomOut()

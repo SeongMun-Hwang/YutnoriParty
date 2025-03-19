@@ -12,6 +12,7 @@ public class VolumeUIManager : MonoBehaviour
     public Slider sfxSlider;    
     public TextMeshProUGUI sfxText;
     public GameObject volumeUI;
+    public GameObject titleMenuCanvas;
 
     private void Start()
     {
@@ -31,6 +32,11 @@ public class VolumeUIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             volumeUI.SetActive(false);
+
+            if (titleMenuCanvas != null)
+            {
+                titleMenuCanvas.SetActive(true);
+            }
         }
     }
     private void LoadVolumeSettings()

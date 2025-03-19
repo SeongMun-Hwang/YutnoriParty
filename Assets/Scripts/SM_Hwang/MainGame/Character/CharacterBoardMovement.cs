@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
@@ -124,6 +123,13 @@ public class CharacterBoardMovement : MonoBehaviour
                 Debug.Log("meet obstacle");
                 meetObstacle = false;
                 break;
+            }
+        }
+        if (GetComponent<CharacterInfo>().childs != null)
+        {
+            foreach(CharacterBoardMovement info in GetComponent<CharacterInfo>().childs)
+            {
+                info.GetComponent<CharacterBoardMovement>().currentNode = currentNode;
             }
         }
         //이동 종료 후 처리
