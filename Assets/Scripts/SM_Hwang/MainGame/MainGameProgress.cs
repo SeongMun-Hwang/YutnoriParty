@@ -16,6 +16,7 @@ public class MainGameProgress : NetworkBehaviour
     public System.Action endMinigameActions;
     public ulong winnerId;
     bool _isMinigamePlaying = false;
+    public NetworkVariable<bool> isGameEnd = new NetworkVariable<bool>(false);
     public bool isMinigamePlaying
     {
         get => _isMinigamePlaying;

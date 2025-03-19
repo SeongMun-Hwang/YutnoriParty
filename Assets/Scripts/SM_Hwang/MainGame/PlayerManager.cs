@@ -182,6 +182,7 @@ public class PlayerManager : NetworkBehaviour
     {
         GameManager.Instance.winnerName.Value = ServerSingleton.Instance.clientIdToUserData[id].userName;
         GameManager.Instance.winnerCharacterIndex.Value = index;
+        MainGameProgress.Instance.isGameEnd.Value = true;
         GoToAwardSceneClientRpc("", "");
     }
 
