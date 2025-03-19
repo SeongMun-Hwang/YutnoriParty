@@ -29,6 +29,7 @@ public class MinigameManager : NetworkBehaviour
     public List<ulong> playerList;
     public Define.MGPlayerType playerType;
     private bool isRandomGame = true;
+    public bool isCheat = false;
 
     [SerializeField] private List<GameObject> HideableWhenMinigame;
 
@@ -220,7 +221,7 @@ public class MinigameManager : NetworkBehaviour
             }
         }
 
-        devCheatMinigameMenuUI.SetActive(isUnloading && IsServer);
+        devCheatMinigameMenuUI.SetActive(isCheat && isUnloading && IsServer);
         foreach (var go in HideableWhenMinigame)
         {
             go.SetActive(isUnloading);
