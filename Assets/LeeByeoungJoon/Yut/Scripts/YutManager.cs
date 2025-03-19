@@ -36,8 +36,11 @@ public class YutManager : NetworkBehaviour
     [SerializeField] Image powerGauge;
     [SerializeField] TextMeshProUGUI throwChanceTmp;
     List<Yut> yuts = new List<Yut>();
-    List<YutResult> results = new List<YutResult>();
-    public List<YutResult> Results { get { return results; } }
+    //List<YutResult> results = new List<YutResult>();
+    //public List<YutResult> Results { get { return results; } }
+
+    List<YutResults> results = new List<YutResults>();
+    public List<YutResults> Results { get { return results; } }
 
     int faceDown = 0;
     int powerAmountSign = 1;
@@ -222,20 +225,24 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    throwChance++;
-        //    Debug.Log(throwChance);
-        //    //YutResultCount();
-        //}
+        if (!IsOwner) return; //오너 아니면 리턴
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            throwChance++;
+            Debug.Log(throwChance);
+            //YutResultCount();
+        }
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
             int backdoCnt, doCnt, gaeCnt, gurCnt, yutCnt, moCnt;
             backdoCnt = doCnt = gaeCnt = gurCnt = yutCnt = moCnt = 0;
 
-            foreach (var result in results)
+            foreach (var value in results)
             {
+                var result = value.yutResult;
+
                 switch (result)
                 {
                     case YutResult.BackDo:
@@ -671,12 +678,6 @@ public class YutManager : NetworkBehaviour
         return results.Count;
     }
 
-    public List<YutResult> GetYutResults()
-    {
-        //현재 플레이어의 클라이언트 id 체크하고 리스트 반환?
-        return results;
-    }
-
     [ClientRpc]
     void AddYutResultClientRpc(YutResult result, ulong senderId)
     {
@@ -685,18 +686,73 @@ public class YutManager : NetworkBehaviour
         //윷 던지는거 요청한 클라이언트의 윷 결과창을 갱신
         if (senderId == NetworkManager.Singleton.LocalClientId)
         {
-            results.Add(result);
+            Debug.Log("윷 결과 스폰 요청");
+
+            
+            //SpawnYutResultServerRpc(result, senderId);
             //SetViewportTransform();
-            Instantiate(yutResultPrefab, yutResultContent.transform).SetYutText(result);
         }
+        
+        var yutResult = Instantiate(yutResultPrefab, yutResultContent.transform);
+        yutResult.SetYutText(result);
+        yutResult.SetClientId(senderId);
+        results.Add(yutResult);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void CallRemoveResultRpc(YutResult result, ulong except)
+    {
+        RemoveResultRpc(result, except);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void RemoveResultRpc(YutResult result, ulong except)
+    {
+        //제외 대상(리무브 요청한 클라이언트)은 리무브 안함
+        if(except == NetworkManager.Singleton.LocalClientId) return;
+        
+        RemoveYutResult(result);
     }
 
     //리스트에서 윷 결과 삭제
     public void RemoveYutResult(YutResult result)
     {
         //Debug.Log("id : " + NetworkManager.Singleton.LocalClientId + "" + result + "삭제");
-        results.Remove(result);
+        //results.Remove(result);
         //SetViewportTransform();
+        foreach(var value in results)
+        {
+            if(value.yutResult == result)
+            {
+                Debug.Log("일치하는 윷 결과 찾음, 디스트로이");
+
+                results.Remove(value);
+                Destroy(value.gameObject);
+                return;
+            }
+        }
+
+        Debug.Log("일치하는 윷 결과 못찾음");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SpawnYutResultServerRpc(YutResult result, ulong senderId)
+    {
+        Debug.Log("윷 결과 스폰");
+        var yutResult = Instantiate(yutResultPrefab);
+        yutResult.SetYutText(result);
+        var no = yutResult.GetComponent<NetworkObject>();
+        no.SpawnWithOwnership(senderId);
+
+        if (no.TrySetParent(yutResultContent.transform))
+        {
+            Debug.Log("부모 설정 성공");
+        }
+        else
+        {
+            Debug.Log("부모 설정 실패");
+        }
+
     }
 
     //윷 결과를 중앙에 정렬하기 위한 함수

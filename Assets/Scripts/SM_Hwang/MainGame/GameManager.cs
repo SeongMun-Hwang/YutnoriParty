@@ -24,6 +24,7 @@ public class GameManager : NetworkBehaviour
     }
     public AnnounceCanvas announceCanvas;
     public GameObject inGameCanvas;
+    public GameObject blockCanvas;
     public MainGameProgress mainGameProgress;
     public PlayerBoard playerBoard;
     public Node startNode;

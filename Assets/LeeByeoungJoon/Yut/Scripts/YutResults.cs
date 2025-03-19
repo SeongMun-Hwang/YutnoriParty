@@ -10,7 +10,11 @@ public class YutResults : NetworkBehaviour
     [SerializeField] TextMeshProUGUI yutText;
     [SerializeField] List<Color32> yutColors;
     [SerializeField] List<string> yutNames;
-    YutResult yutResult;
+
+    ulong targetId;
+
+    public YutResult yutResult;
+
     public void SetYutText(YutResult result)
     {
         yutResult = result;
@@ -18,10 +22,20 @@ public class YutResults : NetworkBehaviour
         yutText.text = yutNames[(int)result];
     }
 
+    public void SetClientId(ulong id)
+    {
+        targetId = id;
+    }
+
     public void OnButtonPressed()
     {
         AudioManager.instance.Playsfx(13);
 
+        if (NetworkManager.Singleton.LocalClientId != targetId)
+        {
+            GameManager.Instance.announceCanvas.ShowAnnounceText("다른 플레이어의 턴입니다!");
+            return;
+        }
         if (PlayerManager.Instance.isMoving)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("다른 말이 이동 중입니다!");
@@ -109,9 +123,18 @@ public class YutResults : NetworkBehaviour
         }
         //결과 리스트에서 뺌
         //Debug.Log("네트워크 싱글톤 id " + NetworkManager.Singleton.LocalClientId);
-        YutManager.Instance.RemoveYutResult(yutResult);
 
         //버튼 없앰
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        //DestroyYutResultRpc();
+        
+        YutManager.Instance.CallRemoveResultRpc(yutResult, NetworkManager.Singleton.LocalClientId); //다른 클라이언트에 동기화 콜
+        YutManager.Instance.RemoveYutResult(yutResult); //본인거는 바로 없앰
+    }
+
+    [Rpc(SendTo.NotMe)]
+    void DestroyYutResultRpc()
+    {
+        Debug.Log(gameObject);
     }
 }
