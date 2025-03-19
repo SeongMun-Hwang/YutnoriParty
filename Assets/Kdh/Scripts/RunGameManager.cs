@@ -120,7 +120,7 @@ public class RunGameManager : NetworkBehaviour
             countdownText.text = countdown.ToString();
         else if (countdown == 0)
         {
-            countdownText.text = "GO!";
+            countdownText.text = "시작!";
             guidePanel.SetActive(false);
         }
         else
