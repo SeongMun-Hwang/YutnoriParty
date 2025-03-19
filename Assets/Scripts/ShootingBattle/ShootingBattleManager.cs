@@ -16,7 +16,7 @@ public class ShootingBattleManager : NetworkBehaviour
     [SerializeField] private TMP_Text timerUI;
     [SerializeField] private List<TMP_Text> usernameUI;
     [SerializeField] private List<TMP_Text> scoreUI;
-    [SerializeField] private GameObject targetPanel;
+    [SerializeField] private GameObject guidePanel;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
     [SerializeField] private List<Color32> crosshairColors;
@@ -114,7 +114,7 @@ public class ShootingBattleManager : NetworkBehaviour
 
     public void InitScoreBoardUI(bool previousValue, bool newValue)
     {
-        targetPanel.SetActive(false);
+        guidePanel.SetActive(false);
         for (int i = 0; i < playerIds.Count; i++)
         {
             int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);

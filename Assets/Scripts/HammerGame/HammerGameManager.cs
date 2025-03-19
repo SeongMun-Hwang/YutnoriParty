@@ -12,6 +12,7 @@ public class HammerGameManager : NetworkBehaviour
     [SerializeField] Camera watchCamera;
     [SerializeField] public Transform lookAtTransform;
     [SerializeField] GameObject pillar;
+    [SerializeField] GameObject guidePanel;
     [SerializeField] PlayerUICanvas playerUICanvas;
     private static HammerGameManager instance;
     private List<GameObject> playingCharacters = new List<GameObject>();
@@ -129,6 +130,7 @@ public class HammerGameManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(timer.ToString(), 0.7f);
             yield return null;
         }
+        guidePanel.SetActive(false);
         foreach (GameObject player in playingCharacters)
         {
             player.GetComponent<HammerGameController>().StartHammerGameClientRpc();
