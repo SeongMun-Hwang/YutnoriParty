@@ -88,8 +88,8 @@ public class YutGrabController : NetworkBehaviour
             //이미 스페이스바 눌렀으면 조작 불가
             if (!isSpacePressed)
             {
-                //스페이스바 누르면 윷을 잡음
-                if (Input.GetKeyDown(KeyCode.Space))
+                //스페이스바 or 클릭 누르면 윷을 잡음
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
                 {
                     //Debug.Log("스페이스바 누름");
                     GrabYut();
