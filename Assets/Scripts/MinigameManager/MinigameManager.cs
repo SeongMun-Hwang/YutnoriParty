@@ -28,7 +28,7 @@ public class MinigameManager : NetworkBehaviour
     private Dictionary<ulong, Define.MGPlayerType> playerTypes;
     public List<ulong> playerList;
     public Define.MGPlayerType playerType;
-    private bool isRandomGame = true;
+    private bool isRandomGame = false;
 
     [SerializeField] private List<GameObject> HideableWhenMinigame;
 

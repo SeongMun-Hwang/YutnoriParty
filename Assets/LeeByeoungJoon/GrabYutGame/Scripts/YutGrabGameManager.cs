@@ -16,6 +16,10 @@ public class YutGrabGameManager : NetworkBehaviour
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject drawMessageUI;
     [SerializeField] private GameObject loseMessageUI;
+    [SerializeField] private GameObject howToPlayUI;
+
+    //카메라 UI
+    [SerializeField] Canvas camOutlineCanvas;
 
     // 게임에 참여하는 유저 관련
     NetworkList<ulong> playerIds = new NetworkList<ulong>(); // 참가한 플레이어 ID 리스트
@@ -52,11 +56,12 @@ public class YutGrabGameManager : NetworkBehaviour
     {
         if(!IsServer) return;
 
+        int index = 0;
         foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
         {
             if (MinigameManager.Instance.IsPlayer(clientId))
             {
-                SpawnCharacterRpc(clientId);
+                SpawnCharacterRpc(clientId, index++);
                 playerIds.Add(clientId);
             }
             else
@@ -114,6 +119,7 @@ public class YutGrabGameManager : NetworkBehaviour
         float h = 1;
         float x = 0;
         float y = 0;
+        Rect rect = new Rect();
 
         switch (playerNum)
         {
@@ -123,8 +129,10 @@ public class YutGrabGameManager : NetworkBehaviour
 
                 for (int i = 0; i < playerNum; i++)
                 {
-                    cameras[i].rect = new Rect(i * w, y, w, h);
+                    rect = new Rect(i * w, y, w, h);
+                    cameras[i].rect = rect;
                     cameras[i].gameObject.SetActive(true);
+
                     //Debug.Log($"카메라 x:{i * w} y:{y} w:{w} h:{h}");
                 }
                 break;
@@ -134,7 +142,8 @@ public class YutGrabGameManager : NetworkBehaviour
 
                 for (int i = 0; i < playerNum; i++)
                 {
-                    cameras[i].rect = new Rect(i * w, y, w, h);
+                    rect = new Rect(i * w, y, w, h);
+                    cameras[i].rect = rect;
                     cameras[i].gameObject.SetActive(true);
                 }
                 break;
@@ -146,20 +155,29 @@ public class YutGrabGameManager : NetworkBehaviour
 
                 for (int i = 0; i < playerNum; i++)
                 {
-                    cameras[i].rect = new Rect(x + dx[i], y + dy[i], w, h);
+                    rect = new Rect(x + dx[i], y + dy[i], w, h);
+                    cameras[i].rect = rect;
                     cameras[i].gameObject.SetActive(true);
                 }
                 break;
+        }
+
+        ulong id = NetworkManager.Singleton.LocalClientId;
+        int idx = -1;
+        if (playerIds.Contains(id))
+        {
+            idx = playerIds.IndexOf(id);
+            camOutlineCanvas.worldCamera = cameras[idx];
         }
 
         Debug.Log("카메라 세팅 완료");
     }
 
     [Rpc(SendTo.Server)]
-    void SpawnCharacterRpc(ulong id)
+    void SpawnCharacterRpc(ulong id, int i)
     {
         int index = PlayerManager.Instance.GetClientIndex(id);
-        GameObject go = Instantiate(characterPrefabs[index], spawnPos[index]);
+        GameObject go = Instantiate(characterPrefabs[index], spawnPos[i]);
         go.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         playingCharacters.Add(go);
     }
@@ -186,35 +204,35 @@ public class YutGrabGameManager : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void UpdateScoreUIRpc()
-    {
-        // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
-        for (int i = 0; i < playerIds.Count; i++)
-        {
-            int id = (int)playerIds[i];
-            //기회 쓴 애들만 기록 보이게 함
-            if (!usernameUI[id].transform.parent.gameObject.activeSelf)
-            {
-                usernameUI[id].transform.parent.gameObject.SetActive(true);
-            }
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void UpdateScoreUIRpc()
+    //{
+    //    // Debug.Log($"UI 변경 {playerScore[0]} {playerScore[1]}");
+    //    for (int i = 0; i < playerIds.Count; i++)
+    //    {
+    //        int id = (int)playerIds[i];
+    //        //기회 쓴 애들만 기록 보이게 함
+    //        if (!usernameUI[id].transform.parent.gameObject.activeSelf)
+    //        {
+    //            usernameUI[id].transform.parent.gameObject.SetActive(true);
+    //        }
 
-            Debug.Log("i : " + id + " 기록 : " + playerRecord[id]);
+    //        Debug.Log("i : " + id + " 기록 : " + playerRecord[id]);
 
-            //초기값아니고 기록이 있을때만 업데이트
-            if (playerRecord[id] < 10000.0f)
-            {
-                //센티미터 단위로 표기
-                int centimeteres = (int)(playerRecord[id] * 100);
+    //        //초기값아니고 기록이 있을때만 업데이트
+    //        if (playerRecord[id] < 10000.0f)
+    //        {
+    //            //센티미터 단위로 표기
+    //            int centimeteres = (int)(playerRecord[id] * 100);
                 
-                scoreUI[id].text = $"{centimeteres}cm";
-            }
-            else//기록 없으면 X표기
-            {
-                scoreUI[id].text = "X";
-            }
-        }
-    }
+    //            scoreUI[id].text = $"{centimeteres}cm";
+    //        }
+    //        else//기록 없으면 X표기
+    //        {
+    //            scoreUI[id].text = "X";
+    //        }
+    //    }
+    //}
 
     private void UpdateScoreUI(NetworkListEvent<float> changeEvent)
     {
@@ -228,13 +246,13 @@ public class YutGrabGameManager : NetworkBehaviour
                 usernameUI[id].transform.parent.gameObject.SetActive(true);
             }
 
-            Debug.Log("i : " + id + " 기록 : " + playerRecord[id]);
+            Debug.Log("i : " + i + " 기록 : " + playerRecord[i]);
 
             //초기값아니고 기록이 있을때만 업데이트
-            if (playerRecord[id] < 10000.0f)
+            if (playerRecord[i] < 10000.0f)
             {
                 //센티미터 단위로 표기
-                int centimeteres = (int)((playerRecord[id]) * 100);
+                int centimeteres = (int)((playerRecord[i]) * 100);
 
                 scoreUI[id].text = $"{centimeteres}cm";
             }
@@ -260,6 +278,8 @@ public class YutGrabGameManager : NetworkBehaviour
             yield return null;
         }
 
+        DeactiveHowToPlayUIRpc();
+
         //isPlaying.Value = true;
 
         Debug.Log("게임 스타트 요청");
@@ -267,6 +287,12 @@ public class YutGrabGameManager : NetworkBehaviour
         {
             playingCharacters[i].GetComponent<YutGrabController>().GameStartRpc();
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void DeactiveHowToPlayUIRpc()
+    {
+        howToPlayUI.SetActive(false);
     }
 
     [Rpc(SendTo.Server)]
@@ -290,14 +316,14 @@ public class YutGrabGameManager : NetworkBehaviour
         //StartCoroutine(DelayUpdateScore(0.5f));
     }
 
-    IEnumerator DelayUpdateScore(float time)
-    {
-        Debug.Log("스코어 업데이트 기다림.. "  + time);
-        yield return new WaitForSeconds(time);
+    //IEnumerator DelayUpdateScore(float time)
+    //{
+    //    Debug.Log("스코어 업데이트 기다림.. "  + time);
+    //    yield return new WaitForSeconds(time);
 
-        Debug.Log("스코어 업데이트 요청");
-        UpdateScoreUIRpc();
-    }
+    //    Debug.Log("스코어 업데이트 요청");
+    //    UpdateScoreUIRpc();
+    //}
 
     [Rpc(SendTo.Server)]
     public void NoChanceRpc()
