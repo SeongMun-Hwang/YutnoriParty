@@ -61,6 +61,7 @@ public class MainGameProgress : NetworkBehaviour
         currentPlayerNumber.Value = UnityEngine.Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         ActivateCanvasClientRpc(); //캔버스 여기서 한번만 켬
+        //SpawnCanvasServerRpc();
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
 
@@ -68,6 +69,13 @@ public class MainGameProgress : NetworkBehaviour
     void ActivateCanvasClientRpc()
     {
         GameManager.Instance.inGameCanvas.SetActive(true);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SpawnCanvasServerRpc()
+    {
+        Debug.Log("캔버스 스폰됨??" + GameManager.Instance.inGameCanvas.GetComponent<NetworkObject>().IsSpawned);
+        //GameManager.Instance.inGameCanvas.GetComponent<NetworkObject>().Spawn();
     }
 
     /*턴 시작*/

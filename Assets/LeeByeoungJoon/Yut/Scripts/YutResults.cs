@@ -13,7 +13,7 @@ public class YutResults : NetworkBehaviour
 
     ulong targetId;
 
-    YutResult yutResult;
+    public YutResult yutResult;
 
     public void SetYutText(YutResult result)
     {
@@ -123,11 +123,13 @@ public class YutResults : NetworkBehaviour
         }
         //결과 리스트에서 뺌
         //Debug.Log("네트워크 싱글톤 id " + NetworkManager.Singleton.LocalClientId);
-        YutManager.Instance.RemoveYutResult(yutResult);
 
         //버튼 없앰
-        Destroy(gameObject);
-        DestroyYutResultRpc();
+        //Destroy(gameObject);
+        //DestroyYutResultRpc();
+        
+        YutManager.Instance.CallRemoveResultRpc(yutResult, NetworkManager.Singleton.LocalClientId); //다른 클라이언트에 동기화 콜
+        YutManager.Instance.RemoveYutResult(yutResult); //본인거는 바로 없앰
     }
 
     [Rpc(SendTo.NotMe)]
