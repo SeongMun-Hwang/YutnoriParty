@@ -508,8 +508,7 @@ public class MainGameProgress : NetworkBehaviour
                     EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
                 }
 
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(playerId) + "무승부!", 2f);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(enemyId) + "무승부!", 2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("무승부!", 2f);
 
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, playerId);
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemyId);
