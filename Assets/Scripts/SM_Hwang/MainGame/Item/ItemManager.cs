@@ -124,12 +124,13 @@ public class ItemManager : NetworkBehaviour
         go.GetComponent<NetworkObject>().Spawn();
     }
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnItemEffectServerRpc(NetworkObjectReference noRef)
+    public void SpawnItemEffectServerRpc(NetworkObjectReference noRef, ulong id)
     {
         noRef.TryGet(out NetworkObject no);
         int n = no.GetComponent<CharacterInfo>().overlappedCount;
         GameObject go = Instantiate(reverseEffectPrefab, no.transform.position 
             + new Vector3(0, 2*(n+1), 0), Quaternion.identity);
+        go.GetComponent<StarCrown>().ownerId.Value = id;
         go.GetComponent<NetworkObject>().Spawn();
         go.GetComponent<NetworkObject>().TrySetParent(no.transform);
         no.GetComponent<CharacterInfo>().ItemEffect = go;
