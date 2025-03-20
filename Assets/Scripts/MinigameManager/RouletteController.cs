@@ -7,10 +7,21 @@ using UnityEngine;
 
 public class RouletteController : NetworkBehaviour
 {
+    public enum BattleType
+    {
+        VsMatch,
+        PartyTime,
+        BlackHole
+    }
+
+    private int battleType;
+
     public Transform ContentObject;
     public GameObject RoulettePanel;
+    public GameObject TypePanel;
 
     private List<GameObject> itemList;
+    public List<GameObject> typePanelList;
     private int itemCount;
     private int rollIndex = 0;
     private int previousIndex = 0; // -1 인덱스를 의미 (직전에 플레이한 게임이 아님)
@@ -33,6 +44,7 @@ public class RouletteController : NetworkBehaviour
 
         itemCount = itemList.Count;
         RoulettePanel.SetActive(false);
+        TypePanel.SetActive(false);
     }
 
     public override void OnNetworkSpawn()
@@ -40,9 +52,10 @@ public class RouletteController : NetworkBehaviour
         MinigameIndex.OnValueChanged += FixRoulette;
     }
 
-    public void StartRoll()
+    public void StartRoll(BattleType type)
     {
         RoulettePanel.SetActive(true);
+        TypePanel.SetActive(true);
         if (IsServer)
         {
             Debug.Log($"{itemCount}개 중에서 롤렛 돌리자");
@@ -57,14 +70,18 @@ public class RouletteController : NetworkBehaviour
                 minigameIndex = (minigameIndex + 1) % itemCount;
             }
 
-            StartRollClientRpc(minRoll + minigameIndex);
+            StartRollClientRpc(minRoll + minigameIndex, (int)type);
         }
     }
 
     [ClientRpc]
-    private void StartRollClientRpc(int count)
+    private void StartRollClientRpc(int count, int type)
     {
         RoulettePanel.SetActive(true);
+        TypePanel.SetActive(true);
+        battleType = type;
+        typePanelList[battleType].SetActive(true);
+
         Debug.Log("롤렛 돌리자 클라이언트");
         isRolling = true;
         rollingCoroutine = StartCoroutine(Rolling(count));
@@ -114,7 +131,9 @@ public class RouletteController : NetworkBehaviour
         {
             EndActions.Invoke();
         }
+        typePanelList[battleType].SetActive(false);
         RoulettePanel.SetActive(false);
+        TypePanel.SetActive(false);
     }
 
     private void FixRoulette(int oldValue, int newValue)
