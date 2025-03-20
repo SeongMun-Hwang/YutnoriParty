@@ -264,6 +264,7 @@ public class MainGameProgress : NetworkBehaviour
         {
             Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
+            ChangeCurrentPlayer(null);
             DestoryCharacterOnStartNode();
             EndTurnServerRpc();
         }
@@ -417,7 +418,6 @@ public class MainGameProgress : NetworkBehaviour
         for (int i = 1; i < characters.Count; i++)
         {
             PlayerManager.Instance.OverlapCharacter(characters[0], characters[i]); //겹치고
-            characters[i].GetComponent<Outline>().DisableOutline(); //위에 있는 애 아웃라인 끄고
         }
         ChangeCurrentPlayer(characters[0]);
     }
@@ -444,11 +444,6 @@ public class MainGameProgress : NetworkBehaviour
                     }
                     if (hit.collider.gameObject.TryGetComponent<CharacterBoardMovement>(out var character))
                     {
-                        if (currentCharacter != null)
-                        {
-                            currentCharacter.GetComponent<Outline>().DisableOutline();
-                        }
-                        hit.collider.gameObject.GetComponent<Outline>().EnableOutline();
                         ChangeCurrentPlayer(character.gameObject);
                     }
                 }
@@ -633,11 +628,12 @@ public class MainGameProgress : NetworkBehaviour
         if(currentCharacter != null)
         {
             currentCharacter.GetComponent<CharacterInfo>().SetPyramidServerRpc(false);
-            currentCharacter.GetComponent<Outline>().DisableOutline();
         }
 
-        currentCharacter = nextCharacter.GetComponent<CharacterBoardMovement>();
-        currentCharacter.GetComponent<CharacterInfo>().SetPyramidServerRpc(true);
-        currentCharacter.GetComponent<Outline>().EnableOutline();
+        if (nextCharacter != null)
+        {
+            currentCharacter = nextCharacter.GetComponent<CharacterBoardMovement>();
+            currentCharacter.GetComponent<CharacterInfo>().SetPyramidServerRpc(true);
+        }
     }
 }

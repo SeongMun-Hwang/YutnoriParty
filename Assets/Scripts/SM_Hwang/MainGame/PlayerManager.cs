@@ -67,8 +67,7 @@ public class PlayerManager : NetworkBehaviour
         ulong senderId = rpcParams.Receive.SenderClientId;
         
         GameObject go = Instantiate(GameManager.Instance.playerCharacters[index], Vector3.zero, Quaternion.identity);
-        go.GetComponent<NetworkObject>().Spawn();
-        go.GetComponent<NetworkObject>().ChangeOwnership(senderId);
+        go.GetComponent<NetworkObject>().SpawnWithOwnership(senderId);
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -81,10 +80,6 @@ public class PlayerManager : NetworkBehaviour
     {
         currentCharacters.Add(noRef);
         noRef.TryGet(out NetworkObject no);
-        if (MainGameProgress.Instance.currentCharacter != null)
-        {
-            MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
-        }
         MainGameProgress.Instance.ChangeCurrentPlayer(no.gameObject);
     }
 
@@ -226,8 +221,8 @@ public class PlayerManager : NetworkBehaviour
         {
             playerName = GameManager.Instance.playerBoard.playerProfileDatas[GetClientIndex(clientId)].userName.ToString();
         }
-        //int index = playerName.IndexOf("#");
-        //playerName = playerName.Substring(0, index);
+        int index = playerName.IndexOf("#");
+        if(index != -1) playerName = playerName.Substring(0, index);
         return playerName;
     }
 }

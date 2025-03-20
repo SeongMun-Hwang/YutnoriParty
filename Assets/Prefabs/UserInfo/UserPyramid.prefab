@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3498880988069105746}
   - component: {fileID: 8102117755723141990}
   - component: {fileID: 4766133676298311109}
-  - component: {fileID: 3107422288214313753}
+  - component: {fileID: 7041888126245687076}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &3107422288214313753
+--- !u!114 &7041888126245687076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,7 +141,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7188906029415970956}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: -0.000000059590075}
+  m_LocalPosition: {x: 0, y: 0, z: -2.84217e-13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -149,7 +149,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.00000019610532, y: -0.0000010302591}
   m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &12782355149452586
@@ -182,8 +182,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: P4
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8820a2398dad96c41a40372573afac44, type: 2}
+  m_sharedMaterial: {fileID: 1512382276533695686, guid: 8820a2398dad96c41a40372573afac44, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -207,13 +207,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1
-  m_fontSizeBase: 1
+  m_fontSize: 0.65
+  m_fontSizeBase: 0.65
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -261,15 +261,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: f6f92b68640d81345a0b27adb6d2939d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 80
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f6f92b68640d81345a0b27adb6d2939d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 80
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f6f92b68640d81345a0b27adb6d2939d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 39.50831
+      value: 29.631231
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f6f92b68640d81345a0b27adb6d2939d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -352,4 +352,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94390709042dda64e91c6a52d4ceea1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndex: {fileID: 0}
+  playerIndex: {fileID: 3029435935534709037}
+  overlappedHeight: 0

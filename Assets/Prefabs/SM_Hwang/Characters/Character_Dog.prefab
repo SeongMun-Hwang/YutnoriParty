@@ -66,9 +66,6 @@ PrefabInstance:
       addedObject: {fileID: -5789683784504321204}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 318697466270937128}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -606979119771863364}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015e3cadc94c784439f4339fac06569b, type: 3}
       insertIndex: -1
@@ -247,24 +244,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &318697466270937128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3171602940925265327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outlineMode: 0
-  outlineColor: {r: 0, g: 1, b: 0, a: 1}
-  outlineWidth: 5
-  precomputeOutline: 0
-  bakeKeys: []
-  bakeValues: []
 --- !u!114 &-606979119771863364
 MonoBehaviour:
   m_ObjectHideFlags: 0
