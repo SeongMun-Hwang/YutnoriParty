@@ -97,7 +97,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                     {
                         Debug.Log("Find Node");
                         ItemManager.Instance.ItemUseAnnounceServerRpc("장애물", NetworkManager.Singleton.LocalClientId);
-                        ItemManager.Instance.SetObstacleServerRpc(no.transform.position);
+                        ItemManager.Instance.SetObstacleServerRpc(no.transform.position, NetworkManager.Singleton.LocalClientId);
                         ItemManager.Instance.RemoveItem();
                     }
                 }
@@ -124,13 +124,19 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         switch (itemName)
         {
             case ItemName.ChanceUp:
-                TooltipManager.Instance.DrawTooltip("한번 더!", "당신이 윷을 한 번 더 던질 수 있는 기회가 주어집니다.");
+                TooltipManager.Instance.DrawTooltip(
+                    "한번 더!", "당신이 윷을 한 번 더 던질 수 있는 기회가 주어집니다.", TooltipManager.TooltipType.Item
+                    );
                 break;
             case ItemName.ReverseMove:
-                TooltipManager.Instance.DrawTooltip("혼란", "선택한 상대방의 말의 이동방향을 딱 한 번 반대로 설정합니다.");
+                TooltipManager.Instance.DrawTooltip(
+                    "혼란", "선택한 상대방의 말의 이동방향을 딱 한 번 반대로 설정합니다.", TooltipManager.TooltipType.Item
+                    );
                 break;
             case ItemName.Obstacle:
-                TooltipManager.Instance.DrawTooltip("장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.");
+                TooltipManager.Instance.DrawTooltip(
+                    "장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.", TooltipManager.TooltipType.Item
+                    );
                 break;
         }
     }

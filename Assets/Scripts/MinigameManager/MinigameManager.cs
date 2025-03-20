@@ -12,6 +12,7 @@ public class MinigameManager : NetworkBehaviour
     public static MinigameManager Instance { get { return instance; } }
 
     public NetworkVariable<int> maxPlayers;
+    public NetworkVariable<bool> minigameStart = new NetworkVariable<bool>(false);
 
     // 추후 미니게임이 추가될 때, Define 클래스의 MinigameType 열거형과 씬의 이름을 추가할 것
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
@@ -69,6 +70,7 @@ public class MinigameManager : NetworkBehaviour
         if (NetworkManager.Singleton.IsServer)
         {
             if (MainGameProgress.Instance.isGameEnd.Value) { return; }
+            minigameStart.Value = true;
             if (!isRandomGame)
             {
                 StartMiniGameClientRpc();
@@ -179,6 +181,7 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     void EndMiniGameClientRpc()
     {
+        if (IsServer) { minigameStart.Value = false; }
         StartCoroutine(LoadSceneWithFade(1f, true));
     }
 

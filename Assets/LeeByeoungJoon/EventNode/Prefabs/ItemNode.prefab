@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 595303662270503296}
   - component: {fileID: 1527393547972771811}
   - component: {fileID: 4706438655982684537}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Giftbox01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2085421059181836290}
   - component: {fileID: 755964558630643108}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 7892072990628403454}
   - component: {fileID: 1919938040652643822}
   - component: {fileID: 1779275147449200913}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Island
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2628846750924878662}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: uploads_files_4008356_GiftBox_fbx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 1744435083484472235}
   - component: {fileID: 277653693539588082}
   - component: {fileID: 2868116765214822736}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Giftbox02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 6159294615906804418}
   - component: {fileID: 6586522467185234248}
   - component: {fileID: 4957577139477780308}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Giftbox03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -440,7 +440,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8476722836276272333}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: EffectTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,7 +474,7 @@ GameObject:
   - component: {fileID: 4911389082946874689}
   - component: {fileID: 9074918833992485940}
   - component: {fileID: 5683779139776893250}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: ItemNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
