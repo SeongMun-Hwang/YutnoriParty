@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,6 +26,12 @@ public class GameManager : NetworkBehaviour
     public AnnounceCanvas announceCanvas;
     public GameObject inGameCanvas;
     public GameObject blockCanvas;
+    public Image profile;
+    public Image profileBackground;
+    public TextMeshProUGUI playerName;
+    public List<Sprite> profiles = new List<Sprite>();
+    public List<Color> playerColors = new List<Color>();
+
     public MainGameProgress mainGameProgress;
     public PlayerBoard playerBoard;
     public Node startNode;

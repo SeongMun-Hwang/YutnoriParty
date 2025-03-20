@@ -62,6 +62,7 @@ public class MainGameProgress : NetworkBehaviour
         currentPlayerNumber.Value = UnityEngine.Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         ActivateCanvasClientRpc(); //캔버스 여기서 한번만 켬
+        //CallProfileChangeServerRpc(); //프로필 설정해주고
         //SpawnCanvasServerRpc();
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
@@ -281,10 +282,12 @@ public class MainGameProgress : NetworkBehaviour
             && !YutManager.Instance.isCalulating)
         {
             Debug.Log("End turn");
-            GameManager.Instance.inGameCanvas.SetActive(false);
-            ChangeCurrentPlayer(null);
             //GameManager.Instance.inGameCanvas.SetActive(false);
+            ChangeCurrentPlayer(null);
             GameManager.Instance.blockCanvas.SetActive(true);
+
+            CallProfileChangeServerRpc();
+            
             DestoryCharacterOnStartNode();
             EndTurnServerRpc();
         }
@@ -292,6 +295,22 @@ public class MainGameProgress : NetworkBehaviour
         //IsEndMoveExcuteChangeServerRpc(false);
         isEndMoveExcuting = false;
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    void CallProfileChangeServerRpc()
+    {
+        ProfileChangeClientRpc();
+    }
+
+    [ClientRpc]
+    void ProfileChangeClientRpc()
+    {
+        int num = PlayerManager.Instance.ReturnNumOfCharacter();
+        Debug.Log("프로필 변경, 현재 플레이어 인덱스 : " + num);
+        GameManager.Instance.profileBackground.color = GameManager.Instance.playerColors[num];
+        GameManager.Instance.profile.sprite = GameManager.Instance.profiles[num]; //프로필 변경
+    }
+
     /*턴 종료*/
     //다음 플레이어의 턴 시작, 이상 반복
     [ServerRpc(RequireOwnership = false)]
