@@ -6,7 +6,7 @@ public class LookAtCamera : MonoBehaviour
     {
         if(Camera.main != null)
         {
-            transform.LookAt(Camera.main.transform);
+            transform.forward = -Camera.main.transform.forward;
         }
     }
 }
