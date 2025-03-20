@@ -16,7 +16,7 @@ public class PlayerPyramid : MonoBehaviour
        // playerIndex.gameObject.transform.rotation = Quaternion.identity;
 
         float yAxis = Mathf.PingPong(Time.time * moveSpeed, yRange * 2) - yRange;
-        transform.position = new Vector3(transform.position.x, initialY+overlappedHeight, transform.position.z);
+        transform.position = new Vector3(transform.position.x, initialY+overlappedHeight+yAxis, transform.position.z);
     }
     public void SetUserName(string name)
     {
