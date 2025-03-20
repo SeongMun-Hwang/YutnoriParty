@@ -677,12 +677,12 @@ public class YutManager : NetworkBehaviour
 
         if (autoYut)
         {
-            CallYutThrow();
+            CallYutThrowRpc();
         }
     }
 
     [Rpc(SendTo.Server)]
-    void CallYutThrow()
+    void CallYutThrowRpc()
     {
         ThrowYutsServerRpc(4, Random.Range(minThrowPower, maxThrowPower), new ServerRpcParams());
         throwChance--;
