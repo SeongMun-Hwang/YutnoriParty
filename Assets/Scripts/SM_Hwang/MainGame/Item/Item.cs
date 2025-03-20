@@ -71,8 +71,15 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                     {
                         if (no.OwnerClientId != NetworkManager.Singleton.LocalClientId)
                         {
-                            ItemManager.Instance.ItemUseAnnounceServerRpc("혼란", NetworkManager.Singleton.LocalClientId);
                             Debug.Log("Find target");
+                            if (no.GetComponent<CharacterInfo>().isReverse.Value)
+                            {
+                                GameManager.Instance.announceCanvas.ShowAnnounceText("이미 혼란 상태 입니다!.", 2f);
+                                isToggled = false;
+                                ItemManager.Instance.ReturnCurrentItem().GetComponent<Image>().color = Color.white;
+                                yield break;
+                            }
+                            ItemManager.Instance.ItemUseAnnounceServerRpc("혼란", NetworkManager.Singleton.LocalClientId);
                             ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId, itemName);
                             ItemManager.Instance.SpawnItemEffectServerRpc(no, NetworkManager.Singleton.LocalClientId);
                             ItemManager.Instance.SetItemServerRpc(no, true);
