@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CharacterBoardMovement : MonoBehaviour
 {
+    [SerializeField] GameObject destinationPrefab;
+    [SerializeField] GameObject arrowPrefab;
     private CharacterInfo characterInfo;
     private Animator animator;
     private Node selectedNode;
@@ -146,12 +148,11 @@ public class CharacterBoardMovement : MonoBehaviour
 
         List<GameObject> spawnedDesObjects = new List<GameObject>();
         Dictionary<GameObject, Node> objectToNodeMap = new Dictionary<GameObject, Node>();
-        GameObject arrowPrefab = Resources.Load<GameObject>("ArrowPrefab");
         List<GameObject> spawnedArrows = new List<GameObject>();
         //가능한 모든 경로에 자신 복제
         foreach (Node node in possibleNodes)
         {
-            GameObject desInstance = Instantiate(gameObject, node.transform.position, Quaternion.identity);
+            GameObject desInstance = Instantiate(destinationPrefab, node.transform.position, Quaternion.identity);
             Destroy(desInstance.GetComponent<CharacterBoardMovement>());
             spawnedDesObjects.Add(desInstance);
             objectToNodeMap[desInstance] = node;
