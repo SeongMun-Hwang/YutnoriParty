@@ -395,9 +395,9 @@ public class LuckyCalcManager : NetworkBehaviour
     [ClientRpc]
     private void CloseCardClientRpc(int[] cardIds)
     {
-        foreach (int cardId in cardIds)
+        for (int i = 0; i < cards.Count; i++)
         {
-            cards[cardId].CloseCard();
+            cards[i].CloseCard();
         }
     }
 
