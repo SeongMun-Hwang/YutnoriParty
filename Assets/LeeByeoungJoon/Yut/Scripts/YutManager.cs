@@ -344,6 +344,7 @@ public class YutManager : NetworkBehaviour
         
         powerAmount = power;
         isThrowButtonDown = value;
+        powerGauge.fillAmount = Mathf.Clamp(powerAmount, 0, 1);
     }
 
     public void ThrowButtonReleased()
