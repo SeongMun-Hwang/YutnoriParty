@@ -60,7 +60,7 @@ public class TooltipManager : MonoBehaviour
                     }
                     else if (currentHitObject.name.Contains("IslandNode"))
                     {
-                        DrawTooltip("무인도", "한 턴 동안 이 노드에 갇히게 됩니다.", TooltipType.SpecialNode);
+                        DrawTooltip("무인도", "한 턴 동안 이 노드에 갇히게 됩니다.\n두 턴이 지나거나, 전투에서 승리 시 바로 빠져나옵니다.", TooltipType.SpecialNode);
                     }
                     else if (currentHitObject.name.Contains("ItemNode"))
                     {
@@ -77,6 +77,18 @@ public class TooltipManager : MonoBehaviour
                     ulong id = hit.collider.GetComponent<Obstacle>().ownerId.Value;
                     DrawTooltip("장애물", $"장애물에 부딪힌 말은 이 자리에서 이동을 멈춥니다." +
                         $"<br>설치 <color=#99EFFF>{PlayerManager.Instance.RetrunPlayerName(id)}</color>", TooltipType.SpecialNode
+                        );
+                }
+            }
+            else if (hit.collider.gameObject.name.Contains("StarCrown"))
+            {
+                Transform currentHitObject = hit.collider.transform;
+                if (lastHitObject != currentHitObject)
+                {
+                    lastHitObject = currentHitObject;
+                    ulong id = hit.collider.GetComponent<StarCrown>().ownerId.Value;
+                    DrawTooltip("혼란", $"다음 이동 방향이 반대가 됩니다." +
+                        $"<br>시전자 <color=#99EFFF>{PlayerManager.Instance.RetrunPlayerName(id)}</color>", TooltipType.SpecialNode
                         );
                 }
             }

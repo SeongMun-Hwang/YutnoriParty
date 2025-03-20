@@ -74,7 +74,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                             ItemManager.Instance.ItemUseAnnounceServerRpc("혼란", NetworkManager.Singleton.LocalClientId);
                             Debug.Log("Find target");
                             ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId, itemName);
-                            ItemManager.Instance.SpawnItemEffectServerRpc(no);
+                            ItemManager.Instance.SpawnItemEffectServerRpc(no, NetworkManager.Singleton.LocalClientId);
                             ItemManager.Instance.SetItemServerRpc(no, true);
                             break;
                         }

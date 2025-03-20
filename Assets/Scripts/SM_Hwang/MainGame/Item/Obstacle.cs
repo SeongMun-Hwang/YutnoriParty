@@ -14,4 +14,8 @@ public class Obstacle : NetworkBehaviour
             Destroy(go, 2f);
         }
     }
+    public override void OnNetworkDespawn()
+    {
+        Destroy(gameObject);
+    }
 }
