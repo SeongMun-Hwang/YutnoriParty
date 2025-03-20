@@ -136,7 +136,7 @@ public class CharacterBoardMovement : MonoBehaviour
         }
         //이동 종료 후 처리
         PlayerManager.Instance.isMoving = false;
-        animator.SetFloat("isMoving", 0f);
+        GetComponent<Animator>().SetFloat("isMoving", 0f);
         ItemManager.Instance.DespawnItemEffectServerRpc(gameObject);
         //StartCoroutine(GameManager.Instance.mainGameProgress.EndMove());
         GameManager.Instance.mainGameProgress.EndMove();
