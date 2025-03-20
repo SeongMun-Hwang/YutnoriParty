@@ -35,7 +35,7 @@ public class TooltipManager : MonoBehaviour
 
     private void RaycastObjectAndDrawTooltip()
     {
-        if (Camera.main == null) { return; }
+        if (tooltipCanvas == null || Camera.main == null) { return; }
         if (MinigameManager.Instance.minigameStart.Value) 
         {
             EraseTooltip();
@@ -46,7 +46,7 @@ public class TooltipManager : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("SpecialNode")))
         {
-            Debug.Log(hit.collider.gameObject.name);
+            //Debug.Log(hit.collider.gameObject.name);
             if (hit.collider.gameObject.name.Contains("Trigger"))
             {
                 Transform currentHitObject = hit.collider.transform.parent;
@@ -93,6 +93,7 @@ public class TooltipManager : MonoBehaviour
 
     private void UpdatePosition()
     {
+        if (tooltipCanvas == null) { return; }
         float width = tooltipPanel.rect.width;
         float height = tooltipPanel.rect.height;
 
@@ -119,6 +120,8 @@ public class TooltipManager : MonoBehaviour
 
     public void DrawTooltip(string title, string description, TooltipType type = TooltipType.None)
     {
+        if (tooltipCanvas == null) { return; }
+
         tooltipTitle.text = title;
         tooltipDescription.text = description;
 
@@ -140,11 +143,13 @@ public class TooltipManager : MonoBehaviour
 
     public void EraseTooltip()
     {
+        if (tooltipCanvas == null) { return; }
         tooltipCanvas.gameObject.SetActive(false);
     }
 
     public bool IsTooltipActive()
     {
+        if (tooltipCanvas == null) { return false; }
         return tooltipCanvas.activeSelf;
     }
 }
