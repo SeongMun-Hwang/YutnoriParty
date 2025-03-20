@@ -65,7 +65,7 @@ public class MinigameManager : NetworkBehaviour
         }
     }
 
-    public void StartMinigame()
+    public void StartMinigame(RouletteController.BattleType type)
     {
         if (NetworkManager.Singleton.IsServer)
         {
@@ -88,7 +88,7 @@ public class MinigameManager : NetworkBehaviour
                 gameType = (Define.MinigameType)roulette.MinigameIndex.Value;
                 Debug.Log($"랜덤으로 {gameType} 선택");
             };
-            roulette.StartRoll();
+            roulette.StartRoll(type);
         }
         else
         {

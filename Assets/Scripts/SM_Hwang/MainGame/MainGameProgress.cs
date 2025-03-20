@@ -431,7 +431,7 @@ public class MainGameProgress : NetworkBehaviour
             no.GetComponent<BlackHoleNode>().BlackHoleEventEndRpc();
         });
         MinigameManager.Instance.SetPlayers(playerIds);
-        MinigameManager.Instance.StartMinigame();
+        MinigameManager.Instance.StartMinigame(RouletteController.BattleType.BlackHole);
         //StartMiniGameClientRpc();
     }
 
@@ -591,7 +591,7 @@ public class MainGameProgress : NetworkBehaviour
         });
         ulong[] players = new ulong[2] { playerNetObj.OwnerClientId, enemyNetObj.OwnerClientId };
         MinigameManager.Instance.SetPlayers(players);
-        MinigameManager.Instance.StartMinigame();
+        MinigameManager.Instance.StartMinigame(RouletteController.BattleType.VsMatch);
     }
     [ServerRpc(RequireOwnership = false)]
     void StartPartyGameServerRpc()
@@ -622,7 +622,7 @@ public class MainGameProgress : NetworkBehaviour
             ItemManager.Instance.GetItemClientRpc(winnerId);
         });
         MinigameManager.Instance.SetPlayers(playerIds.ToArray());
-        MinigameManager.Instance.StartMinigame();
+        MinigameManager.Instance.StartMinigame(RouletteController.BattleType.PartyTime);
     }
     [ClientRpc]
     void AddThrowChanceClientRpc(ulong targetId)
