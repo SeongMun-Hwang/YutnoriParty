@@ -67,10 +67,12 @@ public class GameManager : NetworkBehaviour
         if (playerBoard.gameObject.activeSelf)
         {
             playerBoard.gameObject.SetActive(false);
+            inGameCanvas.SetActive(false);
         }
         else
         {
             playerBoard.gameObject.SetActive(true);
+            inGameCanvas.SetActive(true);
         }
     }
 
