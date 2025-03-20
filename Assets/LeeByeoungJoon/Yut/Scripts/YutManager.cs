@@ -118,7 +118,7 @@ public class YutManager : NetworkBehaviour
         for (int i = 0; i < yutNum; i++)
         {
             //윷 소환하고
-            if (i == 1)
+            if (i == 0)
             {
                 //0번 윷은 백도 윷
                 yuts.Add(Instantiate(backDoYutPrefab));
