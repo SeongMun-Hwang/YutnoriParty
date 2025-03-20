@@ -66,9 +66,6 @@ PrefabInstance:
       addedObject: {fileID: 1266755161688498511}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5605361747289146209}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5905374286713868406}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43df296e2a0dfcf4da8cbd358f90c93f, type: 3}
       insertIndex: -1
@@ -173,27 +170,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &5605361747289146209
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6720154922840694447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3bfb369affbf5342b338b29eb7582ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  inIsland:
-    m_InternalValue: 0
-  canMove:
-    m_InternalValue: 1
-  overlappedCount: 0
-  isReverse:
-    m_InternalValue: 0
-  ItemEffect: {fileID: 0}
 --- !u!136 &5905374286713868406
 CapsuleCollider:
   m_ObjectHideFlags: 0
