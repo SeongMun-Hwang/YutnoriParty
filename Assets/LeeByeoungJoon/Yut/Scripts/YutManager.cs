@@ -55,6 +55,7 @@ public class YutManager : NetworkBehaviour
     float waitTime = 10;
     float waitInterval = 0.5f;
     float powerAmount = 0;
+    bool isThrower = false;
     bool backDo = false;
     bool isThrowButtonDown = false;
     bool isFaceError = false;
@@ -225,7 +226,7 @@ public class YutManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsOwner) return; //오너 아니면 리턴
+        //if (!IsOwner) return; //오너 아니면 리턴
 
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -289,8 +290,8 @@ public class YutManager : NetworkBehaviour
             powerGauge.fillAmount = Mathf.Clamp(powerAmount, 0, 1);
             //Debug.Log("현재 파워 : " + powerAmount);
 
-            //타임아웃되면 알아서 던짐
-            if (Time.time - powerStartTime > powerTimeOut)
+            //던진 당사자고, 타임아웃되면 알아서 던짐
+            if (isThrower && Time.time - powerStartTime > powerTimeOut)
             {
                 ThrowButtonReleased();
             }
@@ -321,8 +322,27 @@ public class YutManager : NetworkBehaviour
         powerAmount = 0;
         powerStartTime = Time.time;
 
+        isThrower = true;
         isThrowButtonDown = true;
+        CallPowerGaugeSyncRpc(NetworkManager.Singleton.LocalClientId, true, powerAmount);
     }
+
+    [Rpc(SendTo.Server)]
+    void CallPowerGaugeSyncRpc(ulong senderId, bool value, float power)
+    {
+        PowerGaugeSyncRpc(senderId, value, power);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void PowerGaugeSyncRpc(ulong senderId, bool value, float power)
+    {
+        //콜한 당사자는 스킵
+        if(senderId == NetworkManager.Singleton.LocalClientId) return;
+        
+        powerAmount = power;
+        isThrowButtonDown = value;
+    }
+
     public void ThrowButtonReleased()
     {
         //버튼 풀려있으면 작동 안되게함
@@ -330,6 +350,8 @@ public class YutManager : NetworkBehaviour
 
         //버튼 풀면 파워게이지 멈추고
         isThrowButtonDown = false;
+        isThrower = false;
+        CallPowerGaugeSyncRpc(NetworkManager.Singleton.LocalClientId, false, powerAmount);
 
         //윷 몇개 던질지 확인하고, 현재 파워로 던짐
         ThrowYutsServerRpc(yutNum, Mathf.Clamp(minThrowPower + (maxThrowPower - minThrowPower) * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
