@@ -6608,6 +6608,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1339523380792925225, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
+      propertyPath: m_Name
+      value: BackGround Mask
+      objectReference: {fileID: 0}
     - target: {fileID: 1382540949358359510, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -6691,6 +6695,10 @@ PrefabInstance:
     - target: {fileID: 7936227416434041091, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8528441672138973547, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
+      propertyPath: m_Name
+      value: Profile
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13031,10 +13039,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e015260be56478e419f9f65a17b1c7c9, type: 3}
   - {fileID: 21300000, guid: c343a55932d56eb4cb91b69ea04e6dbd, type: 3}
   playerColors:
-  - {r: 0.65882355, g: 0.21960786, b: 0.2784314, a: 0}
-  - {r: 0.45882356, g: 0.79215693, b: 0.29411766, a: 0}
-  - {r: 0.9725491, g: 0.7568628, b: 0.20784315, a: 0}
-  - {r: 0.28627452, g: 0.7137255, b: 0.7725491, a: 0}
+  - {r: 0.65882355, g: 0.21960786, b: 0.2784314, a: 1}
+  - {r: 0.45882356, g: 0.79215693, b: 0.29411766, a: 1}
+  - {r: 0.9725491, g: 0.7568628, b: 0.20784315, a: 1}
+  - {r: 0.28627452, g: 0.7137255, b: 0.7725491, a: 1}
   mainGameProgress: {fileID: 1365642760}
   playerBoard: {fileID: 2113713794}
   startNode: {fileID: 1219398259}

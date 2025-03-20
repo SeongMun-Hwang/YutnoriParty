@@ -62,7 +62,6 @@ public class MainGameProgress : NetworkBehaviour
         currentPlayerNumber.Value = UnityEngine.Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
         ActivateCanvasClientRpc(); //캔버스 여기서 한번만 켬
-        //CallProfileChangeServerRpc(); //프로필 설정해주고
         //SpawnCanvasServerRpc();
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
@@ -96,7 +95,9 @@ public class MainGameProgress : NetworkBehaviour
     {
         Debug.Log("Spawn canvas client rpc");
         //GameManager.Instance.inGameCanvas.SetActive(true);
-        GameManager.Instance.blockCanvas.SetActive(false);
+        GameManager.Instance.blockCanvas.SetActive(false); //블록 캔버스 비활성화
+        CallProfileChangeServerRpc(NetworkManager.Singleton.LocalClientId); //다른 플레이어들은 현재 플레이중인 플레이어의 프로필 뜨게 설정
+
         YutManager.Instance.throwChance++;
         //StartCoroutine(WaitForCanvasAndActivate());
     }
@@ -284,9 +285,8 @@ public class MainGameProgress : NetworkBehaviour
             Debug.Log("End turn");
             //GameManager.Instance.inGameCanvas.SetActive(false);
             ChangeCurrentPlayer(null);
-            GameManager.Instance.blockCanvas.SetActive(true);
 
-            CallProfileChangeServerRpc();
+            GameManager.Instance.blockCanvas.SetActive(true); //블록 캔버스 활성화
             
             DestoryCharacterOnStartNode();
             EndTurnServerRpc();
@@ -297,18 +297,19 @@ public class MainGameProgress : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void CallProfileChangeServerRpc()
+    void CallProfileChangeServerRpc(ulong id)
     {
-        ProfileChangeClientRpc();
+        ProfileChangeClientRpc(id);
     }
 
     [ClientRpc]
-    void ProfileChangeClientRpc()
+    void ProfileChangeClientRpc(ulong id)
     {
-        int num = PlayerManager.Instance.ReturnNumOfCharacter();
+        int num = (int)PlayerManager.Instance.GetClientIndex(id);
         Debug.Log("프로필 변경, 현재 플레이어 인덱스 : " + num);
-        GameManager.Instance.profileBackground.color = GameManager.Instance.playerColors[num];
+        GameManager.Instance.profileBackground.color = GameManager.Instance.playerColors[num]; //프로필 배경 색 변경
         GameManager.Instance.profile.sprite = GameManager.Instance.profiles[num]; //프로필 변경
+        GameManager.Instance.playerName.text = $"{PlayerManager.Instance.RetrunPlayerName(id)} 턴 진행중";
     }
 
     /*턴 종료*/
