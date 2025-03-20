@@ -36,7 +36,7 @@ public class CrowdController : MonoBehaviour
         }
 
         elapsedTime = 0f;
-        GetComponent<Animator>().SetTrigger("Reset");
+
         // 점프 하강
         while (elapsedTime < jumpDuration / 2)
         {

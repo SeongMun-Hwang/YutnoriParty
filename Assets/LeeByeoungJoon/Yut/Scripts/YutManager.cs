@@ -318,6 +318,9 @@ public class YutManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("기회 없음!");
             return;
         }
+
+        Debug.Log("버튼 프레스 아이디 : " + NetworkManager.Singleton.LocalClientId);
+
         //누르고 있는 동안 파워 게이지 작동
         powerAmount = 0;
         powerStartTime = Time.time;
@@ -348,10 +351,13 @@ public class YutManager : NetworkBehaviour
         //버튼 풀려있으면 작동 안되게함
         if (!isThrowButtonDown) return;
 
+        Debug.Log("버튼 릴리즈 아이디 : " + NetworkManager.Singleton.LocalClientId);
+
         //버튼 풀면 파워게이지 멈추고
         isThrowButtonDown = false;
-        isThrower = false;
         CallPowerGaugeSyncRpc(NetworkManager.Singleton.LocalClientId, false, powerAmount);
+
+        isThrower = false;
 
         //윷 몇개 던질지 확인하고, 현재 파워로 던짐
         ThrowYutsServerRpc(yutNum, Mathf.Clamp(minThrowPower + (maxThrowPower - minThrowPower) * powerAmount, minThrowPower, maxThrowPower), new ServerRpcParams());
