@@ -45,16 +45,17 @@ public class YutManager : NetworkBehaviour
     int faceDown = 0;
     int powerAmountSign = 1;
     float yutRaycastLength = 10;
-    float minThrowPower = 200; //최소 파워
-    float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
+    public float minThrowPower = 220; //최소 파워
+    public float maxThrowPower = 320; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float minTorque = 6; //최소 토크
-    float maxTorque = 15; //최대 토크
+    public float minTorque = 6; //최소 토크
+    public float maxTorque = 10; //최대 토크
     float yutSpacing = 2;
     float waitTime = 10;
     float waitInterval = 0.5f;
     float powerAmount = 0;
+    bool autoYut = false;
     bool isThrower = false;
     bool backDo = false;
     bool isThrowButtonDown = false;
@@ -235,6 +236,21 @@ public class YutManager : NetworkBehaviour
             //YutResultCount();
         }
 
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (!autoYut)
+            {
+                autoYut = true;
+                throwChance = 100;
+            }
+            else
+            {
+                autoYut= false;
+                throwChance = 0;
+            }
+            //YutResultCount();
+        }
+
         if (Input.GetKeyDown(KeyCode.Y))
         {
             int backdoCnt, doCnt, gaeCnt, gurCnt, yutCnt, moCnt;
@@ -402,11 +418,13 @@ public class YutManager : NetworkBehaviour
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
             float randomSign = Mathf.Sign(Random.Range(-1, 1));
             float randomTorque = Random.Range(minTorque, maxTorque); //최소한 한바퀴 이상 돌 수 있게 토크 조절
-            yut.Rigidbody.AddForce(Vector3.up * 250, ForceMode.Impulse); //250 ~ 300
-            yut.Rigidbody.AddTorque(Random.insideUnitSphere.normalized * 10 * randomSign, ForceMode.Impulse);
-            //yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+            yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse); //250 ~ 300
+            //yut.Rigidbody.AddTorque(Random.insideUnitSphere.normalized * 15 * randomSign, ForceMode.Impulse); //6~
+            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
 
-            
+            float randomOtherTorgue = Random.Range(-2f, 2f);
+            yut.Rigidbody.AddTorque(yut.transform.up * randomOtherTorgue, ForceMode.Impulse);
+            yut.Rigidbody.AddTorque(yut.transform.right * randomOtherTorgue, ForceMode.Impulse);
 
             yut.torqueSign = randomSign; //토크 부호 저장
             yut.soundActivated = true; //사운드 켬
@@ -414,6 +432,11 @@ public class YutManager : NetworkBehaviour
         }
         
         StartCoroutine(YutResultCheck(0, yutNums, rpcParams));
+    }
+
+    float GetRandomSign()
+    {
+        return Mathf.Sign(Random.Range(-1, 1));
     }
 
     IEnumerator YutCollisionOn(Yut yut, float second)
@@ -638,6 +661,7 @@ public class YutManager : NetworkBehaviour
                 AddYutResultClientRpc(YutResult.Error, senderId);
                 break;
         }
+
         EndYutCalculatingRpc();
 
         //null 리턴하면 코루틴이 안멈추나? break랑 다른건?
@@ -650,6 +674,18 @@ public class YutManager : NetworkBehaviour
         isCalulating = false;
         isYutFalled = false;
         powerGauge.fillAmount = 1f;
+
+        if (autoYut)
+        {
+            CallYutThrow();
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    void CallYutThrow()
+    {
+        ThrowYutsServerRpc(4, Random.Range(minThrowPower, maxThrowPower), new ServerRpcParams());
+        throwChance--;
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
