@@ -1,9 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class YutGrabGameManager : NetworkBehaviour
 {
@@ -18,6 +18,7 @@ public class YutGrabGameManager : NetworkBehaviour
     [SerializeField] private GameObject loseMessageUI;
     [SerializeField] private GameObject howToPlayUI;
     [SerializeField] private GameObject guidePanel;
+    [SerializeField] private Image outLine;
 
     //카메라 UI
     [SerializeField] Canvas camOutlineCanvas;
@@ -169,9 +170,30 @@ public class YutGrabGameManager : NetworkBehaviour
         {
             idx = playerIds.IndexOf(id);
             camOutlineCanvas.worldCamera = cameras[idx];
+            Color color = GameManager.Instance.playerColors[PlayerManager.Instance.GetClientIndex(id)];
+            outLine.color = color;
+            outLine.GetComponent<Shadow>().effectColor = color;
+
+            StartCoroutine(BlinkingOutline());
         }
 
         Debug.Log("카메라 세팅 완료");
+    }
+
+    IEnumerator BlinkingOutline()
+    {
+        int blinkNum = 3;
+        WaitForSecondsRealtime time = new WaitForSecondsRealtime(0.5f);
+        while (blinkNum > 0)
+        {
+            yield return time;
+            outLine.gameObject.SetActive(false);
+
+            yield return time;
+            outLine.gameObject.SetActive(true);
+
+            blinkNum--;
+        }
     }
 
     [Rpc(SendTo.Server)]

@@ -305,11 +305,12 @@ public class MainGameProgress : NetworkBehaviour
     [ClientRpc]
     void ProfileChangeClientRpc(ulong id)
     {
-        int num = (int)PlayerManager.Instance.GetClientIndex(id);
+        int num = PlayerManager.Instance.GetClientIndex(id);
         Debug.Log("프로필 변경, 현재 플레이어 인덱스 : " + num);
         GameManager.Instance.profileBackground.color = GameManager.Instance.playerColors[num]; //프로필 배경 색 변경
         GameManager.Instance.profile.sprite = GameManager.Instance.profiles[num]; //프로필 변경
         GameManager.Instance.playerName.text = $"{PlayerManager.Instance.RetrunPlayerName(id)} 턴 진행중";
+        Debug.Log($"이름 : {PlayerManager.Instance.RetrunPlayerName(id)}, id : {id}");
     }
 
     /*턴 종료*/

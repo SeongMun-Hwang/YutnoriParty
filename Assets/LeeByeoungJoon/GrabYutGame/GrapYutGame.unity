@@ -2036,6 +2036,7 @@ GameObject:
   - component: {fileID: 510539855}
   - component: {fileID: 510539857}
   - component: {fileID: 510539856}
+  - component: {fileID: 510539858}
   m_Layer: 12
   m_Name: OutLine
   m_TagString: Untagged
@@ -2100,6 +2101,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 510539854}
   m_CullTransparentMesh: 1
+--- !u!114 &510539858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510539854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_EffectDistance: {x: -7.88, y: -8.34}
+  m_UseGraphicAlpha: 1
 --- !u!1 &591790790
 GameObject:
   m_ObjectHideFlags: 0
@@ -5356,6 +5372,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 71154782}
     m_Modifications:
+    - target: {fileID: 714916745518609723, guid: 6df5b235f26573a49a9f89cf7442a8b2, type: 3}
+      propertyPath: outLine
+      value: 
+      objectReference: {fileID: 510539856}
     - target: {fileID: 714916745518609723, guid: 6df5b235f26573a49a9f89cf7442a8b2, type: 3}
       propertyPath: gameScene
       value: 
