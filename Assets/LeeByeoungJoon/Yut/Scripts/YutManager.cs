@@ -49,7 +49,7 @@ public class YutManager : NetworkBehaviour
     float maxThrowPower = 300; //최대 파워(파워 계산은 얘 기반이라 이걸로 조절)
     float powerTimeOut = 3; //자동으로 던져지는 시간
     float powerStartTime = 0;
-    float minTorque = 10; //최소 토크
+    float minTorque = 6; //최소 토크
     float maxTorque = 15; //최대 토크
     float yutSpacing = 2;
     float waitTime = 10;
@@ -402,9 +402,11 @@ public class YutManager : NetworkBehaviour
             //윷에 힘을 가해 위쪽 방향으로 던지고, 랜덤한 토크를 가해 앞 뒷면을 조절한다
             float randomSign = Mathf.Sign(Random.Range(-1, 1));
             float randomTorque = Random.Range(minTorque, maxTorque); //최소한 한바퀴 이상 돌 수 있게 토크 조절
-            yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse);
-            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+            yut.Rigidbody.AddForce(Vector3.up * 250, ForceMode.Impulse); //250 ~ 300
+            yut.Rigidbody.AddTorque(Random.insideUnitSphere.normalized * 10 * randomSign, ForceMode.Impulse);
             //yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+
+            
 
             yut.torqueSign = randomSign; //토크 부호 저장
             yut.soundActivated = true; //사운드 켬
