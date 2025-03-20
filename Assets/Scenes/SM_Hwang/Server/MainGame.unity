@@ -7414,6 +7414,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2809248375023208505, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4126322290754499463, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: m_Name
       value: YutManager
@@ -7421,6 +7425,10 @@ PrefabInstance:
     - target: {fileID: 4126322290754499463, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4678014231801173711, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5425832162161682363, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: m_IsActive
