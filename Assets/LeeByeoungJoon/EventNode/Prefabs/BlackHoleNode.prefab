@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 336249788408371823}
   - component: {fileID: 1800870651808513516}
   - component: {fileID: 2651824963815844339}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BlackHole
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2085421059181836290}
   - component: {fileID: 755964558630643108}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 7892072990628403454}
   - component: {fileID: 1919938040652643822}
   - component: {fileID: 1779275147449200913}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BlackHole(1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 2825413709849188872}
   - component: {fileID: 4279125510749765003}
   - component: {fileID: 527580223969192340}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BlackHole(2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 1067749530059622033}
   - component: {fileID: 1472585617211472163}
   - component: {fileID: 1345897297486030204}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BlackHoleCore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -411,7 +411,7 @@ GameObject:
   - component: {fileID: 5683779139776893250}
   - component: {fileID: 413136117341382017}
   - component: {fileID: 970766919658117667}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BlackHoleNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}

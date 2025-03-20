@@ -12,6 +12,7 @@ public class MinigameManager : NetworkBehaviour
     public static MinigameManager Instance { get { return instance; } }
 
     public NetworkVariable<int> maxPlayers;
+    public NetworkVariable<bool> minigameStart = new NetworkVariable<bool>(false);
 
     // 추후 미니게임이 추가될 때, Define 클래스의 MinigameType 열거형과 씬의 이름을 추가할 것
     private Dictionary<Define.MinigameType, string> MinigameScenes = new Dictionary<Define.MinigameType, string>()
@@ -29,6 +30,7 @@ public class MinigameManager : NetworkBehaviour
     public List<ulong> playerList;
     public Define.MGPlayerType playerType;
     private bool isRandomGame = true;
+    public bool isCheat = false;
 
     [SerializeField] private List<GameObject> HideableWhenMinigame;
 
@@ -43,14 +45,14 @@ public class MinigameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (IsServer)
-        {
-            MinigameButtonUI.SetActive(true);
-        }
-        else
-        {
-            MinigameButtonUI.SetActive(false);
-        }
+        //if (IsServer)
+        //{
+        //    MinigameButtonUI.SetActive(true);
+        //}
+        //else
+        //{
+        //    MinigameButtonUI.SetActive(false);
+        //}
 
         if (instance == null)
         {
@@ -67,6 +69,8 @@ public class MinigameManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            if (MainGameProgress.Instance.isGameEnd.Value) { return; }
+            minigameStart.Value = true;
             if (!isRandomGame)
             {
                 StartMiniGameClientRpc();
@@ -142,6 +146,8 @@ public class MinigameManager : NetworkBehaviour
     // 참가자의 목록만 인자로 지정해주면 나머지는 자동으로 관전자로 정해짐
     public void SetPlayers(ulong[] players)
     {
+        if (NetworkManager.Singleton.IsServer && MainGameProgress.Instance.isGameEnd.Value) { return; }
+
         playerTypes = new Dictionary<ulong, Define.MGPlayerType>();
         maxPlayers.Value = players.Length;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
@@ -175,6 +181,7 @@ public class MinigameManager : NetworkBehaviour
     [ClientRpc]
     void EndMiniGameClientRpc()
     {
+        if (IsServer) { minigameStart.Value = false; }
         StartCoroutine(LoadSceneWithFade(1f, true));
     }
 
@@ -217,7 +224,7 @@ public class MinigameManager : NetworkBehaviour
             }
         }
 
-        devCheatMinigameMenuUI.SetActive(isUnloading && IsServer);
+        devCheatMinigameMenuUI.SetActive(isCheat && isUnloading && IsServer);
         foreach (var go in HideableWhenMinigame)
         {
             go.SetActive(isUnloading);

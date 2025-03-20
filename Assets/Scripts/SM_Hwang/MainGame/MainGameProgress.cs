@@ -16,6 +16,7 @@ public class MainGameProgress : NetworkBehaviour
     public System.Action endMinigameActions;
     public ulong winnerId;
     bool _isMinigamePlaying = false;
+    public NetworkVariable<bool> isGameEnd = new NetworkVariable<bool>(false);
     public bool isMinigamePlaying
     {
         get => _isMinigamePlaying;
@@ -60,8 +61,24 @@ public class MainGameProgress : NetworkBehaviour
         numOfPlayer = NetworkManager.ConnectedClients.Count;
         currentPlayerNumber.Value = UnityEngine.Random.Range(0, numOfPlayer);
         YutManager.Instance.HideYutRpc(); //윷 안보이게 함
+        ActivateCanvasClientRpc(); //캔버스 여기서 한번만 켬
+        //SpawnCanvasServerRpc();
         StartTurn((int)NetworkManager.ConnectedClientsIds[currentPlayerNumber.Value]);
     }
+
+    [ClientRpc]
+    void ActivateCanvasClientRpc()
+    {
+        GameManager.Instance.inGameCanvas.SetActive(true);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SpawnCanvasServerRpc()
+    {
+        Debug.Log("캔버스 스폰됨??" + GameManager.Instance.inGameCanvas.GetComponent<NetworkObject>().IsSpawned);
+        //GameManager.Instance.inGameCanvas.GetComponent<NetworkObject>().Spawn();
+    }
+
     /*턴 시작*/
     //누구의 턴인지 공지
     void StartTurn(int n)
@@ -77,7 +94,8 @@ public class MainGameProgress : NetworkBehaviour
     public void SpawnInGameCanvasClientRpc(ClientRpcParams clientRpcParams = default)
     {
         Debug.Log("Spawn canvas client rpc");
-        GameManager.Instance.inGameCanvas.SetActive(true);
+        //GameManager.Instance.inGameCanvas.SetActive(true);
+        GameManager.Instance.blockCanvas.SetActive(false);
         YutManager.Instance.throwChance++;
         //StartCoroutine(WaitForCanvasAndActivate());
     }
@@ -265,6 +283,8 @@ public class MainGameProgress : NetworkBehaviour
             Debug.Log("End turn");
             GameManager.Instance.inGameCanvas.SetActive(false);
             ChangeCurrentPlayer(null);
+            //GameManager.Instance.inGameCanvas.SetActive(false);
+            GameManager.Instance.blockCanvas.SetActive(true);
             DestoryCharacterOnStartNode();
             EndTurnServerRpc();
         }
@@ -499,8 +519,7 @@ public class MainGameProgress : NetworkBehaviour
                     EventNodeManager.Instance.EscapeIslandCallRpc(enemyNetObj);
                 }
 
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(playerId) + "무승부!", 2f);
-                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(PlayerManager.Instance.RetrunPlayerName(enemyId) + "무승부!", 2f);
+                GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("무승부!", 2f);
 
                 PlayerManager.Instance.DespawnCharacterServerRpc(player, playerId);
                 PlayerManager.Instance.DespawnCharacterServerRpc(enemy, enemyId);

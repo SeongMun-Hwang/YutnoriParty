@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6720571551579654681}
   - component: {fileID: 3810007676641776286}
   - component: {fileID: 8451069318697490207}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Obstacle
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -147,4 +147,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 956189666dbe3a04e92b66a635ba2598, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   obstacle_Destructed: {fileID: 8147084086453631467, guid: 54e29dda2feab8644ba437a07d78a2d9, type: 3}

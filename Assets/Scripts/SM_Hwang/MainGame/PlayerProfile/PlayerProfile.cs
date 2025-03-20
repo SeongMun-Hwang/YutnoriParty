@@ -74,4 +74,10 @@ public class PlayerProfile : MonoBehaviour
             }
         }
     }
+
+    private void OnDisable()
+    {
+        TopEmojiSlot.transform.parent.gameObject.SetActive(false);
+        BottomEmojiSlot.transform.parent.gameObject.SetActive(false);
+    }
 }

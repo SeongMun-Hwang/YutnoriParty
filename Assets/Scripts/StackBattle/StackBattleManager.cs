@@ -31,11 +31,14 @@ public class StackBattleManager : NetworkBehaviour
     private bool timeover = false;
 	public BlockSpawnHandler spawner;
 
+    [SerializeField] List<GameObject> playerObjects;
+
     // UI관련
     public Button turnButton;
     [SerializeField] private TMP_Text turnText;
 	[SerializeField] private TMP_Text timerUI;
 	[SerializeField] private List<TMP_Text> usernameUI;
+    [SerializeField] private GameObject guidePanel;
     [SerializeField] private GameObject winMessageUI;
 	[SerializeField] private GameObject loseMessageUI;
 
@@ -109,8 +112,11 @@ public class StackBattleManager : NetworkBehaviour
 
     public void InitScoreBoardUI(bool previousValue, bool newValue)
     {
+        guidePanel.SetActive(false);
         for (int i = 0; i < playerIds.Count; i++)
         {
+            int order = GameManager.Instance.GetOrderOfPlayerById(playerIds[i]);
+            playerObjects[order].SetActive(true);
             usernameUI[i].transform.parent.gameObject.SetActive(true);
             foreach (PlayerProfileData data in GameManager.Instance.playerBoard.playerProfileDatas)
             {

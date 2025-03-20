@@ -4,6 +4,7 @@ using UnityEngine;
 public class Obstacle : NetworkBehaviour
 {
     [SerializeField] GameObject obstacle_Destructed;
+    public NetworkVariable<ulong> ownerId = new NetworkVariable<ulong>(99);
     private void OnDestroy()
     {
         if (IsServer)

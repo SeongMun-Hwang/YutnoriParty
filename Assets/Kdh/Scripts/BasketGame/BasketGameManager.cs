@@ -15,6 +15,7 @@ public class BasketGameManager : NetworkBehaviour
     [SerializeField] private GameObject winnerTextCanvas;
     [SerializeField] private GameObject winMessageUI;
     [SerializeField] private GameObject loseMessageUI;
+    [SerializeField] private GameObject guidePanel;
 
     private NetworkList<ulong> playerIds = new NetworkList<ulong>(); 
     private List<GameObject> basketObjects = new List<GameObject>();
@@ -130,7 +131,7 @@ public class BasketGameManager : NetworkBehaviour
         if (countdown > 0)
             countdownText.text = countdown.ToString();
         else if (countdown == 0)
-            countdownText.text = "GO!";
+            countdownText.text = "시작!";
         else
             countdownText.gameObject.SetActive(false);
     }
@@ -138,7 +139,7 @@ public class BasketGameManager : NetworkBehaviour
     [ClientRpc]
     private void StartGameClientRpc()
     {
-
+        guidePanel.SetActive(false);
         if (scoreBoardText != null)
         {
             scoreBoardText.transform.parent.gameObject.SetActive(true);
@@ -190,9 +191,9 @@ public class BasketGameManager : NetworkBehaviour
         if (remainingTimeText != null)
         {
             if (time > 0)
-                remainingTimeText.text = $"Time: {time}s";
+                remainingTimeText.text = $"남은 시간: {time}초";
             else
-                remainingTimeText.text = "Finish!";
+                remainingTimeText.text = "게임 종료!";
         }
     }
 

@@ -144,7 +144,8 @@ public class CharacterBoardMovement : MonoBehaviour
     {
         List<GameObject> spawnedDesObjects = new List<GameObject>();
         Dictionary<GameObject, Node> objectToNodeMap = new Dictionary<GameObject, Node>();
-
+        GameObject arrowPrefab = Resources.Load<GameObject>("ArrowPrefab");
+        List<GameObject> spawnedArrows = new List<GameObject>();
         //가능한 모든 경로에 자신 복제
         foreach (Node node in possibleNodes)
         {
@@ -152,7 +153,15 @@ public class CharacterBoardMovement : MonoBehaviour
             Destroy(desInstance.GetComponent<CharacterBoardMovement>());
             spawnedDesObjects.Add(desInstance);
             objectToNodeMap[desInstance] = node;
+            if (arrowPrefab != null)
+            {
+                GameObject arrowInstance = Instantiate(arrowPrefab, desInstance.transform);
+                arrowInstance.transform.localPosition = new Vector3(0, 3f, 0); // 캐릭터 머리 위로 이동
+                arrowInstance.transform.localRotation = Quaternion.Euler(0, -45, 0);
+                spawnedArrows.Add(arrowInstance);
+            }
         }
+    
         //selectedNode 비움
         selectedNode = null;
         while (selectedNode == null)
@@ -174,6 +183,10 @@ public class CharacterBoardMovement : MonoBehaviour
         foreach (GameObject desInstance in spawnedDesObjects)
         {
             Destroy(desInstance);
+        }
+        foreach (GameObject arrow in spawnedArrows)
+        {
+            Destroy(arrow);
         }
     }
     private void OnTriggerEnter(Collider other)

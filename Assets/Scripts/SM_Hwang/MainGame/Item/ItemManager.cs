@@ -98,9 +98,10 @@ public class ItemManager : NetworkBehaviour
         no.GetComponent<CharacterInfo>().isReverse.Value = value;
     }
     [ServerRpc(RequireOwnership =false)]
-    public void SetObstacleServerRpc(Vector3 pos)
+    public void SetObstacleServerRpc(Vector3 pos, ulong id)
     {
         GameObject go=Instantiate(obstaclePrefab,pos,Quaternion.identity);
+        go.GetComponent<Obstacle>().ownerId.Value = id;
         go.GetComponent<NetworkObject>().Spawn();
     }
     [ServerRpc(RequireOwnership = false)]

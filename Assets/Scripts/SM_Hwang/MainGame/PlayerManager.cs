@@ -43,7 +43,7 @@ public class PlayerManager : NetworkBehaviour
             GameManager.Instance.announceCanvas.ShowAnnounceText("먼저 던지세요!");
             return;
         }
-        if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0] == YutResult.BackDo && currentCharacters.Count > 0)
+        if (YutManager.Instance.Results.Count == 1 && YutManager.Instance.Results[0].yutResult == YutResult.BackDo && currentCharacters.Count > 0)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("백도를 이동하세요!");
             return;
@@ -176,6 +176,7 @@ public class PlayerManager : NetworkBehaviour
     {
         GameManager.Instance.winnerName.Value = ServerSingleton.Instance.clientIdToUserData[id].userName;
         GameManager.Instance.winnerCharacterIndex.Value = index;
+        MainGameProgress.Instance.isGameEnd.Value = true;
         GoToAwardSceneClientRpc("", "");
     }
 

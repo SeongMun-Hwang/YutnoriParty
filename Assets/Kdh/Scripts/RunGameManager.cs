@@ -30,6 +30,7 @@ public class RunGameManager : NetworkBehaviour
 
     /*추가 부분*/
     [SerializeField] public Camera runGameCamera;
+    public GameObject guidePanel;
     private static RunGameManager instance;
     public static RunGameManager Instance
     {
@@ -118,7 +119,10 @@ public class RunGameManager : NetworkBehaviour
         if (countdown > 0)
             countdownText.text = countdown.ToString();
         else if (countdown == 0)
-            countdownText.text = "GO!";
+        {
+            countdownText.text = "시작!";
+            guidePanel.SetActive(false);
+        }
         else
             countdownText.gameObject.SetActive(false);
     }

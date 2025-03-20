@@ -23,6 +23,7 @@ public class LuckyCalcManager : NetworkBehaviour
     public TMP_Text opertorText;
     public TMP_Text leftOperandText;
     public TMP_Text rightOperandText;
+    [SerializeField] private GameObject guidePanel;
     [SerializeField] private GameObject cardPrefabs;
     [SerializeField] private Transform cardParent;
     [SerializeField] private List<TMP_Text> usernameUI;
@@ -86,6 +87,7 @@ public class LuckyCalcManager : NetworkBehaviour
 
     public void InitScoreBoardUI(bool previousValue, bool newValue)
     {
+        guidePanel.SetActive(false);
         for (int i = 0; i < playerIds.Count; i++)
         {
             usernameUI[i].transform.parent.gameObject.SetActive(true);
