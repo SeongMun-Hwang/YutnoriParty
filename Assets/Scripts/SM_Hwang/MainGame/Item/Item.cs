@@ -47,6 +47,11 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             {
                 GameManager.Instance.announceCanvas.ShowAnnounceText("노드를 고르세요!", 2f);
                 coroutine = StartCoroutine(ChooseNode());
+            }            
+            if (itemName == ItemName.Carry)
+            {
+                GameManager.Instance.announceCanvas.ShowAnnounceText("내 말을 고르세요!", 2f);
+                coroutine = StartCoroutine(ChooseCarryCharacter());
             }
         }
         else
@@ -54,6 +59,32 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             Debug.Log("Item deselected");
             StopCoroutine(coroutine);
             ItemManager.Instance.currentItem = null;
+        }
+    }
+    private IEnumerator ChooseCarryCharacter()
+    {
+        while (true)
+        {
+            if (Input.GetMouseButtonDown(0)) // 마우스 클릭 감지
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    if (hit.collider.TryGetComponent<NetworkObject>(out NetworkObject no))
+                    {
+                        if (itemName == ItemName.Carry)
+                        {
+                            if (no.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+                            {
+                                ItemManager.Instance.CarryCharacter(no.gameObject);
+                                ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId,itemName);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            yield return null;
         }
     }
     /*아이템 적용 대상 선택(상대)*/
@@ -69,7 +100,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                 {
                     if (hit.collider.TryGetComponent<NetworkObject>(out NetworkObject no))
                     {
-                        if (no.OwnerClientId != NetworkManager.Singleton.LocalClientId)
+                        if (itemName == ItemName.ReverseMove)
                         {
                             Debug.Log("Find target");
                             if (no.GetComponent<CharacterInfo>().isReverse.Value)
@@ -143,6 +174,11 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             case ItemName.Obstacle:
                 TooltipManager.Instance.DrawTooltip(
                     "장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.", TooltipManager.TooltipType.Item
+                    );
+                break;
+            case ItemName.Carry:
+                TooltipManager.Instance.DrawTooltip(
+                    "업기", "바로 말을 하나 업습니다! 사기템!", TooltipManager.TooltipType.Item
                     );
                 break;
         }

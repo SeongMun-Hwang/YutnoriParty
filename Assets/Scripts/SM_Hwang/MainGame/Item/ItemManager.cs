@@ -3,12 +3,14 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
+using System.Collections;
 
 public enum ItemName
 {
     ChanceUp,
     ReverseMove,
     Obstacle,
+    Carry,
     None
 }
 public class ItemManager : NetworkBehaviour
@@ -26,8 +28,10 @@ public class ItemManager : NetworkBehaviour
     [SerializeField] Sprite obstacleImg;
     [SerializeField] Sprite reverseImg;
     [SerializeField] Sprite chanceUpImg;
+    [SerializeField] Sprite carryImg;
 
     public GameObject currentItem;
+
     public override void OnNetworkSpawn()
     {
         if (IsClient) { instance = this; }
@@ -56,6 +60,10 @@ public class ItemManager : NetworkBehaviour
                 go.GetComponent<Item>().SetItemName(ItemName.Obstacle);
                 go.GetComponent<Item>().itemImg.sprite = obstacleImg;
                 SetItemProfileServerRpc(targetId, ItemName.Obstacle, 1);
+                break;            
+            case ItemName.Carry:
+                go.GetComponent<Item>().SetItemName(ItemName.Carry);
+                go.GetComponent<Item>().itemImg.sprite = carryImg;
                 break;
         }
         itemLists.Add(go);
@@ -151,5 +159,17 @@ public class ItemManager : NetworkBehaviour
     {
         string playerName = PlayerManager.Instance.RetrunPlayerName(clientId);
         GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc(playerName + "가 " + text + " 아이템을 사용했습니다!", 2f);
+    }
+    public void CarryCharacter(GameObject parent)
+    {
+        ItemManager.Instance.ItemUseAnnounceServerRpc("업기", NetworkManager.Singleton.LocalClientId);
+        PlayerManager.Instance.SpawnCharacter();
+        StartCoroutine(wait(parent));
+    }
+    public IEnumerator wait(GameObject parent)
+    {
+        yield return new WaitForSeconds(0.5f);
+        PlayerManager.Instance.OverlapCharacter(parent.gameObject, MainGameProgress.Instance.currentCharacter.gameObject);
+        MainGameProgress.Instance.ChangeCurrentPlayer(parent.gameObject);
     }
 }

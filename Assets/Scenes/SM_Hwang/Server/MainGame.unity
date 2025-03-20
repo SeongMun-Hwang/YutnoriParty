@@ -7446,6 +7446,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: -740
       objectReference: {fileID: 0}
+    - target: {fileID: 6904261757083183811, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
+      propertyPath: carryImg
+      value: 
+      objectReference: {fileID: 21300000, guid: 6217b2f9b0c967845bd094e335cbd6e3, type: 3}
     - target: {fileID: 7317005755051212874, guid: 5a3cc4f84c8015f4fb63ce54bf2124a0, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1860156455
