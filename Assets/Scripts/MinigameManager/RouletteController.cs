@@ -150,6 +150,8 @@ public class RouletteController : NetworkBehaviour
 
     public void CloseRouletteForce()
     {
+        typePanelList[battleType].SetActive(false);
         RoulettePanel.SetActive(false);
+        TypePanel.SetActive(false);
     }
 }
