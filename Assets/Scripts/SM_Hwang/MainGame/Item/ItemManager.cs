@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
+using System.Collections;
 
 public enum ItemName
 {
@@ -30,6 +31,7 @@ public class ItemManager : NetworkBehaviour
     [SerializeField] Sprite carryImg;
 
     public GameObject currentItem;
+
     public override void OnNetworkSpawn()
     {
         if (IsClient) { instance = this; }
@@ -160,9 +162,14 @@ public class ItemManager : NetworkBehaviour
     }
     public void CarryCharacter(GameObject parent)
     {
+        ItemManager.Instance.ItemUseAnnounceServerRpc("업기", NetworkManager.Singleton.LocalClientId);
         PlayerManager.Instance.SpawnCharacter();
-        MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
-        PlayerManager.Instance.OverlapCharacter(parent, MainGameProgress.Instance.currentCharacter.gameObject);
-        parent.gameObject.GetComponent<Outline>().EnableOutline();
+        StartCoroutine(wait(parent));
+    }
+    public IEnumerator wait(GameObject parent)
+    {
+        yield return new WaitForSeconds(0.5f);
+        PlayerManager.Instance.OverlapCharacter(parent.gameObject, MainGameProgress.Instance.currentCharacter.gameObject);
+        MainGameProgress.Instance.ChangeCurrentPlayer(parent.gameObject);
     }
 }

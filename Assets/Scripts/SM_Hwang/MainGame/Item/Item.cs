@@ -76,15 +76,8 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                         {
                             if (no.OwnerClientId == NetworkManager.Singleton.LocalClientId)
                             {
-                                Debug.Log("target name : " + no.gameObject.name);
-                                ItemManager.Instance.ItemUseAnnounceServerRpc("업기", NetworkManager.Singleton.LocalClientId);
-                                Debug.Log("업을 말 찾음");
-                                PlayerManager.Instance.SpawnCharacter();
-                                MainGameProgress.Instance.currentCharacter.GetComponent<Outline>().DisableOutline();
-                                PlayerManager.Instance.OverlapCharacter(no.gameObject, MainGameProgress.Instance.currentCharacter.gameObject);
-                                no.gameObject.GetComponent<Outline>().EnableOutline();
-
-                                ItemManager.Instance.RemoveItem();
+                                ItemManager.Instance.CarryCharacter(no.gameObject);
+                                ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId,itemName);
                                 break;
                             }
                         }
@@ -181,6 +174,11 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             case ItemName.Obstacle:
                 TooltipManager.Instance.DrawTooltip(
                     "장애물", "특정 위치에 장애물을 배치합니다. 장애물에 부딪힌 말은 그 자리에서 이동을 멈춥니다.", TooltipManager.TooltipType.Item
+                    );
+                break;
+            case ItemName.Carry:
+                TooltipManager.Instance.DrawTooltip(
+                    "업기", "바로 말을 하나 업습니다! 사기템!", TooltipManager.TooltipType.Item
                     );
                 break;
         }
