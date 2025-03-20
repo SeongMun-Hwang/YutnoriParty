@@ -268,6 +268,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a018996525816848ba1def434e55708, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8404653918543052014}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a018996525816848ba1def434e55708, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4695458249420449567}
   m_SourcePrefab: {fileID: 100100000, guid: 5a018996525816848ba1def434e55708, type: 3}
 --- !u!4 &237751286760727404 stripped
 Transform:
@@ -359,6 +362,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 5457195156965778172}
+--- !u!114 &-4695458249420449567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835745920466049348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca167d331b5e914789558f1e8fe11c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
