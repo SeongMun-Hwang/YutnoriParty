@@ -142,6 +142,8 @@ public class CharacterBoardMovement : MonoBehaviour
     /*이동 가능 목적지에 캐릭터 복제, 마우스로 클릭*/
     private IEnumerator SpawnAndSelectNode(List<Node> possibleNodes)
     {
+        GameManager.Instance.announceCanvas.ShowAnnounceText("진행 방향을 고르세요!", 2f);
+
         List<GameObject> spawnedDesObjects = new List<GameObject>();
         Dictionary<GameObject, Node> objectToNodeMap = new Dictionary<GameObject, Node>();
         GameObject arrowPrefab = Resources.Load<GameObject>("ArrowPrefab");
