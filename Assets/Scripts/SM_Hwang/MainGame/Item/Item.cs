@@ -36,7 +36,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
             {
                 YutManager.Instance.throwChance++;
                 ItemManager.Instance.ItemUseAnnounceServerRpc("한 번 더", NetworkManager.Singleton.LocalClientId);
-                ItemManager.Instance.RemoveItem();
+                ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId, itemName);
             }
             if (itemName == ItemName.ReverseMove)
             {
@@ -73,7 +73,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                         {
                             ItemManager.Instance.ItemUseAnnounceServerRpc("혼란", NetworkManager.Singleton.LocalClientId);
                             Debug.Log("Find target");
-                            ItemManager.Instance.RemoveItem();
+                            ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId, itemName);
                             ItemManager.Instance.SpawnItemEffectServerRpc(no);
                             ItemManager.Instance.SetItemServerRpc(no, true);
                             break;
@@ -98,7 +98,7 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                         Debug.Log("Find Node");
                         ItemManager.Instance.ItemUseAnnounceServerRpc("장애물", NetworkManager.Singleton.LocalClientId);
                         ItemManager.Instance.SetObstacleServerRpc(no.transform.position, NetworkManager.Singleton.LocalClientId);
-                        ItemManager.Instance.RemoveItem();
+                        ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId, itemName);
                     }
                 }
             }

@@ -30,7 +30,6 @@ public class GameManager : NetworkBehaviour
     public Node startNode;
     public Node blackNode;
     public List<GameObject> playerCharacters;
-    public List<Transform> profilePositions;
     public List<GameObject> hideableWhenOtherScene;
     public bool isEmojiDelay = false;
     public List<Sprite> emojiList;
@@ -38,6 +37,7 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<FixedString128Bytes> lobbyName = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> winnerName = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<int> winnerCharacterIndex = new NetworkVariable<int>();
+    public List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
     public override void OnNetworkSpawn()
     {
         if(IsServer) lobbyId.Value = HostSingleton.Instance.ReturnJoinCode();

@@ -11,6 +11,14 @@ public class PlayerProfile : MonoBehaviour
     [SerializeField] TextMeshProUGUI playerNameTmp;
     [SerializeField] TextMeshProUGUI characterNumber;
 
+    //Item info
+    [SerializeField] TextMeshProUGUI yutChanceItemNumTmp;
+    [SerializeField] TextMeshProUGUI obstacleItemNumTmp;
+    [SerializeField] TextMeshProUGUI confuseItemNumTmp;
+    private int chanceUpItemNum = 0;
+    private int obstacleItemNum = 0;
+    private int confuseItemNum = 0;
+
     public List<Color32> ProfileColor;
     public List<Sprite> ProfileSpriteList;
     public Transform CharacterIconList;
@@ -21,6 +29,11 @@ public class PlayerProfile : MonoBehaviour
     public ulong clientId;
     public FixedString128Bytes username;
     public int score;
+
+    private void OnEnable()
+    {
+        GameManager.Instance.playerProfiles.Add(this);
+    }
 
     public void SetData(ulong clientId, FixedString128Bytes username, int score)
     {
@@ -74,10 +87,28 @@ public class PlayerProfile : MonoBehaviour
             }
         }
     }
-
     private void OnDisable()
     {
         TopEmojiSlot.transform.parent.gameObject.SetActive(false);
         BottomEmojiSlot.transform.parent.gameObject.SetActive(false);
+        GameManager.Instance.playerProfiles.Remove(this);
+    }
+    public void SetItemData(ItemName itemName, int num)
+    {
+        switch (itemName)
+        {
+            case ItemName.ChanceUp:
+                chanceUpItemNum += num;
+                yutChanceItemNumTmp.text = "X" + chanceUpItemNum;
+                break;
+            case ItemName.Obstacle:
+                obstacleItemNum += num;
+                obstacleItemNumTmp.text = "X" + obstacleItemNum;
+                break;
+            case ItemName.ReverseMove:
+                confuseItemNum += num;
+                confuseItemNumTmp.text = "X" + confuseItemNum;
+                break;
+        }
     }
 }

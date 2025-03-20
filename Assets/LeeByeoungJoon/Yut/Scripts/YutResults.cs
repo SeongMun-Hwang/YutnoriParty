@@ -89,7 +89,6 @@ public class YutResults : NetworkBehaviour
             }
             return;
         }
-        ItemManager.Instance.RemoveItem();
         //버튼 누르면 윷 사라지게 함
         YutManager.Instance.HideYutRpc();
         

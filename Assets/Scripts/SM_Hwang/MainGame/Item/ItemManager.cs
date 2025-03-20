@@ -36,6 +36,7 @@ public class ItemManager : NetworkBehaviour
     public void GetItemClientRpc(ulong targetId)
     {
         if (targetId == 99) return;
+        int index = PlayerManager.Instance.GetClientIndex(targetId);
         Debug.Log("Player" + targetId + "Get Item");
         if (NetworkManager.Singleton.LocalClientId != targetId) return;
         GameObject go = Instantiate(itemPrefab, transform.position, Quaternion.identity, spawnTransform);
@@ -44,18 +45,34 @@ public class ItemManager : NetworkBehaviour
             case ItemName.ChanceUp:            
                 go.GetComponent<Item>().SetItemName(ItemName.ChanceUp);
                 go.GetComponent<Item>().itemImg.sprite = chanceUpImg;
+                SetItemProfileServerRpc(targetId, ItemName.ChanceUp, 1);
                 break;
             case ItemName.ReverseMove:
                 go.GetComponent<Item>().SetItemName(ItemName.ReverseMove);
                 go.GetComponent<Item>().itemImg.sprite = reverseImg;
+                SetItemProfileServerRpc(targetId, ItemName.ReverseMove, 1);
                 break;
             case ItemName.Obstacle:
                 go.GetComponent<Item>().SetItemName(ItemName.Obstacle);
                 go.GetComponent<Item>().itemImg.sprite = obstacleImg;
+                SetItemProfileServerRpc(targetId, ItemName.Obstacle, 1);
                 break;
         }
         itemLists.Add(go);
 
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void SetItemProfileServerRpc(ulong clientId, ItemName name, int value)
+    {
+        Debug.Log("Set item profile server rpc");
+        int index = PlayerManager.Instance.GetClientIndex(clientId);
+        SetItemProfileClientRpc(index, name, value);    
+    }
+    [ClientRpc]
+    public void SetItemProfileClientRpc(int index, ItemName name, int value)
+    {
+        Debug.Log("Set item profile client rpc");
+        GameManager.Instance.playerProfiles[index].SetItemData(name, value);
     }
     private ItemName RandomItem()
     {
@@ -76,7 +93,7 @@ public class ItemManager : NetworkBehaviour
         }
         return ItemName.None;
     }
-    public void RemoveItem()
+    public void RemoveItem(ulong clientId, ItemName itemName)
     {
         if (currentItem != null)
         {
@@ -84,6 +101,8 @@ public class ItemManager : NetworkBehaviour
             itemLists.Remove(currentItem);
             Destroy(currentItem);
             currentItem = null;
+            int index = PlayerManager.Instance.GetClientIndex(clientId);
+            SetItemProfileServerRpc(clientId, itemName, -1);
         }
     }
     public Item ReturnCurrentItem()
