@@ -76,9 +76,11 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                         {
                             if (no.OwnerClientId == NetworkManager.Singleton.LocalClientId)
                             {
-                                if (PlayerManager.Instance.ReturnNumOfCharacter() == 0)
+                                if (PlayerManager.Instance.currentCharacters.Count==PlayerManager.Instance.ReturnNumOfCharacter())
                                 {
                                     GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!");
+                                    isToggled = false;
+                                    ItemManager.Instance.ReturnCurrentItem().GetComponent<Image>().color = Color.white;
                                     yield break;
                                 }
                                 ItemManager.Instance.CarryCharacter(no.gameObject);
