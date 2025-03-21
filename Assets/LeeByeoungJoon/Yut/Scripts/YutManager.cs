@@ -236,20 +236,20 @@ public class YutManager : NetworkBehaviour
             //YutResultCount();
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            if (!autoYut)
-            {
-                autoYut = true;
-                throwChance = 100;
-            }
-            else
-            {
-                autoYut= false;
-                throwChance = 0;
-            }
-            //YutResultCount();
-        }
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    if (!autoYut)
+        //    {
+        //        autoYut = true;
+        //        throwChance = 100;
+        //    }
+        //    else
+        //    {
+        //        autoYut= false;
+        //        throwChance = 0;
+        //    }
+        //    //YutResultCount();
+        //}
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
@@ -420,7 +420,7 @@ public class YutManager : NetworkBehaviour
             float randomTorque = Random.Range(minTorque, maxTorque); //최소한 한바퀴 이상 돌 수 있게 토크 조절
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse); //250 ~ 300
             //yut.Rigidbody.AddTorque(Random.insideUnitSphere.normalized * 15 * randomSign, ForceMode.Impulse); //6~
-            yut.Rigidbody.AddTorque(yut.transform.forward * 15 * randomSign, ForceMode.Impulse);
+            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
 
             float randomOtherTorgue = Random.Range(-2f, 2f);
             yut.Rigidbody.AddTorque(yut.transform.up * randomOtherTorgue, ForceMode.Impulse);
@@ -597,6 +597,7 @@ public class YutManager : NetworkBehaviour
             //던지는 횟수 초기화
             ClearYutResuliClientRpc();
             //YutFalledRpc(false);
+            GameManager.Instance.announceCanvas.ShowAnnounceTextClientRpc("낙! 턴이 넘어갑니다!");
             ThrowChanceChangeClientRpc(-999, senderId);
             EndYutCalculatingRpc();
 
