@@ -420,7 +420,7 @@ public class YutManager : NetworkBehaviour
             float randomTorque = Random.Range(minTorque, maxTorque); //최소한 한바퀴 이상 돌 수 있게 토크 조절
             yut.Rigidbody.AddForce(Vector3.up * power, ForceMode.Impulse); //250 ~ 300
             //yut.Rigidbody.AddTorque(Random.insideUnitSphere.normalized * 15 * randomSign, ForceMode.Impulse); //6~
-            yut.Rigidbody.AddTorque(yut.transform.forward * randomTorque * randomSign, ForceMode.Impulse);
+            yut.Rigidbody.AddTorque(yut.transform.forward * 15 * randomSign, ForceMode.Impulse);
 
             float randomOtherTorgue = Random.Range(-2f, 2f);
             yut.Rigidbody.AddTorque(yut.transform.up * randomOtherTorgue, ForceMode.Impulse);
@@ -860,7 +860,14 @@ public class YutManager : NetworkBehaviour
     [ClientRpc]
     public void ClearYutResuliClientRpc()
     {
+        Debug.Log("윷 결과 리스트 클리어 요청");
         //모든 클라이언트에서 리스트 클리어
+        foreach (var result in results)
+        {
+            Debug.Log("없애줘 : " + result);
+            result.DestroyYutResult();
+        }
+
         results.Clear();
     }
 

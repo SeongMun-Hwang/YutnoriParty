@@ -131,9 +131,9 @@ public class YutResults : NetworkBehaviour
         YutManager.Instance.RemoveYutResult(yutResult); //본인거는 바로 없앰
     }
 
-    [Rpc(SendTo.NotMe)]
-    void DestroyYutResultRpc()
+    public void DestroyYutResult()
     {
-        Debug.Log(gameObject);
+        Debug.Log("윷결과 디스트로이 : " + yutResult);
+        Destroy(gameObject);
     }
 }
