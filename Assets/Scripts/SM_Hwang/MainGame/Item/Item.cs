@@ -76,6 +76,11 @@ public class Item : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
                         {
                             if (no.OwnerClientId == NetworkManager.Singleton.LocalClientId)
                             {
+                                if (PlayerManager.Instance.ReturnNumOfCharacter() == 0)
+                                {
+                                    GameManager.Instance.announceCanvas.ShowAnnounceText("소환 가능한 말이 없습니다!");
+                                    yield break;
+                                }
                                 ItemManager.Instance.CarryCharacter(no.gameObject);
                                 ItemManager.Instance.RemoveItem(NetworkManager.Singleton.LocalClientId,itemName);
                                 break;
