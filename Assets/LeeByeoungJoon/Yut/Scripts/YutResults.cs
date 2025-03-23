@@ -72,7 +72,7 @@ public class YutResults : NetworkBehaviour
         if (!MainGameProgress.Instance.currentCharacter.GetComponent<CharacterInfo>().canMove.Value)
         {
             GameManager.Instance.announceCanvas.ShowAnnounceText("무인도에 갇혔습니다!", 2f);
-            if (PlayerManager.Instance.ReturnNumOfCharacter() == 1)
+            if (PlayerManager.Instance.currentCharacters.Count >= PlayerManager.Instance.ReturnNumOfCharacter())
             {
                 YutManager.Instance.RemoveYutResult(yutResult);
                 if (YutManager.Instance.Results.Count == 0)
